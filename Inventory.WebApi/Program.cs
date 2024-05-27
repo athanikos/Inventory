@@ -1,16 +1,40 @@
+using Inventory.Users;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+
 namespace Inventory.WebApi
 {
+   // https://www.youtube.com/watch?v=S0RSsHKiD6Y
+
+
     public class Program
     {
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
+
+          
+
             // Add services to the container.
             builder.Services.AddAuthorization();
+            builder.Services.AddAuthentication().AddCookie(IdentityConstants.ApplicationScheme);
 
+            ConfigureServices.AddServices(builder.Services, builder.Configuration);
+
+            builder.Services.AddSwaggerGen();
 
             var app = builder.Build();
+
+   
+
+            if (app.Environment.IsDevelopment()) {
+                app.UseSwagger();
+                app.UseSwaggerUI();
+                app.ApplyMigrations();
+            }
+
+        
 
             // Configure the HTTP request pipeline.
 
@@ -21,7 +45,7 @@ namespace Inventory.WebApi
             var summaries = new[]
             {
             "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-        };
+             };
 
             app.MapGet("/weatherforecast", (HttpContext httpContext) =>
             {
@@ -34,7 +58,10 @@ namespace Inventory.WebApi
                     })
                     .ToArray();
                 return forecast;
-            });
+            }).RequireAuthorization();
+
+
+            app.MapIdentityApi<IdentityUser>();
 
             app.Run();
         }
