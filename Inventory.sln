@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.7.33906.173
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Inventory.Users", "Inventory.Library\Inventory.Users.csproj", "{E089E927-C4A1-484E-8513-79336C15789E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Inventory.Users", "Inventory.Users\Inventory.Users.csproj", "{E089E927-C4A1-484E-8513-79336C15789E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Inventory.WebApi", "Inventory.WebApi\Inventory.WebApi.csproj", "{87325F5C-EC1F-4B8A-A094-171E6004298F}"
 EndProject
