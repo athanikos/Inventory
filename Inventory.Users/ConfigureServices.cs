@@ -14,15 +14,17 @@ namespace Inventory.Users
             var connectionString = configuration.GetConnectionString("Users");
 
 
-            services.AddIdentityCore<User>().
-                AddEntityFrameworkStores<UsersDbContext>().
-                AddApiEndpoints();
+         
 
             services.AddDbContext<UsersDbContext>(options =>
                                                    options.UseSqlServer(connectionString)
                 
-
                 );
+
+            services.AddIdentityCore<IdentityUser>().
+             AddEntityFrameworkStores<UsersDbContext>().
+             AddApiEndpoints();
+
 
             //services.AddScoped<UsersDbContext>(provider
             //    => provider.GetRequiredService<UsersDbContext>());
