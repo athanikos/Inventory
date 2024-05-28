@@ -8,7 +8,8 @@ namespace Inventory.Users
 {
     public static class ConfigureServices
     {
-        public static IServiceCollection AddServices(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddServices(this IServiceCollection services, 
+            IConfiguration configuration)
         {
             var connectionString = configuration.GetConnectionString("Users");
 
@@ -23,8 +24,8 @@ namespace Inventory.Users
 
                 );
 
-            services.AddScoped<UsersDbContext>(provider
-                => provider.GetRequiredService<UsersDbContext>());
+            //services.AddScoped<UsersDbContext>(provider
+            //    => provider.GetRequiredService<UsersDbContext>());
 
 
             return services;

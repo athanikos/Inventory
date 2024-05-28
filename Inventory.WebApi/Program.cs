@@ -22,7 +22,7 @@ namespace Inventory.WebApi
 
             ConfigureServices.AddServices(builder.Services, builder.Configuration);
 
-            builder.Services.AddSwaggerGen();
+            //builder.Services.AddSwaggerGen();
 
             var app = builder.Build();
 

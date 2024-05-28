@@ -2,26 +2,33 @@
 
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using System.Reflection;
 
 namespace Inventory.Users
 {
-    public class UsersDbContext : IdentityDbContext<User>
+    public class UsersDbContext : IdentityDbContext
     {
-   
+
+        public UsersDbContext()
+       
+        {
+
+
+        }
+
         public UsersDbContext (DbContextOptions<UsersDbContext> options) 
             : base(options) {
         
         
         }
-
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            base.OnModelCreating(builder);
-
-            builder.Entity<User>().Property(u => u.Initials).HasMaxLength(5);
-
             builder.HasDefaultSchema("Users");
+            builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+            base.OnModelCreating(builder);
         }
 
+     
     }
 }
