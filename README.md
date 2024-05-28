@@ -2,7 +2,7 @@
 
 
 
-##installing migrations 
+## installing migrations 
 
 dotnet tool install --global dotnet-ef
 
