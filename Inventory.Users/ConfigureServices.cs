@@ -10,25 +10,17 @@ namespace Inventory.Users
     {
         public static IServiceCollection AddServices(this IServiceCollection services, 
             IConfiguration configuration)
-        {
-            var connectionString = configuration.GetConnectionString("Users");
-
-
-         
+        {          
 
             services.AddDbContext<UsersDbContext>(options =>
-                                                   options.UseSqlServer(connectionString)
+                                                   options.UseSqlServer(
+                                                       configuration.GetConnectionString("Users"))
                 
-                );
+            );
 
             services.AddIdentityCore<IdentityUser>().
-             AddEntityFrameworkStores<UsersDbContext>().
-             AddApiEndpoints();
-
-
-            //services.AddScoped<UsersDbContext>(provider
-            //    => provider.GetRequiredService<UsersDbContext>());
-
+            AddEntityFrameworkStores<UsersDbContext>().
+            AddApiEndpoints();
 
             return services;
         }
