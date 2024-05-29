@@ -12,11 +12,9 @@ namespace Inventory.Users
             IConfiguration configuration)
         {          
 
-            services.AddDbContext<UsersDbContext>(options =>
-                                                   options.UseSqlServer(
-                                                       configuration.GetConnectionString("Users"))
-                
-            );
+            services.AddDbContext<UsersDbContext>(options =>  
+            options.UseSqlServer(configuration.
+            GetConnectionString("Users")));
 
             services.AddIdentityCore<IdentityUser>().
             AddEntityFrameworkStores<UsersDbContext>().

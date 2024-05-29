@@ -1,23 +1,12 @@
-﻿
-
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using System.Reflection;
 
 namespace Inventory.Users
 {
     public class UsersDbContext : IdentityDbContext<IdentityUser>
     {
-
-        public UsersDbContext()
-       
-        {
-
-
-        }
-
         public UsersDbContext (DbContextOptions<UsersDbContext> options) 
             : base(options) {
         
@@ -29,7 +18,5 @@ namespace Inventory.Users
             builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
             base.OnModelCreating(builder);
         }
-
-     
     }
 }

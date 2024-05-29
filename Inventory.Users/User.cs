@@ -1,9 +1,5 @@
 ﻿namespace Inventory.Users;
-
-
 using Microsoft.AspNetCore.Identity;
-
-
 
     public class User : IdentityUser
     {

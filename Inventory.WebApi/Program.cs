@@ -6,16 +6,15 @@ using AspNet.Security.OAuth.Validation;
 
 namespace Inventory.WebApi
 {
-   // https://www.youtube.com/watch?v=S0RSsHKiD6Y
-
-
+ 
+    /// <summary>
+    /// 
+    /// </summary>
     public class Program
     {
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-
-
 
             builder.Services.AddSwaggerGen();
                                   
@@ -36,9 +35,7 @@ namespace Inventory.WebApi
             
             }
 
-
             app.MapIdentityApi<IdentityUser>();
-
             app.Run();
         }
     }
