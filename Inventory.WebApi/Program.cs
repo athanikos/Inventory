@@ -1,21 +1,14 @@
-using Inventory.Users;
-using Microsoft.AspNetCore.Authentication.Cookies;
+using FastEndpoints;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using AspNet.Security.OAuth.Validation;
+using System.Reflection;
 
 namespace Inventory.WebApi
 {
- 
-    /// <summary>
-    /// 
-    /// </summary>
     public class Program
     {
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-
             builder.Services.AddSwaggerGen();
                                   
             builder.Services.AddAuthentication(options =>
@@ -25,7 +18,20 @@ namespace Inventory.WebApi
             }).AddBearerToken(IdentityConstants.BearerScheme);
 
             builder.Services.AddAuthorizationBuilder();
-            ConfigureServices.AddServices(builder.Services, builder.Configuration);
+
+            List<Assembly> mediatRAssemblies = [typeof(Program).Assembly];
+
+
+            Users.ConfigureServices.AddServices(builder.Services, builder.Configuration);
+            Products.ConfigureServices.AddServices(builder.Services,
+                builder.Configuration, mediatRAssemblies);
+
+            // Set up MediatR
+            builder.Services.AddMediatR(cfg =>
+              cfg.RegisterServicesFromAssemblies(mediatRAssemblies.ToArray()));
+
+            builder.Services.AddFastEndpoints().AddAuthorization();
+
 
             var app = builder.Build();
  
@@ -34,6 +40,7 @@ namespace Inventory.WebApi
                 app.UseSwaggerUI();
             
             }
+            app.UseFastEndpoints();
 
             app.MapIdentityApi<IdentityUser>();
             app.Run();

@@ -19,6 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Inventory.Products\Inventory.Products.csproj" />
     <ProjectReference Include="..\Inventory.Users\Inventory.Users.csproj" />
   </ItemGroup>
 
