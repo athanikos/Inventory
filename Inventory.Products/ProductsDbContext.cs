@@ -1,7 +1,5 @@
 ﻿using Inventory.Products.Entities;
 using Microsoft.EntityFrameworkCore;
-
-
 namespace Inventory.Products;
 
 public class ProductsDbContext : DbContext
@@ -11,8 +9,8 @@ public class ProductsDbContext : DbContext
             <ProductsDbContext> options) :
             base(options)  { }
            
-        public   DbSet<Product> Products { get; set; }
-        public   DbSet<Inventory.Products.Entities.Inventory> Inventories { get; set; }
+        public   DbSet<Entities.Product> Products { get; set; }
+        public   DbSet<Entities.Inventory> Inventories { get; set; }
 
 
     protected override void OnModelCreating
@@ -21,26 +19,30 @@ public class ProductsDbContext : DbContext
                     base.OnModelCreating(modelBuilder);
                     modelBuilder.HasDefaultSchema("Products");
 
-                    var config = modelBuilder.Entity<Product>();
-                    modelBuilder.Entity<Product>().ToTable("Product");
+                    var config = modelBuilder.Entity<Entities.Product>();
+                    modelBuilder.Entity<Entities.Product>().ToTable("Product");
 
-                    modelBuilder.Entity<Inventory.Products.Entities.Inventory>()
+                    modelBuilder.Entity<Entities.Inventory>()
                     .HasMany(e => e.Products);
 
-                    modelBuilder.Entity<Inventory.Products.Entities.Inventory>().ToTable("Inventory");
+                    modelBuilder.Entity<Entities.Inventory>().ToTable("Inventory");
 
 
-                    modelBuilder.Entity<Product>()
+                    modelBuilder.Entity<Entities.Product>()
                                             .HasMany(e => e.Categories)
                                             .WithMany(e => e.Products)
                                             .UsingEntity<ProductCategory>();
 
-                    modelBuilder.Entity<Product>()
+                    modelBuilder.Entity<Entities.Product>()
                                 .HasMany(e => e.Metrics)
                                  .WithMany(e => e.Products)
                                  .UsingEntity<ProductMetric>();
 
-             
+                    modelBuilder.Entity<Entities.Source>()
+                      .HasMany(e => e.Metrics);
+                   
+
+
 
     }
 

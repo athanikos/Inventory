@@ -18,7 +18,7 @@ namespace Inventory.Products.Handlers
         public async Task<ProductDto> Handle(AddProductCommand request,
             CancellationToken cancellationToken)
         {
-            Product prd = new Product()
+            Entities.Product prd = new Entities.Product()
             {
                 Description = request.Description,
                 InventoryId = request.InventoryId
