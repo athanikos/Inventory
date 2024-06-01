@@ -1,10 +1,10 @@
-﻿using FastEndpoints;
+﻿using Inventory.Products.Endpoints;
 using Inventory.Products.Entities;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
-using static Azure.Core.HttpHeader;
+using Inventory.Products.Dto;
+using Microsoft.AspNetCore.Http;
 
-namespace Inventory.Products.Endpoints
+namespace Inventory.Products.Handlers
 {
     internal class AddProductHandler : IRequestHandler<AddProductCommand, ProductDto>
     {
@@ -15,17 +15,19 @@ namespace Inventory.Products.Endpoints
             _context = context;
         }
 
-        public async  Task<ProductDto> Handle(AddProductCommand request,
+        public async Task<ProductDto> Handle(AddProductCommand request,
             CancellationToken cancellationToken)
         {
             Product prd = new Product()
-            {  Description = request.Description };
+            {
+                Description = request.Description,
+                InventoryId = request.InventoryId
+            };
 
             _context.Products.Add(prd);
             await _context.SaveChangesAsync(cancellationToken);
-          
-            return new ProductDto()
-            { Id = prd.Id, Description = prd.Description };
+
+            return new ProductDto(prd.Id, prd.Description);
         }
     }
 }

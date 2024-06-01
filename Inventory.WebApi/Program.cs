@@ -30,7 +30,7 @@ namespace Inventory.WebApi
             builder.Services.AddMediatR(cfg =>
               cfg.RegisterServicesFromAssemblies(mediatRAssemblies.ToArray()));
 
-            builder.Services.AddFastEndpoints().AddAuthorization();
+            builder.Services.AddFastEndpoints();
 
 
             var app = builder.Build();

@@ -6,13 +6,17 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Inventory.Products.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class productsWithInventory : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.EnsureSchema(
+                name: "Products");
+
             migrationBuilder.CreateTable(
                 name: "Category",
+                schema: "Products",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -25,7 +29,21 @@ namespace Inventory.Products.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Inventory",
+                schema: "Products",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Inventory", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Metric",
+                schema: "Products",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -42,18 +60,28 @@ namespace Inventory.Products.Data.Migrations
 
             migrationBuilder.CreateTable(
                 name: "Product",
+                schema: "Products",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    InventoryId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Product", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Product_Inventory_InventoryId",
+                        column: x => x.InventoryId,
+                        principalSchema: "Products",
+                        principalTable: "Inventory",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
                 name: "ProductCategory",
+                schema: "Products",
                 columns: table => new
                 {
                     ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -65,12 +93,14 @@ namespace Inventory.Products.Data.Migrations
                     table.ForeignKey(
                         name: "FK_ProductCategory_Category_CategoryId",
                         column: x => x.CategoryId,
+                        principalSchema: "Products",
                         principalTable: "Category",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_ProductCategory_Product_ProductId",
                         column: x => x.ProductId,
+                        principalSchema: "Products",
                         principalTable: "Product",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -78,6 +108,7 @@ namespace Inventory.Products.Data.Migrations
 
             migrationBuilder.CreateTable(
                 name: "ProductMetric",
+                schema: "Products",
                 columns: table => new
                 {
                     ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -89,24 +120,34 @@ namespace Inventory.Products.Data.Migrations
                     table.ForeignKey(
                         name: "FK_ProductMetric_Metric_MetricId",
                         column: x => x.MetricId,
+                        principalSchema: "Products",
                         principalTable: "Metric",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_ProductMetric_Product_ProductId",
                         column: x => x.ProductId,
+                        principalSchema: "Products",
                         principalTable: "Product",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_Product_InventoryId",
+                schema: "Products",
+                table: "Product",
+                column: "InventoryId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ProductCategory_ProductId",
+                schema: "Products",
                 table: "ProductCategory",
                 column: "ProductId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ProductMetric_ProductId",
+                schema: "Products",
                 table: "ProductMetric",
                 column: "ProductId");
         }
@@ -115,19 +156,28 @@ namespace Inventory.Products.Data.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "ProductCategory");
+                name: "ProductCategory",
+                schema: "Products");
 
             migrationBuilder.DropTable(
-                name: "ProductMetric");
+                name: "ProductMetric",
+                schema: "Products");
 
             migrationBuilder.DropTable(
-                name: "Category");
+                name: "Category",
+                schema: "Products");
 
             migrationBuilder.DropTable(
-                name: "Metric");
+                name: "Metric",
+                schema: "Products");
 
             migrationBuilder.DropTable(
-                name: "Product");
+                name: "Product",
+                schema: "Products");
+
+            migrationBuilder.DropTable(
+                name: "Inventory",
+                schema: "Products");
         }
     }
 }

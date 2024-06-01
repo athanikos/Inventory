@@ -7,11 +7,16 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Inventory.Users", "Inventor
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Inventory.WebApi", "Inventory.WebApi\Inventory.WebApi.csproj", "{87325F5C-EC1F-4B8A-A094-171E6004298F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inventory.Products", "Inventory.Products\Inventory.Products.csproj", "{87FDD436-350F-449B-8B01-75FAE1EF3526}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Inventory.Products", "Inventory.Products\Inventory.Products.csproj", "{87FDD436-350F-449B-8B01-75FAE1EF3526}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Users", "Users", "{788AFBED-C03B-4B28-A4B1-041137BDA927}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Products", "Products", "{FC7F9F24-A6CD-4F29-9A04-866E01A39B73}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{73974222-20FE-4DD3-B1B4-B4A1867377EB}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -14,6 +14,11 @@
         public ICollection<Metric> Metrics
         { get;  set; } = new List<Metric>();
 
+
+         public Guid InventoryId { get; set; }
+            
+
+
     }
 
 

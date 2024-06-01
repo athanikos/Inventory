@@ -1,6 +1,7 @@
 ﻿
 namespace Inventory.Products.Endpoints
 {
+    using Azure;
     using FastEndpoints;
     using Inventory.Products.Dto;
     using MediatR;
@@ -9,44 +10,41 @@ namespace Inventory.Products.Endpoints
     using System.Threading;
     using System.Threading.Tasks;
 
-    public  class AddProduct 
-        : Endpoint<AddProductRequest>
+    public class AddInventory :
+        Endpoint<AddInventoryRequest>
     {
         private readonly IMediator _mediator;
 
-        public  AddProduct(IMediator mediator)
+        public  AddInventory(IMediator mediator)
         {
             _mediator = mediator;
         }
 
         public override void Configure()
         {
-            Post("/product");
+            Post("/inventory");
             // to do claims this is per InventoryId claim
             //  something like Admin_<inventoryId>
         }
 
-
-        public override async Task<Results<Ok<ProductDto>, NotFound, ProblemDetails>>
-            HandleAsync(AddProductRequest req,
+        public override async Task<Results<Ok<InventoryDto>, NotFound, ProblemDetails>>
+            HandleAsync(AddInventoryRequest req,
                         CancellationToken ct)
         {
-            var command = new AddProductCommand(
-                req.Description, req.InventoryId);
+            var command = new AddInventoryCommand(
+                req.Description);
             var result = await _mediator!.
                 Send(command, ct);
 
-            return TypedResults.Ok<ProductDto>(result);
+            return TypedResults.Ok<InventoryDto>(result);
         }
     }
 
 
-    public record AddProductRequest
-        (string Description, Guid InventoryId);
+    public record AddInventoryRequest(string Description);
 
-    public record AddProductCommand(string Description, 
-        Guid InventoryId)
-      : IRequest<ProductDto>;
+    public record AddInventoryCommand(string Description)
+      : IRequest<InventoryDto>;
 
   
 }

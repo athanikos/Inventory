@@ -12,14 +12,15 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Inventory.Products.Data.Migrations
 {
     [DbContext(typeof(ProductsDbContext))]
-    [Migration("20240530091544_Initial")]
-    partial class Initial
+    [Migration("20240531173508_productsWithInventory")]
+    partial class productsWithInventory
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
+                .HasDefaultSchema("Products")
                 .HasAnnotation("ProductVersion", "8.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
@@ -40,7 +41,22 @@ namespace Inventory.Products.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Category");
+                    b.ToTable("Category", "Products");
+                });
+
+            modelBuilder.Entity("Inventory.Products.Entities.Inventory", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Inventory", "Products");
                 });
 
             modelBuilder.Entity("Inventory.Products.Entities.Metric", b =>
@@ -68,7 +84,7 @@ namespace Inventory.Products.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Metric");
+                    b.ToTable("Metric", "Products");
                 });
 
             modelBuilder.Entity("Inventory.Products.Entities.Product", b =>
@@ -81,9 +97,14 @@ namespace Inventory.Products.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid>("InventoryId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
 
-                    b.ToTable("Product");
+                    b.HasIndex("InventoryId");
+
+                    b.ToTable("Product", "Products");
                 });
 
             modelBuilder.Entity("Inventory.Products.Entities.ProductCategory", b =>
@@ -98,7 +119,7 @@ namespace Inventory.Products.Data.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("ProductCategory");
+                    b.ToTable("ProductCategory", "Products");
                 });
 
             modelBuilder.Entity("Inventory.Products.Entities.ProductMetric", b =>
@@ -113,7 +134,16 @@ namespace Inventory.Products.Data.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("ProductMetric");
+                    b.ToTable("ProductMetric", "Products");
+                });
+
+            modelBuilder.Entity("Inventory.Products.Entities.Product", b =>
+                {
+                    b.HasOne("Inventory.Products.Entities.Inventory", null)
+                        .WithMany("Products")
+                        .HasForeignKey("InventoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Inventory.Products.Entities.ProductCategory", b =>
@@ -144,6 +174,11 @@ namespace Inventory.Products.Data.Migrations
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Inventory.Products.Entities.Inventory", b =>
+                {
+                    b.Navigation("Products");
                 });
 #pragma warning restore 612, 618
         }
