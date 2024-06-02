@@ -37,3 +37,38 @@
         
     Client can order from inventory. For an inventory to be able to order 
     claimType = CLIENTINVENTORY claimValue = <InventoryId>
+
+    One Product has some description. A mtric can be acquired value. 
+    A product batch was acquired (5 out of toital 20) was acquired at 10 euros but some other batch of 5 items was acquired at 9. 
+
+    ProductId Description  
+    1         5
+
+    productId MetricId Quantity Value           EffectiveFrom    
+    1         1        5        9               DateMinValue  
+    1         1        5        10              DateMinValue       
+
+
+    MetricId     Description  
+    1            AcquiredPrice
+
+    Effective From will allways be min Value in this case since there wil be no change . Acquired also means the inventory bought it increases quantity (?)
+
+
+
+    For selling price 
+    productId MetricId Quantity Value           EffectiveFrom    
+    1         2        10        20              DateMinValue       
+
+    
+    MetricId     Description  
+    2            SellingPrice
+    
+
+    
+
+
+
+
+
+    
