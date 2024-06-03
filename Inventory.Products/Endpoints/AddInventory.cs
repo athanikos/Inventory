@@ -1,7 +1,6 @@
 ﻿
 namespace Inventory.Products.Endpoints
 {
-    using Azure;
     using FastEndpoints;
     using Inventory.Products.Dto;
     using MediatR;

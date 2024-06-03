@@ -1,8 +1,6 @@
 ﻿using Inventory.Products.Endpoints;
-using Inventory.Products.Entities;
 using MediatR;
 using Inventory.Products.Dto;
-using Microsoft.AspNetCore.Http;
 
 namespace Inventory.Products.Handlers
 {

@@ -6,7 +6,7 @@ using Entities = Inventory.Products.Entities;
 namespace Product.Products.Handlers
 {
     internal class EditProductHandler :
-        IRequestHandler<AddProductCommand, ProductDto>
+        IRequestHandler<EditProductCommand, ProductDto>
     {
         private readonly Inventory.Products.ProductsDbContext _context;
 
@@ -16,7 +16,7 @@ namespace Product.Products.Handlers
         }
 
         public async Task<ProductDto> Handle
-            (AddProductCommand request, 
+            (EditProductCommand request, 
             CancellationToken cancellationToken)
         {
             Entities.Product prd =

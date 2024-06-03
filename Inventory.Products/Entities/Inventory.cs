@@ -2,7 +2,7 @@
 namespace Inventory.Products.Entities
 {
 
-    public class Inventory
+    public sealed class Inventory
     {
         public Guid Id { get; set; }
          = Guid.NewGuid();

@@ -1,4 +1,4 @@
 ﻿namespace Inventory.Products.Dto;
 
-public record SourceDto(Guid Id,string Description);
+public record ProductDto(Guid Id,string Description);
  

@@ -1,5 +1,4 @@
 ﻿using Inventory.Products.Endpoints;
-using Inventory.Products.Entities;
 using MediatR;
 using Inventory.Products.Dto;
 
@@ -19,8 +18,8 @@ namespace Inventory.Products.Handlers
             (AddInventoryCommand request, 
             CancellationToken cancellationToken)
         {
-            Inventory.Products.Entities.Inventory inv = 
-                new Inventory.Products.Entities.Inventory()
+            Entities.Inventory inv = 
+                new Entities.Inventory()
             { Description = request.Description };
             _context.Inventories.Add(inv);
             _context.Entry(inv).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
