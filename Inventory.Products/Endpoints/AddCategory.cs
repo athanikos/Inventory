@@ -31,7 +31,10 @@ namespace Category.Products.Endpoints
             HandleAsync(AddCategoryRequest req,
                         CancellationToken ct)
         {
-            var command = new AddCategoryCommand(req.Id, req.FatherId, req.Description);
+          
+
+
+            var command = new AddCategoryCommand(req.FatherId, req.Description);
             var result = await _mediator!.
                 Send(command, ct);
 
@@ -40,10 +43,9 @@ namespace Category.Products.Endpoints
     }
 
 
-    public record AddCategoryRequest(Guid Id, Guid FatherId, string Description);
+    public record AddCategoryRequest(Guid FatherId, string Description);
 
-    public record AddCategoryCommand(Guid Id, Guid FatherId, string Description)
-      : IRequest<CategoryDto>;
+    public record AddCategoryCommand(Guid FatherId, string Description): IRequest<CategoryDto>;
 
   
 }

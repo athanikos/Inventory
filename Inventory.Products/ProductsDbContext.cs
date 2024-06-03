@@ -32,6 +32,8 @@ public class ProductsDbContext : DbContext
                         modelBuilder.Entity<Entities.Inventory>().ToTable("Inventory");
 
 
+                        modelBuilder.Entity<Entities.Category>().ToTable("Category");
+
                         modelBuilder.Entity<Entities.Product>()
                                                 .HasMany(e => e.Categories)
                                                 .WithMany(e => e.Products)

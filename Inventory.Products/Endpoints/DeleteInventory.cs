@@ -41,8 +41,7 @@ namespace Inventory.Products.Endpoints
 
     public record DeleteInventoryRequest(Guid Id);
 
-    public record DeleteInventoryCommand(Guid Id)
-      : IRequest;
+    public record DeleteInventoryCommand(Guid Id): IRequest;
 
   
 }

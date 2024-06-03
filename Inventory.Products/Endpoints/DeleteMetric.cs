@@ -41,10 +41,9 @@ namespace Inventory.Metrics.Endpoints
     }
 
 
-    public record DeleteMetricRequest ( Guid Id);
+    public record DeleteMetricRequest (Guid Id);
 
-    public record DeleteMetricCommand ( Guid Id)
-      : IRequest;
+    public record DeleteMetricCommand (Guid Id) : IRequest;
 
   
 }
