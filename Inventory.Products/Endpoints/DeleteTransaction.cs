@@ -10,7 +10,7 @@ namespace Transaction.Products.Endpoints
     using Inventory.Products.Dto;
 
     public class EditTransaction :
-        Endpoint<EditTransactionRequest>
+        Endpoint<DeleteTransactionRequest>
     {
         private readonly IMediator _mediator;
 
@@ -26,23 +26,24 @@ namespace Transaction.Products.Endpoints
             //  something like Admin_<TransactionId>
         }
 
-        public override async Task<Results<Ok<TransactionDto>, NotFound, ProblemDetails>>
-            HandleAsync(EditTransactionRequest req,
+        public override async Task<Results<Ok, NotFound, ProblemDetails>>
+            HandleAsync(DeleteTransactionRequest req,
                         CancellationToken ct)
         {
-            var command = new EditTransactionCommand(
-                req.Description);
-            var result = await _mediator!.
+            var command = new DeleteTransactionCommand(
+                req.Id);
+            
+            await _mediator!.
                 Send(command, ct);
 
-            return TypedResults.Ok<TransactionDto>(result);
+            return TypedResults.Ok();
         }
     }
 
 
-    public record EditTransactionRequest(string Description);
+    public record DeleteTransactionRequest(Guid Id);
 
-    public record EditTransactionCommand(string Description)
+    public record DeleteTransactionCommand(Guid Id)
       : IRequest<TransactionDto>;
 
   

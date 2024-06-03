@@ -1,11 +1,10 @@
 ﻿using MediatR;
 using Inventory.Products.Dto;
 using Transaction.Products.Endpoints;
-using Inventory.Products.Endpoints;
 
 namespace Inventory.Products.Handlers
 {
-    public class EditTransactionHandler   :
+    internal class EditTransactionHandler   :
         IRequestHandler<AddTransactionCommand, TransactionDto>
     {
         private readonly ProductsDbContext _context;
@@ -16,7 +15,7 @@ namespace Inventory.Products.Handlers
         }
 
         public async Task<TransactionDto> Handle
-            (EditTransactionCommand request, 
+            (AddTransactionCommand request, 
             CancellationToken cancellationToken)
         {
             Entities.Transaction trns =  new Entities.Transaction()    

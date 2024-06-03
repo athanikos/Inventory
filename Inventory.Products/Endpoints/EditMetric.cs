@@ -31,7 +31,12 @@ namespace Inventory.Products.Endpoints
                         CancellationToken ct)
         {
             var command = new EditMetricCommand(
-                req.Description);
+             req. Id,
+                         req.Description,
+                         req.Value,
+                         req.EffectiveDate,
+             req.Code,
+                         req.SourceId);
             var result = await _mediator!.
                 Send(command, ct);
 
@@ -40,10 +45,19 @@ namespace Inventory.Products.Endpoints
     }
 
 
-    public record EditMetricRequest(string Description);
+    public record EditMetricRequest(Guid Id,
+                        string Description,
+                        decimal Value,
+                        DateTime EffectiveDate,
+                        string Code,
+                        Guid SourceId);
 
-    public record EditMetricCommand(string Description)
-      : IRequest<MetricDto>;
+    public record EditMetricCommand(Guid Id,
+                        string Description,
+                        decimal Value,
+                        DateTime EffectiveDate,
+                        string Code,
+                        Guid SourceId)  : IRequest<MetricDto>;
 
   
 }

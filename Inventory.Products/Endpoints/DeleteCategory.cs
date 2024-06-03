@@ -26,23 +26,24 @@ namespace Category.Products.Endpoints
             //  something like Admin_<CategoryId>
         }
 
-        public override async Task<Results<Ok<CategoryDto>, NotFound, ProblemDetails>>
+        public override async Task<Results<Ok, NotFound, ProblemDetails>>
             HandleAsync(DeleteCategoryRequest req,
                         CancellationToken ct)
         {
             var command = new DeleteCategoryCommand(
-                req.Description);
-            var result = await _mediator!.
+                req.Id);
+          
+            await _mediator!.
                 Send(command, ct);
-
-            return TypedResults.Ok<CategoryDto>(result);
+           
+            return TypedResults.Ok(); //todo fix 
         }
     }
 
 
-    public record DeleteCategoryRequest(string Description);
+    public record DeleteCategoryRequest(Guid Id);
 
-    public record DeleteCategoryCommand(string Description)
+    public record DeleteCategoryCommand(Guid Id)
       : IRequest<CategoryDto>;
 
   

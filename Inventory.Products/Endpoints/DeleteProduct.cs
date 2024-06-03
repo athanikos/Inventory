@@ -27,25 +27,25 @@ namespace Inventory.Products.Endpoints
         }
 
 
-        public override async Task<Results<Ok<ProductDto>, NotFound, ProblemDetails>>
+        public override async Task<Results<Ok, NotFound, ProblemDetails>>
             HandleAsync(DeleteProductRequest req,
                         CancellationToken ct)
         {
             var command = new DeleteProductCommand(
-                req.Description, req.InventoryId);
-            var result = await _mediator!.
+                 req.Id);
+             await _mediator!.
                 Send(command, ct);
 
-            return TypedResults.Ok<ProductDto>(result);
+            return TypedResults.Ok(); //todo fix 
+            
         }
     }
 
 
     public record DeleteProductRequest
-        (string Description, Guid InventoryId);
+        (string Description, Guid Id);
 
-    public record DeleteProductCommand(string Description, 
-        Guid InventoryId)
+    public record DeleteProductCommand(Guid Id)
       : IRequest<ProductDto>;
 
   
