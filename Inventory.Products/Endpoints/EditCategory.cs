@@ -1,5 +1,5 @@
 ﻿
-namespace Product.Products.Endpoints
+namespace Inventory.Products.Endpoints
 {
     using FastEndpoints;
     using MediatR;
@@ -31,7 +31,11 @@ namespace Product.Products.Endpoints
                         CancellationToken ct)
         {
             var command = new EditCategoryCommand(
-                req.Description);
+                req.Id,
+                req.Description,
+                req.FatherId);
+
+
             var result = await _mediator!.
                 Send(command, ct);
 
@@ -40,9 +44,11 @@ namespace Product.Products.Endpoints
     }
 
 
-    public record EditCategoryRequest(string Description);
+    public record EditCategoryRequest
+        (Guid Id, string Description, Guid FatherId);
 
-    public record EditCategoryCommand(string Description)
+    public record EditCategoryCommand
+        (Guid Id, string Description, Guid FatherId)
       : IRequest<CategoryDto>;
 
   

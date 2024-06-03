@@ -21,7 +21,7 @@ namespace Category.Products.Endpoints
 
         public override void Configure()
         {
-            Delete("/Category");
+            Delete("/category");
             // to do claims this is per CategoryId claim
             //  something like Admin_<CategoryId>
         }

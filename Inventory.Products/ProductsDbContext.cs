@@ -11,8 +11,11 @@ public class ProductsDbContext : DbContext
            
         public   DbSet<Entities.Product> Products { get; set; }
         public   DbSet<Entities.Inventory> Inventories { get; set; }
-        public   DbSet<Entities.Transaction> Transactions { get; set; }
-        public   DbSet<Entities.TransactionItem> TransactionItems { get; set; }
+        public   DbSet<Entities.Category> Categories { get; set; }
+        public   DbSet<Entities.Metric> Metrics { get; set; }
+
+        public DbSet<Entities.Transaction> Transactions { get; set; }
+        public DbSet<Entities.TransactionItem> TransactionItems { get; set; }
 
     protected override void OnModelCreating
             (ModelBuilder modelBuilder)

@@ -3,6 +3,7 @@ namespace Inventory.Metrics.Endpoints
 {
     using FastEndpoints;
     using Inventory.Products.Dto;
+    using Inventory.Products.Entities;
     using MediatR;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Http.HttpResults;
@@ -32,7 +33,13 @@ namespace Inventory.Metrics.Endpoints
                         CancellationToken ct)
         {
             var command = new AddMetricCommand(
-                req.Description, req.InventoryId);
+                        req.Id,
+                        req.Description,
+                        req.Value,
+                        req.EffectiveDate,
+                        req.Code,
+                        req.SourceId);
+
             var result = await _mediator!.
                 Send(command, ct);
 
@@ -42,10 +49,19 @@ namespace Inventory.Metrics.Endpoints
 
 
     public record AddMetricRequest
-        (string Description, Guid InventoryId);
+        (Guid Id,
+                        string Description,
+                        decimal Value,
+                        DateTime EffectiveDate,
+                        string Code,
+                        Guid SourceId);
 
-    public record AddMetricCommand(string Description, 
-        Guid InventoryId)
+    public record AddMetricCommand(Guid Id,
+                        string Description,
+                        decimal Value,
+                        DateTime EffectiveDate,
+                        string Code,
+                        Guid SourceId)
       : IRequest<MetricDto>;
 
   

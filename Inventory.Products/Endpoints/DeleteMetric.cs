@@ -21,7 +21,7 @@ namespace Inventory.Metrics.Endpoints
 
         public override void Configure()
         {
-            Delete("/Metric");
+            Delete("/metric");
             // to do claims this is per InventoryId claim
             //  something like Admin_<inventoryId>
         }

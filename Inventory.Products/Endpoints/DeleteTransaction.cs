@@ -9,28 +9,28 @@ namespace Transaction.Products.Endpoints
     using System.Threading.Tasks;
     using Inventory.Products.Dto;
 
-    public class AddTransaction :
-        Endpoint<AddTransactionRequest>
+    public class EditTransaction :
+        Endpoint<EditTransactionRequest>
     {
         private readonly IMediator _mediator;
 
-        public  AddTransaction(IMediator mediator)
+        public  EditTransaction(IMediator mediator)
         {
             _mediator = mediator;
         }
 
         public override void Configure()
         {
-            Post("/transaction");
+            Delete("/transaction");
             // to do claims this is per TransactionId claim
             //  something like Admin_<TransactionId>
         }
 
         public override async Task<Results<Ok<TransactionDto>, NotFound, ProblemDetails>>
-            HandleAsync(AddTransactionRequest req,
+            HandleAsync(EditTransactionRequest req,
                         CancellationToken ct)
         {
-            var command = new AddTransactionCommand(
+            var command = new EditTransactionCommand(
                 req.Description);
             var result = await _mediator!.
                 Send(command, ct);
@@ -40,9 +40,9 @@ namespace Transaction.Products.Endpoints
     }
 
 
-    public record AddTransactionRequest(string Description);
+    public record EditTransactionRequest(string Description);
 
-    public record AddTransactionCommand(string Description)
+    public record EditTransactionCommand(string Description)
       : IRequest<TransactionDto>;
 
   

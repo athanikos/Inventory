@@ -35,7 +35,7 @@ namespace Inventory.Products.Endpoints
             var result = await _mediator!.
                 Send(command, ct);
 
-            return TypedResults.Ok<InventoryDto>(result);
+            return TypedResults.Ok(result);
         }
     }
 

@@ -1,37 +1,36 @@
 ﻿
-namespace TransactionItem.Products.Endpoints
+namespace Inventory.Products.Endpoints
 {
     using FastEndpoints;
-     using MediatR;
+    using MediatR;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Http.HttpResults;
     using System.Threading;
     using System.Threading.Tasks;
     using Inventory.Products.Dto;
-    using Inventory.Products.Entities;
 
-    public class AddTransactionItem :
-        Endpoint<AddTransactionItemRequest>
+    public class EditTransactionItem :
+        Endpoint<EditTransactionItemRequest>
     {
         private readonly IMediator _mediator;
 
-        public  AddTransactionItem(IMediator mediator)
+        public  EditTransactionItem(IMediator mediator)
         {
             _mediator = mediator;
         }
 
         public override void Configure()
         {
-            Post("/transactionItem");
+            Post("/transactionitem");
             // to do claims this is per TransactionItemId claim
             //  something like Admin_<TransactionItemId>
         }
 
         public override async Task<Results<Ok<TransactionItemDto>, NotFound, ProblemDetails>>
-            HandleAsync(AddTransactionItemRequest req,
+            HandleAsync(EditTransactionItemRequest req,
                         CancellationToken ct)
         {
-            var command = new AddTransactionItemCommand(
+            var command = new EditTransactionItemCommand(
                        req.Id,
                        req.TransactionId,
                        req.Description,
@@ -55,7 +54,7 @@ namespace TransactionItem.Products.Endpoints
     }
 
 
-    public record AddTransactionItemRequest(Guid TransactionId,
+    public record EditTransactionItemRequest(Guid TransactionId,
                     Guid Id,
                     string Description,
                     string TransactionType,
@@ -70,7 +69,7 @@ namespace TransactionItem.Products.Endpoints
                     decimal DeliveryFees,
                      decimal FinalPrice);
 
-    public record AddTransactionItemCommand(Guid TransactionId,
+    public record EditTransactionItemCommand(Guid TransactionId,
                     Guid Id,
                     string Description,
                     string TransactionType,

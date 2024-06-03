@@ -21,7 +21,7 @@ namespace Inventory.Products.Endpoints
 
         public override void Configure()
         {
-            Put("/Metric");
+            Put("/metric");
             // to do claims this is per MetricId claim
             //  something like Admin_<MetricId>
         }

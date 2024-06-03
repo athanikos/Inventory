@@ -8,6 +8,7 @@ namespace Category.Products.Endpoints
     using System.Threading;
     using System.Threading.Tasks;
     using Inventory.Products.Dto;
+    using System;
 
     public class AddCategory :
         Endpoint<AddCategoryRequest>
@@ -30,8 +31,7 @@ namespace Category.Products.Endpoints
             HandleAsync(AddCategoryRequest req,
                         CancellationToken ct)
         {
-            var command = new AddCategoryCommand(
-                req.Description);
+            var command = new AddCategoryCommand(req.Id, req.FatherId, req.Description);
             var result = await _mediator!.
                 Send(command, ct);
 
@@ -40,9 +40,9 @@ namespace Category.Products.Endpoints
     }
 
 
-    public record AddCategoryRequest(string Description);
+    public record AddCategoryRequest(Guid Id, Guid FatherId, string Description);
 
-    public record AddCategoryCommand(string Description)
+    public record AddCategoryCommand(Guid Id, Guid FatherId, string Description)
       : IRequest<CategoryDto>;
 
   

@@ -1,9 +1,9 @@
-﻿using Product.Products.Endpoints;
+﻿using Inventory.Products.Endpoints;
 using MediatR;
 using Inventory.Products.Dto;
 using Entities = Inventory.Products.Entities;
 
-namespace Product.Products.Handlers
+namespace Inventory.Products.Handlers
 {
     internal class EditProductHandler :
         IRequestHandler<EditProductCommand, ProductDto>

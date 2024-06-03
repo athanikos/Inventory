@@ -1,5 +1,5 @@
 ﻿
-namespace Transaction.Products.Endpoints
+namespace Inventory.Products.Endpoints
 {
     using FastEndpoints;
     using MediatR;
@@ -9,40 +9,40 @@ namespace Transaction.Products.Endpoints
     using System.Threading.Tasks;
     using Inventory.Products.Dto;
 
-    public class AddTransaction :
-        Endpoint<AddTransactionRequest>
+    public class EditTransaction :
+        Endpoint<EditTransactionRequest>
     {
         private readonly IMediator _mediator;
 
-        public  AddTransaction(IMediator mediator)
+        public EditTransaction(IMediator mediator)
         {
             _mediator = mediator;
         }
 
         public override void Configure()
         {
-            Post("/transaction");
+            Put("/transaction");
             // to do claims this is per TransactionId claim
             //  something like Admin_<TransactionId>
         }
 
         public override async Task<Results<Ok<TransactionDto>, NotFound, ProblemDetails>>
-            HandleAsync(AddTransactionRequest req,
+            HandleAsync(EditTransactionRequest req,
                         CancellationToken ct)
         {
-            var command = new AddTransactionCommand(
-                req.Description);
-            var result = await _mediator!.
-                Send(command, ct);
+            var command = new EditTransactionCommand(
+               req.Id, req.Description, req.Created);
+
+            var result = await _mediator.Send(command, ct);
 
             return TypedResults.Ok<TransactionDto>(result);
         }
     }
 
 
-    public record AddTransactionRequest(string Description);
+    public record EditTransactionRequest(Guid Id,string Description, DateTime Created );
 
-    public record AddTransactionCommand(string Description)
+    public record EditTransactionCommand(Guid Id, string Description, DateTime Created)
       : IRequest<TransactionDto>;
 
   

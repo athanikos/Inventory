@@ -1,5 +1,5 @@
 ﻿
-namespace Product.Products.Endpoints
+namespace Inventory.Products.Endpoints
 {
     using FastEndpoints;
     using MediatR;
@@ -21,7 +21,7 @@ namespace Product.Products.Endpoints
 
         public override void Configure()
         {
-            Put("/Product");
+            Put("/product");
             // to do claims this is per ProductId claim
             //  something like Admin_<ProductId>
         }
