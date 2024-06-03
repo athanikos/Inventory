@@ -2,7 +2,6 @@
 namespace Inventory.Products.Endpoints
 {
     using FastEndpoints;
-    using Inventory.Products.Dto;
     using MediatR;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Http.HttpResults;
@@ -46,7 +45,7 @@ namespace Inventory.Products.Endpoints
         (string Description, Guid Id);
 
     public record DeleteProductCommand(Guid Id)
-      : IRequest<ProductDto>;
+      : IRequest;
 
   
 }

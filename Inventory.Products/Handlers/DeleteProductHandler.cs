@@ -5,28 +5,27 @@ using Entities = Inventory.Products.Entities;
 
 namespace Inventory.Products.Handlers
 {
-    internal class EditProductHandler :
-        IRequestHandler<EditProductCommand, ProductDto>
+    internal class DeleteProductHandler :
+        IRequestHandler<DeleteProductCommand>
     {
         private readonly Inventory.Products.ProductsDbContext _context;
 
-        public EditProductHandler(Inventory.Products.ProductsDbContext context)
+        public DeleteProductHandler(Inventory.Products.ProductsDbContext context)
         {
             _context = context;
         }
 
-        public async Task<ProductDto> Handle
-            (EditProductCommand request, 
+        public async Task Handle
+            (DeleteProductCommand request, 
             CancellationToken cancellationToken)
         {
-            Entities.Product prd =
-                new Entities.Product()
-            { Description = request.Description };
-            _context.Products.Add(prd);
-            _context.Entry(prd).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
-            await _context.SaveChangesAsync(cancellationToken);
-            return new ProductDto(prd.Id, prd.Description);
-
+            var itemToRemove = _context.Products.
+                SingleOrDefault(x => x.Id == request.Id);
+            if (itemToRemove != null)
+            {
+                _context.Products.Remove(itemToRemove);
+                await _context.SaveChangesAsync(cancellationToken);
+            }
         }
 
     

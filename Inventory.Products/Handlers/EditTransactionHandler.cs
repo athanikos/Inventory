@@ -6,7 +6,7 @@ using Inventory.Products.Endpoints;
 namespace Inventory.Products.Handlers
 {
     public class EditTransactionHandler   :
-        IRequestHandler<AddTransactionCommand, TransactionDto>
+        IRequestHandler<EditTransactionCommand, TransactionDto>
     {
         private readonly ProductsDbContext _context;
 

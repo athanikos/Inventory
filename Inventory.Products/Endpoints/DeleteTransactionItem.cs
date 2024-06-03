@@ -1,15 +1,11 @@
-﻿
+﻿using FastEndpoints;
+using MediatR;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Inventory.Products.Dto;
+
 namespace TransactionItem.Products.Endpoints
 {
-    using FastEndpoints;
-     using MediatR;
-    using Microsoft.AspNetCore.Http;
-    using Microsoft.AspNetCore.Http.HttpResults;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using Inventory.Products.Dto;
-    using Inventory.Products.Entities;
-
     public class DeleteTransactionItem :
         Endpoint<DeleteTransactionItemRequest>
     {
@@ -27,7 +23,7 @@ namespace TransactionItem.Products.Endpoints
             //  something like Admin_<TransactionItemId>
         }
 
-        public override async Task<Results<Ok<TransactionItemDto>, NotFound, ProblemDetails>>
+        public override async Task<Results<Ok, NotFound, ProblemDetails>>
             HandleAsync(DeleteTransactionItemRequest req,
                         CancellationToken ct)
         {
@@ -35,10 +31,10 @@ namespace TransactionItem.Products.Endpoints
                        req.Id
                    );
 
-            var result = await _mediator!.
+             await _mediator!.
                 Send(command, ct);
 
-            return TypedResults.Ok<TransactionItemDto>(result);
+            return TypedResults.Ok();
         }
     }
 
@@ -48,7 +44,7 @@ namespace TransactionItem.Products.Endpoints
 
     public record DeleteTransactionItemCommand(Guid Id
                )
-      : IRequest<TransactionItemDto>;
+      : IRequest;
 
   
 }

@@ -1,15 +1,11 @@
-﻿using Inventory.Products.Endpoints;
-using MediatR;
-using Inventory.Products.Dto;
-using FastEndpoints;
-using Inventory.Products.Entities;
+﻿using MediatR;
 using Inventory.Metrics.Endpoints;
 
 
 namespace Inventory.Products.Handlers
-{ 
+{
     internal class DeleteMetricHandler :
-        IRequestHandler<DeleteMetricCommand, MetricDto>
+        IRequestHandler<DeleteMetricCommand>
     {
         private readonly ProductsDbContext  _context;
 
@@ -18,20 +14,16 @@ namespace Inventory.Products.Handlers
             _context = context;
         }
 
-        public async Task<MetricDto> Handle(DeleteMetricCommand request,
+        public async Task 
+            Handle(DeleteMetricCommand request,
             CancellationToken cancellationToken)
         {
-            Entities.Metric metric =
-                new Entities.Metric()
+            var itemToRemove = _context.Metrics.SingleOrDefault(x => x.Id == request.Id);
+            if (itemToRemove != null)
             {
-                         Id= request.Id
-                     
-            };
-
-            _context.Metrics.Add(metric);
-            await _context.SaveChangesAsync(cancellationToken);
-
-            return new MetricDto(metric.Id,metric.Description,metric.Value, metric.EffectiveDate, metric.Code,  metric.SourceId);   
+                _context.Metrics.Remove(itemToRemove);
+                await _context.SaveChangesAsync(cancellationToken);
+            }
         }
     }
 }

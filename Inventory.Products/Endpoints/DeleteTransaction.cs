@@ -44,7 +44,7 @@ namespace Transaction.Products.Endpoints
     public record DeleteTransactionRequest(Guid Id);
 
     public record DeleteTransactionCommand(Guid Id)
-      : IRequest<TransactionDto>;
+      : IRequest;
 
   
 }

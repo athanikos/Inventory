@@ -27,26 +27,24 @@ namespace Inventory.Metrics.Endpoints
         }
 
 
-        public override async Task<Results<Ok<MetricDto>, NotFound, ProblemDetails>>
+        public override async Task<Results<Ok, NotFound, ProblemDetails>>
             HandleAsync(DeleteMetricRequest req,
                         CancellationToken ct)
         {
             var command = new DeleteMetricCommand(
-                req.Description, req.InventoryId);
-            var result = await _mediator!.
+                req.Id);
+             await _mediator!.
                 Send(command, ct);
 
-            return TypedResults.Ok<MetricDto>(result);
+            return TypedResults.Ok();
         }
     }
 
 
-    public record DeleteMetricRequest
-        (string Description, Guid InventoryId);
+    public record DeleteMetricRequest ( Guid Id);
 
-    public record DeleteMetricCommand(string Description, 
-        Guid InventoryId)
-      : IRequest<MetricDto>;
+    public record DeleteMetricCommand ( Guid Id)
+      : IRequest;
 
   
 }

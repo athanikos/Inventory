@@ -7,7 +7,6 @@ namespace Category.Products.Endpoints
     using Microsoft.AspNetCore.Http.HttpResults;
     using System.Threading;
     using System.Threading.Tasks;
-    using Inventory.Products.Dto;
 
     public class DeleteCategory :
         Endpoint<DeleteCategoryRequest>
@@ -44,7 +43,7 @@ namespace Category.Products.Endpoints
     public record DeleteCategoryRequest(Guid Id);
 
     public record DeleteCategoryCommand(Guid Id)
-      : IRequest<CategoryDto>;
+      : IRequest;
 
   
 }

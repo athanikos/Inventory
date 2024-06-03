@@ -1,30 +1,28 @@
 ﻿using MediatR;
-using Inventory.Products.Dto;
 using Transaction.Products.Endpoints;
 
 namespace Inventory.Products.Handlers
 {
-    internal class EditTransactionHandler   :
-        IRequestHandler<AddTransactionCommand, TransactionDto>
+    internal class DeleteTransactionHandler   :
+        IRequestHandler<DeleteTransactionCommand>
     {
         private readonly ProductsDbContext _context;
 
-        public EditTransactionHandler(ProductsDbContext context)
+        public DeleteTransactionHandler(ProductsDbContext context)
         {
             _context = context;
         }
 
-        public async Task<TransactionDto> Handle
-            (AddTransactionCommand request, 
+        public async Task Handle
+            (DeleteTransactionCommand request, 
             CancellationToken cancellationToken)
         {
-            Entities.Transaction trns =  new Entities.Transaction()    
-            { Description = request.Description };
-
-            _context.Transactions.Add(trns);
-            await _context.SaveChangesAsync(cancellationToken);
-
-            return new TransactionDto(trns.Id, trns.Description,DateTime.Now);
+            var itemToRemove = _context.Transactions.SingleOrDefault(x => x.Id == request.Id);
+            if (itemToRemove != null)
+            {
+                _context.Transactions.Remove(itemToRemove);
+                await _context.SaveChangesAsync(cancellationToken);
+            }
 
         }
 
