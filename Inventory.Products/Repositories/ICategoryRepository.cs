@@ -1,5 +1,4 @@
-﻿using Category.Products.Endpoints;
-using Inventory.Products.Dto;
+﻿using Inventory.Products.Dto;
 
 namespace Inventory.Products.Repositories
 {
@@ -7,5 +6,8 @@ namespace Inventory.Products.Repositories
     {
         Task<CategoryDto> AddCategoryAsync(CategoryDto dto);
         bool FatherIdExists(Guid FatherId);
+        Task<CategoryDto> EditCategoryAsync(CategoryDto c);
+        Task DeleteCategoryAsync(CategoryDto c);
+
     }
 }

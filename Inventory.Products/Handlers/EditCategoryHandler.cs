@@ -1,18 +1,16 @@
 ﻿using Inventory.Products.Endpoints;
 using MediatR;
 using Inventory.Products.Dto;
-using Entities = Inventory.Products.Entities;
-using Inventory.Products;
 
 
 namespace Inventory.Products.Handlers
-{ 
+{
     internal class EditCategoryHandler :
         IRequestHandler<EditCategoryCommand, CategoryDto>
     {
         private readonly ProductsDbContext  _context;
 
-        public EditCategoryHandler(Inventory.Products.ProductsDbContext context)
+        public EditCategoryHandler(ProductsDbContext context)
         {
             _context = context;
         }

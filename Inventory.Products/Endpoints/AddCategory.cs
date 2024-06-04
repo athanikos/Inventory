@@ -9,15 +9,18 @@ namespace Category.Products.Endpoints
     using System.Threading.Tasks;
     using Inventory.Products.Dto;
     using System;
+    using Inventory.Products.Repositories;
 
     public class AddCategory :
         Endpoint<AddCategoryRequest>
     {
         private readonly IMediator _mediator;
+        private readonly ICategoryRepository _repository;
 
-        public  AddCategory(IMediator mediator)
+        public  AddCategory(IMediator mediator, ICategoryRepository categoryRepository)
         {
             _mediator = mediator;
+            _repository = categoryRepository;    
         }
 
         public override void Configure()
@@ -31,14 +34,21 @@ namespace Category.Products.Endpoints
             HandleAsync(AddCategoryRequest req,
                         CancellationToken ct)
         {
-          
 
+            if (!_repository.FatherIdExists(req.FatherId))
+            {
+                AddError("FatherId does not exist ");
+                ThrowIfAnyErrors(); // If there are errors, execution shouldn't go beyond this point
+                return new FastEndpoints.ProblemDetails(ValidationFailures);
+            }
+            else
+            {
+                var command = new AddCategoryCommand(req.FatherId, req.Description);
+                var result = await _mediator!.
+                    Send(command, ct);
+                return TypedResults.Ok<CategoryDto>(result);
 
-            var command = new AddCategoryCommand(req.FatherId, req.Description);
-            var result = await _mediator!.
-                Send(command, ct);
-
-            return TypedResults.Ok<CategoryDto>(result);
+            }
         }
     }
 
