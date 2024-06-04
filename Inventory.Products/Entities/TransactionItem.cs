@@ -7,6 +7,8 @@ namespace Inventory.Products.Entities
 
         public Guid TransactionId { get; set; }
 
+        public Guid ProductId { get; set; }
+
         public string Description { get; set; } = string.Empty; 
 
         public string TransactionType { get; set; } = string.Empty;

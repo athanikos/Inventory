@@ -1,31 +1,23 @@
 ﻿using Inventory.Products.Endpoints;
 using MediatR;
 using Inventory.Products.Dto;
+using Inventory.Products.Repositories;
 
 namespace Inventory.Products.Handlers
 {
     internal class AddProductHandler : IRequestHandler<AddProductCommand, ProductDto>
     {
-        private readonly ProductsDbContext _context;
+        private readonly IInventoryRepository _repo;
 
-        public AddProductHandler(ProductsDbContext context)
+        public AddProductHandler(IInventoryRepository repo)
         {
-            _context = context;
+            _repo = repo;
         }
 
         public async Task<ProductDto> Handle(AddProductCommand request,
             CancellationToken cancellationToken)
         {
-            Entities.Product prd = new Entities.Product()
-            {
-                Description = request.Description,
-                InventoryId = request.InventoryId
-            };
-
-            _context.Products.Add(prd);
-            await _context.SaveChangesAsync(cancellationToken);
-
-            return new ProductDto(prd.Id, prd.Description);
+            return await _repo.AddProductAsync(new ProductDto(request.ProductId, request.Description, request.InventoryId));
         }
     }
 }

@@ -1,31 +1,25 @@
 ﻿using Inventory.Products.Endpoints;
 using MediatR;
 using Inventory.Products.Dto;
+using Inventory.Products.Repositories;
 
 namespace Inventory.Products.Handlers
 {
     internal class EditInventoryHandler :
         IRequestHandler<AddInventoryCommand, InventoryDto>
     {
-        private readonly ProductsDbContext _context;
+        private readonly IInventoryRepository _repo;
 
-        public EditInventoryHandler(ProductsDbContext context)
+        public EditInventoryHandler(IInventoryRepository repo)
         {
-            _context = context;
+            _repo = repo;
         }
 
         public async Task<InventoryDto> Handle
             (AddInventoryCommand request, 
             CancellationToken cancellationToken)
         {
-            Entities.Inventory inv = 
-                new Entities.Inventory()
-            { Description = request.Description };
-            _context.Inventories.Add(inv);
-            _context.Entry(inv).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
-            await _context.SaveChangesAsync(cancellationToken);
-            return new InventoryDto(inv.Id, inv.Description);
-
+            return await _repo.EditInventoryAsync(new InventoryDto(request.InventoryId, request.Description)); 
         }
 
     

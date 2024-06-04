@@ -15,9 +15,9 @@ namespace Category.Products.Endpoints
         Endpoint<AddCategoryRequest>
     {
         private readonly IMediator _mediator;
-        private readonly ICategoryRepository _repository;
+        private readonly IInventoryRepository _repository;
 
-        public  AddCategory(IMediator mediator, ICategoryRepository categoryRepository)
+        public  AddCategory(IMediator mediator, IInventoryRepository categoryRepository)
         {
             _mediator = mediator;
             _repository = categoryRepository;    
@@ -35,7 +35,7 @@ namespace Category.Products.Endpoints
                         CancellationToken ct)
         {
 
-            if (!_repository.FatherIdExists(req.FatherId))
+            if (!_repository.InventoryFatherIdExists(req.FatherId))
             {
                 AddError("FatherId does not exist ");
                 ThrowIfAnyErrors(); // If there are errors, execution shouldn't go beyond this point

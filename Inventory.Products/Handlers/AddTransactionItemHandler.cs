@@ -3,45 +3,43 @@ using MediatR;
 using Inventory.Products.Dto;
 using TransactionItem.Products.Endpoints;
 using Inventory.Products.Entities;
+using Inventory.Products.Repositories;
 
 namespace Inventory.Products.Handlers
 {
     internal class AddTransactionItemHandler :
         IRequestHandler<AddTransactionItemCommand, TransactionItemDto>
     {
-        private readonly ProductsDbContext _context;
+        private readonly ITransactionRepository _repository;
 
-        public AddTransactionItemHandler(ProductsDbContext context)
+        public AddTransactionItemHandler(ITransactionRepository repository)
         {
-            _context = context;
+            _repository = repository;
         }
 
         public async Task<TransactionItemDto> Handle
             (AddTransactionItemCommand request, 
             CancellationToken cancellationToken)
         {
-            Entities.TransactionItem trns =  new Entities.TransactionItem()    
-            { Description = request.Description };
 
-            _context.TransactionItems.Add(trns);
-            await _context.SaveChangesAsync(cancellationToken);
-
-            return new TransactionItemDto(
-                       trns.TransactionId,
-                       trns.Id,
-                       trns.Description,
-                       trns.TransactionType,
-                       trns.UnitPrice,
-                       trns.Quantity,
-                       trns.Price,
-                       trns.VatPercentage,
-                       trns.PriceAfterVat,
-                       trns.Discount,
-                       trns.DiscountAmount,
-                       trns.TransactionFees,
-                       trns.DeliveryFees,
-                       trns.FinalPrice
-                       );
+            TransactionItemDto trns =
+               new TransactionItemDto(
+                 request.TransactionId,
+                 request.Id,
+                 request.Description,
+                 request.TransactionType,
+                 request.UnitPrice,
+                 request.Quantity,
+                 request.Price,
+                 request.VatPercentage,
+                 request.PriceAfterVat,
+                 request.Discount,
+                 request.DiscountAmount,
+                request.TransactionFees,
+                request.DeliveryFees,
+                 request.FinalPrice
+                 );
+           return  await _repository.EditTransactionItemAsync(trns);
 
         }
 

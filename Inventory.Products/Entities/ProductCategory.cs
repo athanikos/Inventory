@@ -1,6 +1,6 @@
 ﻿namespace Inventory.Products.Entities
 {
-    internal class ProductCategory
+    public  class ProductCategory
     {
 
         public Guid ProductId { get; set; }

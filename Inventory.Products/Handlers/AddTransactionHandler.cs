@@ -2,31 +2,25 @@
 using MediatR;
 using Inventory.Products.Dto;
 using Transaction.Products.Endpoints;
+using Inventory.Products.Repositories;
 
 namespace Inventory.Products.Handlers
 {
     internal class AddTransactionHandler :
         IRequestHandler<AddTransactionCommand, TransactionDto>
     {
-        private readonly ProductsDbContext _context;
+        private readonly ITransactionRepository _repo;
 
-        public AddTransactionHandler(ProductsDbContext context)
+        public AddTransactionHandler(ITransactionRepository repo)
         {
-            _context = context;
+            _repo = repo;
         }
 
         public async Task<TransactionDto> Handle
             (AddTransactionCommand request, 
             CancellationToken cancellationToken)
         {
-            Entities.Transaction trns =  new Entities.Transaction()    
-            { Description = request.Description };
-
-            _context.Transactions.Add(trns);
-            await _context.SaveChangesAsync(cancellationToken);
-
-            return new TransactionDto(trns.Id, trns.Description,DateTime.Now);
-
+           return await  _repo.AddTransactionAsync(new TransactionDto(request.TransactionId, request.Description, request.Created));
         }
 
     

@@ -31,7 +31,7 @@ namespace Inventory.Products.Endpoints
                         CancellationToken ct)
         {
             var command = new EditProductCommand(
-                req.Description);
+              req.id,  req.Description, req.InventoryId);
             var result = await _mediator!.
                 Send(command, ct);
 
@@ -40,9 +40,9 @@ namespace Inventory.Products.Endpoints
     }
 
 
-    public record EditProductRequest(string Description);
+    public record EditProductRequest(Guid id, string Description, Guid InventoryId);
 
-    public record EditProductCommand(string Description)
+    public record EditProductCommand(Guid id,  string Description, Guid InventoryId)
       : IRequest<ProductDto>;
 
   

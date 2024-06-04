@@ -31,7 +31,7 @@ namespace Transaction.Products.Endpoints
                         CancellationToken ct)
         {
             var command = new AddTransactionCommand(
-                req.Description);
+               req.TransactionId,  req.Description,req.Created);
             var result = await _mediator!.
                 Send(command, ct);
 
@@ -40,9 +40,9 @@ namespace Transaction.Products.Endpoints
     }
 
 
-    public record AddTransactionRequest(string Description);
+    public record AddTransactionRequest(Guid TransactionId, string Description, DateTime Created);
 
-    public record AddTransactionCommand(string Description)
+    public record AddTransactionCommand(Guid TransactionId, string Description, DateTime Created)
       : IRequest<TransactionDto>;
 
   

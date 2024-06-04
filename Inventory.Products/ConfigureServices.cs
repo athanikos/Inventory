@@ -18,7 +18,9 @@ namespace Inventory.Products
             options.UseSqlServer(configuration.
             GetConnectionString("Products")));
 
-            services.AddScoped<ICategoryRepository, CategoryRepository>();
+            services.AddScoped<ITransactionRepository, TransactionRepository>();
+            services.AddScoped<IInventoryRepository, InventoryRepository>();
+         
 
             mediatRAssemblies.Add(typeof(ConfigureServices).Assembly);
             return services;

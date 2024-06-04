@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Inventory.Metrics.Endpoints;
+using Inventory.Products.Repositories;
 
 
 namespace Inventory.Products.Handlers
@@ -7,23 +8,18 @@ namespace Inventory.Products.Handlers
     internal class DeleteMetricHandler :
         IRequestHandler<DeleteMetricCommand>
     {
-        private readonly ProductsDbContext  _context;
+        private readonly IInventoryRepository _repo;
 
-        public DeleteMetricHandler(ProductsDbContext context)
+        public DeleteMetricHandler(IInventoryRepository repo)
         {
-            _context = context;
+            _repo = repo;
         }
 
         public async Task 
             Handle(DeleteMetricCommand request,
             CancellationToken cancellationToken)
         {
-            var itemToRemove = _context.Metrics.SingleOrDefault(x => x.Id == request.Id);
-            if (itemToRemove != null)
-            {
-                _context.Metrics.Remove(itemToRemove);
-                await _context.SaveChangesAsync(cancellationToken);
-            }
+              await   _repo.DeleteMetricAsync(new Dto.MetricDto(request.Id, string.Empty, 0, DateTime.MinValue, string.Empty, Guid.Empty));
         }
     }
 }

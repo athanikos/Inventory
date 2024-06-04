@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using Inventory.Products.Repositories;
+using MediatR;
 using Transaction.Products.Endpoints;
 
 namespace Inventory.Products.Handlers
@@ -6,24 +7,18 @@ namespace Inventory.Products.Handlers
     internal class DeleteTransactionHandler   :
         IRequestHandler<DeleteTransactionCommand>
     {
-        private readonly ProductsDbContext _context;
+        private readonly ITransactionRepository _repo;
 
-        public DeleteTransactionHandler(ProductsDbContext context)
+        public DeleteTransactionHandler(ITransactionRepository repo)
         {
-            _context = context;
+            _repo = repo;
         }
 
         public async Task Handle
             (DeleteTransactionCommand request, 
             CancellationToken cancellationToken)
         {
-            var itemToRemove = _context.Transactions.SingleOrDefault(x => x.Id == request.Id);
-            if (itemToRemove != null)
-            {
-                _context.Transactions.Remove(itemToRemove);
-                await _context.SaveChangesAsync(cancellationToken);
-            }
-
+            await            _repo.DeleteTransactionAsync(new Dto.TransactionDto(request.Id, string.Empty, DateTime.MinValue));
         }
 
     

@@ -1,6 +1,7 @@
 ﻿using Inventory.Products.Endpoints;
 using MediatR;
 using Inventory.Products.Dto;
+using Inventory.Products.Repositories;
 
 
 namespace Inventory.Products.Handlers
@@ -8,28 +9,18 @@ namespace Inventory.Products.Handlers
     internal class EditCategoryHandler :
         IRequestHandler<EditCategoryCommand, CategoryDto>
     {
-        private readonly ProductsDbContext  _context;
+        private readonly IInventoryRepository _categoryRepository;
 
-        public EditCategoryHandler(ProductsDbContext context)
+        public EditCategoryHandler(IInventoryRepository categoryRepository)
         {
-            _context = context;
+            _categoryRepository = categoryRepository;
         }
 
         public async Task<CategoryDto> Handle(EditCategoryCommand request,
             CancellationToken cancellationToken)
         {
-            Entities.Category prd =
-                new Entities.Category()
-            {
-                Id = request.Id,
-                FatherId = request.FatherId,
-                Name = request.Description
-            };
-
-            _context.Categories.Add(prd);
-            await _context.SaveChangesAsync(cancellationToken);
-
-            return new CategoryDto(prd.Id,  prd.Name, prd.FatherId);
+             return await  _categoryRepository.EditCategoryAsync(new CategoryDto(request.Id, request.Description, request.FatherId));
         }
     }
+
 }

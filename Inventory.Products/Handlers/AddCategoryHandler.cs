@@ -9,9 +9,9 @@ namespace Inventory.Products.Handlers
         IRequestHandler<AddCategoryCommand, CategoryDto>
     {
 
-        private readonly ICategoryRepository _repository;
+        private readonly IInventoryRepository _repository;
 
-        public AddCategoryHandler(ICategoryRepository repo)
+        public AddCategoryHandler(IInventoryRepository repo)
         {
             _repository = repo;
         }

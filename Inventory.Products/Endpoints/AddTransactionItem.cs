@@ -2,13 +2,12 @@
 namespace TransactionItem.Products.Endpoints
 {
     using FastEndpoints;
-     using MediatR;
+    using MediatR;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Http.HttpResults;
     using System.Threading;
     using System.Threading.Tasks;
     using Inventory.Products.Dto;
-    using Inventory.Products.Entities;
 
     public class AddTransactionItem :
         Endpoint<AddTransactionItemRequest>

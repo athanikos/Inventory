@@ -1,34 +1,25 @@
 ﻿using Inventory.Metrics.Endpoints;
 using MediatR;
 using Inventory.Products.Dto;
+using Inventory.Products.Repositories;
 
 namespace Inventory.Metrics.Handlers
 {
     internal class AddMetricHandler : IRequestHandler<AddMetricCommand, MetricDto>
     {
-        private readonly Products.ProductsDbContext _context;
+        private readonly IInventoryRepository _repo;
 
-        public AddMetricHandler(Products.ProductsDbContext context)
+        public AddMetricHandler(IInventoryRepository repo)
         {
-            _context = context;
+            _repo = repo;
         }
 
         public async Task<MetricDto> Handle(AddMetricCommand request,
             CancellationToken cancellationToken)
         {
-            Products.Entities.Metric m = new Products.Entities.Metric()
-            {
-                Id = request.Id,
-                Code = request.Code,
-                Description = request.Description,
-                EffectiveDate = request.EffectiveDate,
-                Value = request.Value   
-            };
-
-            _context.Metrics.Add(m);
-            await _context.SaveChangesAsync(cancellationToken);
-
-            return new MetricDto(m.Id,m.Description,m.Value,m.EffectiveDate,m.Code,m.SourceId);
+ 
+           return await _repo.AddMetricAsync(new MetricDto(request.Id, request.Description, request.Value, request.EffectiveDate,
+                request.Code, request.SourceId));
         }
     }
 }

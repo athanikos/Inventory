@@ -31,7 +31,7 @@ namespace Inventory.Products.Endpoints
                         CancellationToken ct)
         {
             var command = new AddInventoryCommand(
-                req.Description);
+              req.InventoryId,  req.Description);
             var result = await _mediator!.
                 Send(command, ct);
 
@@ -40,9 +40,9 @@ namespace Inventory.Products.Endpoints
     }
 
 
-    public record AddInventoryRequest(string Description);
+    public record AddInventoryRequest(Guid InventoryId, string Description);
 
-    public record AddInventoryCommand(string Description)
+    public record AddInventoryCommand(Guid InventoryId, string Description)
       : IRequest<InventoryDto>;
 
   

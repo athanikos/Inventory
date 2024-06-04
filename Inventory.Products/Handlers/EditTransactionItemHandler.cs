@@ -2,6 +2,7 @@
 using MediatR;
 using Inventory.Products.Dto;
 using TransactionItem.Products.Endpoints;
+using Inventory.Products.Repositories;
 
 namespace Inventory.Products.Handlers
 {
@@ -10,70 +11,35 @@ namespace Inventory.Products.Handlers
         IRequestHandler<EditTransactionItemCommand,
         TransactionItemDto>
     {
-        private readonly ProductsDbContext _context;
+        private readonly ITransactionRepository _repo;
 
-        public EditTransactionItemHandler(ProductsDbContext context)
+        public EditTransactionItemHandler(ITransactionRepository repo)
         {
-            _context = context;
+            _repo = repo;
         }
 
         public async Task<TransactionItemDto> Handle
             (EditTransactionItemCommand request, 
             CancellationToken cancellationToken)
         {
-            Entities.TransactionItem trns =
-            new Entities.TransactionItem()
-            {
-                Description = request.Description
-                ,
-                Id = request.Id
-                ,
-                TransactionId = request.TransactionId
-                ,
-                TransactionType = request.TransactionType
-                ,
-                UnitPrice = request.UnitPrice
-                ,
-                Quantity = request.Quantity
-                ,
-                Price = request.Price
-                ,
-                VatPercentage = request.VatPercentage
-                ,
-                PriceAfterVat = request.PriceAfterVat
-                ,
-                Discount = request.Discount
-                ,
-                DiscountAmount = request.DiscountAmount
-                ,
-                TransactionFees = request.TransactionFees
-                ,
-                DeliveryFees = request.DeliveryFees
-                ,
-                FinalPrice = request.FinalPrice
-            };
 
-
-            _context.TransactionItems.Add(trns);
-            await _context.SaveChangesAsync(cancellationToken);
-
-            return new TransactionItemDto(
-                       trns.TransactionId,
-                       trns.Id,
-                       trns.Description,
-                       trns.TransactionType,
-                       trns.UnitPrice,
-                       trns.Quantity,
-                       trns.Price,
-                       trns.VatPercentage,
-                       trns.PriceAfterVat,
-                       trns.Discount,
-                       trns.DiscountAmount,
-                       trns.TransactionFees,
-                       trns.DeliveryFees,
-                       trns.FinalPrice
-                       );
-
+            return await _repo.EditTransactionItemAsync(new TransactionItemDto(
+                 request.TransactionId,
+                 request.Id,
+                 request.Description,
+                 request.TransactionType,
+                 request.UnitPrice,
+                 request.Quantity,
+                 request.Price,
+                 request.VatPercentage,
+                 request.PriceAfterVat,
+                 request.Discount,
+                 request.DiscountAmount,
+                 request.TransactionFees,
+                 request.DeliveryFees,
+                 request.FinalPrice
+                 ));
+       
         }
 
     

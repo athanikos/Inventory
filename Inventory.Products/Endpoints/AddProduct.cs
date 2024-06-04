@@ -31,8 +31,7 @@ namespace Inventory.Products.Endpoints
             HandleAsync(AddProductRequest req,
                         CancellationToken ct)
         {
-            var command = new AddProductCommand(
-                req.Description, req.InventoryId);
+            var command = new AddProductCommand(req.ProductId,   req.Description, req.InventoryId);
             var result = await _mediator!.
                 Send(command, ct);
 
@@ -40,12 +39,10 @@ namespace Inventory.Products.Endpoints
         }
     }
 
-
     public record AddProductRequest
-        (string Description, Guid InventoryId);
+        (Guid ProductId, string Description, Guid InventoryId);
 
-    public record AddProductCommand(string Description, 
-        Guid InventoryId)
+    public record AddProductCommand(Guid ProductId, string Description, Guid InventoryId)
       : IRequest<ProductDto>;
 
   
