@@ -1,11 +1,9 @@
 ﻿
 namespace Inventory.Metrics.Endpoints
 {
-    using Azure.Core;
     using FastEndpoints;
     using Inventory.Products.Dto;
     using Inventory.Products.Repositories;
-    using MediatR;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Http.HttpResults;
     using System.Threading;
@@ -42,7 +40,6 @@ namespace Inventory.Metrics.Endpoints
 
     public record DeleteMetricRequest (Guid Id);
 
-    public record DeleteMetricCommand (Guid Id) : IRequest;
-
+  
   
 }

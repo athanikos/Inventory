@@ -2,13 +2,11 @@
 namespace Transaction.Products.Endpoints
 {
     using FastEndpoints;
-    using MediatR;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Http.HttpResults;
     using System.Threading;
     using System.Threading.Tasks;
     using Inventory.Products.Dto;
-    using Azure.Core;
     using Inventory.Products.Repositories;
 
     public class EditTransaction :
@@ -40,8 +38,6 @@ namespace Transaction.Products.Endpoints
 
     public record DeleteTransactionRequest(Guid Id);
 
-    public record DeleteTransactionCommand(Guid Id)
-      : IRequest;
-
+  
   
 }

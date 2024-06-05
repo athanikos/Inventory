@@ -2,13 +2,11 @@
 namespace TransactionItem.Products.Endpoints
 {
     using FastEndpoints;
-    using MediatR;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Http.HttpResults;
     using System.Threading;
     using System.Threading.Tasks;
     using Inventory.Products.Dto;
-    using Azure.Core;
     using Inventory.Products.Repositories;
 
     public class AddTransactionItem :
@@ -71,22 +69,6 @@ namespace TransactionItem.Products.Endpoints
                     decimal TransactionFees,
                     decimal DeliveryFees,
                      decimal FinalPrice);
-
-    public record AddTransactionItemCommand(Guid TransactionId,
-                    Guid Id,
-                    string Description,
-                    string TransactionType,
-                    decimal UnitPrice,
-                    decimal Quantity,
-                    decimal Price,
-                    decimal VatPercentage,
-                    decimal PriceAfterVat,
-                    decimal Discount,
-                    decimal DiscountAmount,
-                    decimal TransactionFees,
-                    decimal DeliveryFees,
-                    decimal FinalPrice)
-      : IRequest<TransactionItemDto>;
 
   
 }

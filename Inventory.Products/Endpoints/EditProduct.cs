@@ -2,13 +2,11 @@
 namespace Inventory.Products.Endpoints
 {
     using FastEndpoints;
-    using MediatR;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Http.HttpResults;
     using System.Threading;
     using System.Threading.Tasks;
     using Inventory.Products.Dto;
-    using Azure.Core;
     using Inventory.Products.Repositories;
 
     public class EditProduct :
@@ -37,9 +35,6 @@ namespace Inventory.Products.Endpoints
         }
     }
     public record EditProductRequest(Guid id, string Description, Guid InventoryId);
-
-    public record EditProductCommand(Guid id,  string Description, Guid InventoryId)
-      : IRequest<ProductDto>;
 
   
 }

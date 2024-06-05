@@ -1,11 +1,9 @@
 ﻿
 namespace Inventory.Products.Endpoints
 {
-    using Azure.Core;
     using FastEndpoints;
     using Inventory.Products.Dto;
     using Inventory.Products.Repositories;
-    using MediatR;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Http.HttpResults;
     using System.Threading;
@@ -40,8 +38,5 @@ namespace Inventory.Products.Endpoints
     public record AddProductRequest
     (Guid ProductId, string Description, Guid InventoryId);
 
-    public record AddProductCommand(Guid ProductId, string Description, Guid InventoryId)
-      : IRequest<ProductDto>;
-
-  
+    
 }

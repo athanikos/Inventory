@@ -2,13 +2,11 @@
 namespace Inventory.Products.Endpoints
 {
     using FastEndpoints;
-    using MediatR;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Http.HttpResults;
     using System.Threading;
     using System.Threading.Tasks;
     using Inventory.Products.Dto;
-    using Azure.Core;
     using Inventory.Products.Repositories;
 
     public class EditMetric :
@@ -46,12 +44,6 @@ namespace Inventory.Products.Endpoints
     string Code,
     Guid SourceId);
    
-    public record EditMetricCommand(Guid Id,
-    string Description,
-    decimal Value,
-    DateTime EffectiveDate,
-    string Code,
-    Guid SourceId)  : IRequest<MetricDto>;
-
+  
   
 }

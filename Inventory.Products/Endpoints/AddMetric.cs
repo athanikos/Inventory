@@ -1,12 +1,9 @@
 ﻿
 namespace Inventory.Metrics.Endpoints
 {
-    using Azure.Core;
     using FastEndpoints;
     using Inventory.Products.Dto;
-    using Inventory.Products.Entities;
     using Inventory.Products.Repositories;
-    using MediatR;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Http.HttpResults;
     using System.Threading;
@@ -51,13 +48,6 @@ namespace Inventory.Metrics.Endpoints
     string Code,
                         Guid SourceId);
 
-    public record AddMetricCommand(Guid Id,
-                        string Description,
-                        decimal Value,
-                        DateTime EffectiveDate,
-                        string Code,
-                        Guid SourceId)
-      : IRequest<MetricDto>;
-
+  
   
 }

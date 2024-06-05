@@ -1,22 +1,19 @@
-﻿
+﻿using FastEndpoints;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Inventory.Products.Dto;
+using Inventory.Products.Repositories;
+
 namespace Inventory.Products.Endpoints
 {
-    using FastEndpoints;
-    using MediatR;
-    using Microsoft.AspNetCore.Http;
-    using Microsoft.AspNetCore.Http.HttpResults;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using Inventory.Products.Dto;
-
     public class EditCategory :
         Endpoint<EditCategoryRequest>
     {
-        private readonly IMediator _mediator;
+        private readonly IInventoryRepository _repo;
 
-        public  EditCategory(IMediator mediator)
+        public  EditCategory(IInventoryRepository repo)
         {
-            _mediator = mediator;
+            _repo = repo;
         }
 
         public override void Configure()
@@ -30,16 +27,10 @@ namespace Inventory.Products.Endpoints
             HandleAsync(EditCategoryRequest req,
                         CancellationToken ct)
         {
-            var command = new EditCategoryCommand(
-                req.Id,
-                req.Description,
-                req.FatherId);
 
+            var dto = await _repo.AddCategoryAsync(new CategoryDto(req.Id, req.Description,req.FatherId) );
 
-            var result = await _mediator!.
-                Send(command, ct);
-
-            return TypedResults.Ok<CategoryDto>(result);
+            return TypedResults.Ok(dto);
         }
     }
 
@@ -47,9 +38,4 @@ namespace Inventory.Products.Endpoints
     public record EditCategoryRequest
         (Guid Id, string Description, Guid FatherId);
 
-    public record EditCategoryCommand
-        (Guid Id, string Description, Guid FatherId)
-      : IRequest<CategoryDto>;
-
-  
 }

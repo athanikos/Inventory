@@ -37,10 +37,8 @@ namespace Inventory.Products.Endpoints
             return TypedResults.Ok(dto);
         }
     }
-    public record EditTransactionRequest(Guid Id,string Description, DateTime Created );
 
-    public record EditTransactionCommand(Guid Id, string Description, DateTime Created)
-      : IRequest<TransactionDto>;
+    public record EditTransactionRequest(Guid Id,string Description, DateTime Created );
 
   
 }

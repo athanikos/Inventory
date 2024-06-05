@@ -10,7 +10,6 @@ namespace Category.Products.Endpoints
     using Inventory.Products.Dto;
     using System;
     using Inventory.Products.Repositories;
-    using Azure.Core;
 
     public class AddCategory :
         Endpoint<AddCategoryRequest>
@@ -53,7 +52,6 @@ namespace Category.Products.Endpoints
 
     public record AddCategoryRequest(Guid FatherId, string Description);
 
-    public record AddCategoryCommand(Guid FatherId, string Description): IRequest<CategoryDto>;
-
+ 
   
 }

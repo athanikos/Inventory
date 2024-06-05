@@ -2,13 +2,11 @@
 namespace Transaction.Products.Endpoints
 {
     using FastEndpoints;
-    using MediatR;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Http.HttpResults;
     using System.Threading;
     using System.Threading.Tasks;
     using Inventory.Products.Dto;
-    using Azure.Core;
     using Inventory.Products.Repositories;
 
     public class AddTransaction :
@@ -39,9 +37,6 @@ namespace Transaction.Products.Endpoints
         }
     }
     public record AddTransactionRequest(Guid TransactionId, string Description, DateTime Created);
-
-    public record AddTransactionCommand(Guid TransactionId, string Description, DateTime Created)
-      : IRequest<TransactionDto>;
 
   
 }

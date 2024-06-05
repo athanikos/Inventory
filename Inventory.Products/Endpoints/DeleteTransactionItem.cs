@@ -1,8 +1,6 @@
-﻿using Azure.Core;
-using FastEndpoints;
+﻿using FastEndpoints;
 using Inventory.Products.Dto;
 using Inventory.Products.Repositories;
-using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 
@@ -39,9 +37,6 @@ namespace TransactionItem.Products.Endpoints
     public record DeleteTransactionItemRequest(
                     Guid Id);
 
-    public record DeleteTransactionItemCommand(Guid Id
-               )
-      : IRequest;
-
+  
   
 }
