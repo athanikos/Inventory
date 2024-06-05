@@ -10,6 +10,7 @@ namespace Category.Products.Endpoints
     using Inventory.Products.Dto;
     using System;
     using Inventory.Products.Repositories;
+    using Azure.Core;
 
     public class AddCategory :
         Endpoint<AddCategoryRequest>
@@ -43,11 +44,8 @@ namespace Category.Products.Endpoints
             }
             else
             {
-                var command = new AddCategoryCommand(req.FatherId, req.Description);
-                var result = await _mediator!.
-                    Send(command, ct);
-                return TypedResults.Ok<CategoryDto>(result);
-
+                var categoryDto =  await _repository.AddCategoryAsync(new CategoryDto(Guid.NewGuid(), req.Description, req.FatherId));
+                return TypedResults.Ok(categoryDto);
             }
         }
     }

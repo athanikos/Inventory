@@ -1,22 +1,25 @@
 ﻿
 namespace Inventory.Products.Endpoints
 {
+    using Azure.Core;
     using FastEndpoints;
     using Inventory.Products.Dto;
+    using Inventory.Products.Repositories;
     using MediatR;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Http.HttpResults;
+    using Microsoft.EntityFrameworkCore.Storage.Json;
     using System.Threading;
     using System.Threading.Tasks;
 
     public class EditInventory :
         Endpoint<EditInventoryRequest>
     {
-        private readonly IMediator _mediator;
+        private readonly IInventoryRepository _repo;
 
-        public  EditInventory(IMediator mediator)
+        public  EditInventory(IInventoryRepository repo)
         {
-            _mediator = mediator;
+            _repo = repo;
         }
 
         public override void Configure()
@@ -30,19 +33,15 @@ namespace Inventory.Products.Endpoints
             HandleAsync(EditInventoryRequest req,
                         CancellationToken ct)
         {
-            var command = new EditInventoryCommand(
-                req.Description);
-            var result = await _mediator!.
-                Send(command, ct);
-
-            return TypedResults.Ok(result);
+            var dto =  await _repo.EditInventoryAsync(new InventoryDto( req.Id , req.Description));
+            return TypedResults.Ok(dto);
         }
     }
 
 
-    public record EditInventoryRequest(string Description);
+    public record EditInventoryRequest(Guid Id,  string Description);
 
-    public record EditInventoryCommand(string Description)
+    public record EditInventoryCommand(Guid Id, string Description)
       : IRequest<InventoryDto>;
 
   

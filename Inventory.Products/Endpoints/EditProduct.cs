@@ -8,15 +8,17 @@ namespace Inventory.Products.Endpoints
     using System.Threading;
     using System.Threading.Tasks;
     using Inventory.Products.Dto;
+    using Azure.Core;
+    using Inventory.Products.Repositories;
 
     public class EditProduct :
         Endpoint<EditProductRequest>
     {
-        private readonly IMediator _mediator;
+        private readonly IInventoryRepository _repo;
 
-        public  EditProduct(IMediator mediator)
+        public  EditProduct(IInventoryRepository repo)
         {
-            _mediator = mediator;
+            _repo = repo;
         }
 
         public override void Configure()
@@ -30,16 +32,10 @@ namespace Inventory.Products.Endpoints
             HandleAsync(EditProductRequest req,
                         CancellationToken ct)
         {
-            var command = new EditProductCommand(
-              req.id,  req.Description, req.InventoryId);
-            var result = await _mediator!.
-                Send(command, ct);
-
-            return TypedResults.Ok<ProductDto>(result);
+            var dto =   await _repo.EditProductAsync(new ProductDto(req.id, req.Description,req.InventoryId));
+            return TypedResults.Ok<ProductDto>(dto);
         }
     }
-
-
     public record EditProductRequest(Guid id, string Description, Guid InventoryId);
 
     public record EditProductCommand(Guid id,  string Description, Guid InventoryId)

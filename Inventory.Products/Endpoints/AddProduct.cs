@@ -1,8 +1,10 @@
 ﻿
 namespace Inventory.Products.Endpoints
 {
+    using Azure.Core;
     using FastEndpoints;
     using Inventory.Products.Dto;
+    using Inventory.Products.Repositories;
     using MediatR;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Http.HttpResults;
@@ -12,11 +14,11 @@ namespace Inventory.Products.Endpoints
     public  class AddProduct 
         : Endpoint<AddProductRequest>
     {
-        private readonly IMediator _mediator;
+        private readonly IInventoryRepository _repo;
 
-        public  AddProduct(IMediator mediator)
+        public  AddProduct(IInventoryRepository repo)
         {
-            _mediator = mediator;
+            _repo = repo;
         }
 
         public override void Configure()
@@ -31,16 +33,12 @@ namespace Inventory.Products.Endpoints
             HandleAsync(AddProductRequest req,
                         CancellationToken ct)
         {
-            var command = new AddProductCommand(req.ProductId,   req.Description, req.InventoryId);
-            var result = await _mediator!.
-                Send(command, ct);
-
-            return TypedResults.Ok<ProductDto>(result);
+           var dto =  await _repo.AddProductAsync(new ProductDto(req.ProductId, req.Description, req.InventoryId));
+           return TypedResults.Ok(dto);
         }
     }
-
     public record AddProductRequest
-        (Guid ProductId, string Description, Guid InventoryId);
+    (Guid ProductId, string Description, Guid InventoryId);
 
     public record AddProductCommand(Guid ProductId, string Description, Guid InventoryId)
       : IRequest<ProductDto>;

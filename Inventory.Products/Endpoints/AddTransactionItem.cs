@@ -8,15 +8,17 @@ namespace TransactionItem.Products.Endpoints
     using System.Threading;
     using System.Threading.Tasks;
     using Inventory.Products.Dto;
+    using Azure.Core;
+    using Inventory.Products.Repositories;
 
     public class AddTransactionItem :
         Endpoint<AddTransactionItemRequest>
     {
-        private readonly IMediator _mediator;
+        private readonly ITransactionRepository _repo;
 
-        public  AddTransactionItem(IMediator mediator)
+        public  AddTransactionItem(ITransactionRepository repo)
         {
-            _mediator = mediator;
+            _repo = repo;
         }
 
         public override void Configure()
@@ -30,26 +32,27 @@ namespace TransactionItem.Products.Endpoints
             HandleAsync(AddTransactionItemRequest req,
                         CancellationToken ct)
         {
-            var command = new AddTransactionItemCommand(
-                       req.Id,
-                       req.TransactionId,
-                       req.Description,
-                       req.TransactionType,
-                       req.UnitPrice,
-                       req.Quantity,
-                       req.Price,
-                       req.VatPercentage,
-                       req.PriceAfterVat,
-                       req.Discount,
-                       req.DiscountAmount,
-                       req.TransactionFees,
-                       req.DeliveryFees,
-                       req.FinalPrice);
 
-            var result = await _mediator!.
-                Send(command, ct);
+            TransactionItemDto trns =
+               new TransactionItemDto(
+                 req.TransactionId,
+                 req.Id,
+                 req.Description,
+                 req.TransactionType,
+                 req.UnitPrice,
+                 req.Quantity,
+                 req.Price,
+                 req.VatPercentage,
+                 req.PriceAfterVat,
+                 req.Discount,
+                 req.DiscountAmount,
+                 req.TransactionFees,
+                 req.DeliveryFees,
+                 req.FinalPrice
+                 );
+            await _repo.EditTransactionItemAsync(trns);
 
-            return TypedResults.Ok<TransactionItemDto>(result);
+            return TypedResults.Ok(trns);
         }
     }
 

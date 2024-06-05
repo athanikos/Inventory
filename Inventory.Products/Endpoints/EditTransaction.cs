@@ -8,15 +8,18 @@ namespace Inventory.Products.Endpoints
     using System.Threading;
     using System.Threading.Tasks;
     using Inventory.Products.Dto;
+    using Azure.Core;
+    using Microsoft.EntityFrameworkCore.Storage;
+    using Inventory.Products.Repositories;
 
     public class EditTransaction :
         Endpoint<EditTransactionRequest>
     {
-        private readonly IMediator _mediator;
+        private readonly ITransactionRepository _repo;
 
-        public EditTransaction(IMediator mediator)
+        public EditTransaction(ITransactionRepository repo)
         {
-            _mediator = mediator;
+            _repo = repo;
         }
 
         public override void Configure()
@@ -30,16 +33,10 @@ namespace Inventory.Products.Endpoints
             HandleAsync(EditTransactionRequest req,
                         CancellationToken ct)
         {
-            var command = new EditTransactionCommand(
-               req.Id, req.Description, req.Created);
-
-            var result = await _mediator.Send(command, ct);
-
-            return TypedResults.Ok<TransactionDto>(result);
+            var dto =  await _repo.AddTransactionAsync(new TransactionDto(req.Id, req.Description, req.Created));
+            return TypedResults.Ok(dto);
         }
     }
-
-
     public record EditTransactionRequest(Guid Id,string Description, DateTime Created );
 
     public record EditTransactionCommand(Guid Id, string Description, DateTime Created)

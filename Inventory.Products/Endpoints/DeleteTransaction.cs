@@ -8,15 +8,17 @@ namespace Transaction.Products.Endpoints
     using System.Threading;
     using System.Threading.Tasks;
     using Inventory.Products.Dto;
+    using Azure.Core;
+    using Inventory.Products.Repositories;
 
     public class EditTransaction :
         Endpoint<DeleteTransactionRequest>
     {
-        private readonly IMediator _mediator;
+        private readonly ITransactionRepository _repo;
 
-        public  EditTransaction(IMediator mediator)
+        public  EditTransaction(ITransactionRepository repo)
         {
-            _mediator = mediator;
+            _repo = repo;
         }
 
         public override void Configure()
@@ -30,12 +32,7 @@ namespace Transaction.Products.Endpoints
             HandleAsync(DeleteTransactionRequest req,
                         CancellationToken ct)
         {
-            var command = new DeleteTransactionCommand(
-                req.Id);
-            
-            await _mediator!.
-                Send(command, ct);
-
+            await _repo.DeleteTransactionAsync(new TransactionDto(req.Id, string.Empty, DateTime.MinValue));
             return TypedResults.Ok();
         }
     }

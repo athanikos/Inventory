@@ -1,9 +1,11 @@
 ﻿
 namespace Inventory.Metrics.Endpoints
 {
+    using Azure.Core;
     using FastEndpoints;
     using Inventory.Products.Dto;
     using Inventory.Products.Entities;
+    using Inventory.Products.Repositories;
     using MediatR;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Http.HttpResults;
@@ -13,11 +15,11 @@ namespace Inventory.Metrics.Endpoints
     public  class AddMetric 
         : Endpoint<AddMetricRequest>
     {
-        private readonly IMediator _mediator;
+        private readonly IInventoryRepository _repo;
 
-        public  AddMetric(IMediator mediator)
+        public  AddMetric(IInventoryRepository repo)
         {
-            _mediator = mediator;
+            _repo = repo;
         }
 
         public override void Configure()
@@ -32,28 +34,21 @@ namespace Inventory.Metrics.Endpoints
             HandleAsync(AddMetricRequest req,
                         CancellationToken ct)
         {
-            var command = new AddMetricCommand(
-                        req.Id,
-                        req.Description,
-                        req.Value,
-                        req.EffectiveDate,
-                        req.Code,
-                        req.SourceId);
+            
+            
+            var dto =   await _repo.AddMetricAsync(new MetricDto(req.Id, req.Description, req.Value, req.EffectiveDate,
+            req.Code, req.SourceId));
 
-            var result = await _mediator!.
-                Send(command, ct);
 
-            return TypedResults.Ok<MetricDto>(result);
+            return TypedResults.Ok<MetricDto>(dto);
         }
     }
-
-
     public record AddMetricRequest
-        (Guid Id,
-                        string Description,
-                        decimal Value,
-                        DateTime EffectiveDate,
-                        string Code,
+    (Guid Id,
+    string Description,
+    decimal Value,
+    DateTime EffectiveDate,
+    string Code,
                         Guid SourceId);
 
     public record AddMetricCommand(Guid Id,

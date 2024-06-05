@@ -1,8 +1,10 @@
 ﻿
 namespace Inventory.Metrics.Endpoints
 {
+    using Azure.Core;
     using FastEndpoints;
     using Inventory.Products.Dto;
+    using Inventory.Products.Repositories;
     using MediatR;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Http.HttpResults;
@@ -12,11 +14,11 @@ namespace Inventory.Metrics.Endpoints
     public  class DeleteMetric 
         : Endpoint<DeleteMetricRequest>
     {
-        private readonly IMediator _mediator;
+        private readonly IInventoryRepository _repo;
 
-        public  DeleteMetric(IMediator mediator)
+        public  DeleteMetric(IInventoryRepository repo)
         {
-            _mediator = mediator;
+            _repo = repo;
         }
 
         public override void Configure()
@@ -31,11 +33,8 @@ namespace Inventory.Metrics.Endpoints
             HandleAsync(DeleteMetricRequest req,
                         CancellationToken ct)
         {
-            var command = new DeleteMetricCommand(
-                req.Id);
-             await _mediator!.
-                Send(command, ct);
-
+            //todo default 
+            await _repo.DeleteMetricAsync(new MetricDto(req.Id, string.Empty, 0, DateTime.MinValue, string.Empty, Guid.Empty));
             return TypedResults.Ok();
         }
     }

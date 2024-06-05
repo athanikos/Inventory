@@ -8,15 +8,17 @@ namespace Transaction.Products.Endpoints
     using System.Threading;
     using System.Threading.Tasks;
     using Inventory.Products.Dto;
+    using Azure.Core;
+    using Inventory.Products.Repositories;
 
     public class AddTransaction :
         Endpoint<AddTransactionRequest>
     {
-        private readonly IMediator _mediator;
+        private readonly ITransactionRepository _repo;
 
-        public  AddTransaction(IMediator mediator)
+        public  AddTransaction(ITransactionRepository repo)
         {
-            _mediator = mediator;
+            _repo = repo;
         }
 
         public override void Configure()
@@ -30,16 +32,12 @@ namespace Transaction.Products.Endpoints
             HandleAsync(AddTransactionRequest req,
                         CancellationToken ct)
         {
-            var command = new AddTransactionCommand(
-               req.TransactionId,  req.Description,req.Created);
-            var result = await _mediator!.
-                Send(command, ct);
-
-            return TypedResults.Ok<TransactionDto>(result);
+            var dto =  await _repo.AddTransactionAsync(new TransactionDto(req.TransactionId, req.Description, 
+                req.Created));
+            
+            return TypedResults.Ok<TransactionDto>(dto);
         }
     }
-
-
     public record AddTransactionRequest(Guid TransactionId, string Description, DateTime Created);
 
     public record AddTransactionCommand(Guid TransactionId, string Description, DateTime Created)

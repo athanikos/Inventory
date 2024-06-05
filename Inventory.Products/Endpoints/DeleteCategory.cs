@@ -1,7 +1,10 @@
 ﻿
 namespace Category.Products.Endpoints
 {
+    using Azure.Core;
     using FastEndpoints;
+    using Inventory.Products.Dto;
+    using Inventory.Products.Repositories;
     using MediatR;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Http.HttpResults;
@@ -11,11 +14,11 @@ namespace Category.Products.Endpoints
     public class DeleteCategory :
         Endpoint<DeleteCategoryRequest>
     {
-        private readonly IMediator _mediator;
+        private readonly IInventoryRepository _repo;
 
-        public  DeleteCategory(IMediator mediator)
+        public  DeleteCategory(IInventoryRepository repo)
         {
-            _mediator = mediator;
+            _repo = repo;
         }
 
         public override void Configure()
@@ -29,13 +32,8 @@ namespace Category.Products.Endpoints
             HandleAsync(DeleteCategoryRequest req,
                         CancellationToken ct)
         {
-            var command = new DeleteCategoryCommand(
-                req.Id);
-          
-            await _mediator!.
-                Send(command, ct);
-           
-            return TypedResults.Ok(); //todo fix 
+             await  _repo.DeleteCategoryAsync(new CategoryDto(req.Id, string.Empty, Guid.Empty));
+            return TypedResults.Ok();
         }
     }
 

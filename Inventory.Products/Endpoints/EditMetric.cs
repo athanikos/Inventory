@@ -8,15 +8,17 @@ namespace Inventory.Products.Endpoints
     using System.Threading;
     using System.Threading.Tasks;
     using Inventory.Products.Dto;
+    using Azure.Core;
+    using Inventory.Products.Repositories;
 
     public class EditMetric :
         Endpoint<EditMetricRequest>
     {
-        private readonly IMediator _mediator;
+        private readonly IInventoryRepository _repo;
 
-        public  EditMetric(IMediator mediator)
+        public  EditMetric(IInventoryRepository repo)
         {
-            _mediator = mediator;
+            _repo = repo;
         }
 
         public override void Configure()
@@ -30,34 +32,26 @@ namespace Inventory.Products.Endpoints
             HandleAsync(EditMetricRequest req,
                         CancellationToken ct)
         {
-            var command = new EditMetricCommand(
-             req. Id,
-                         req.Description,
-                         req.Value,
-                         req.EffectiveDate,
-             req.Code,
-                         req.SourceId);
-            var result = await _mediator!.
-                Send(command, ct);
+        
+            var dto =  await _repo.EditMetricAsync(new MetricDto(req.Id, req.Description, req.Value, 
+                req.EffectiveDate, req.Code, req.SourceId));
 
-            return TypedResults.Ok<MetricDto>(result);
+            return TypedResults.Ok(dto);
         }
     }
-
-
     public record EditMetricRequest(Guid Id,
-                        string Description,
-                        decimal Value,
-                        DateTime EffectiveDate,
-                        string Code,
-                        Guid SourceId);
-
+    string Description,
+    decimal Value,
+    DateTime EffectiveDate,
+    string Code,
+    Guid SourceId);
+   
     public record EditMetricCommand(Guid Id,
-                        string Description,
-                        decimal Value,
-                        DateTime EffectiveDate,
-                        string Code,
-                        Guid SourceId)  : IRequest<MetricDto>;
+    string Description,
+    decimal Value,
+    DateTime EffectiveDate,
+    string Code,
+    Guid SourceId)  : IRequest<MetricDto>;
 
   
 }

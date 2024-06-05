@@ -1,7 +1,10 @@
 ﻿
 namespace Inventory.Products.Endpoints
 {
+    using Azure.Core;
     using FastEndpoints;
+    using Inventory.Products.Dto;
+    using Inventory.Products.Repositories;
     using MediatR;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Http.HttpResults;
@@ -11,11 +14,11 @@ namespace Inventory.Products.Endpoints
     public  class DeleteProduct 
         : Endpoint<DeleteProductRequest>
     {
-        private readonly IMediator _mediator;
+        private readonly IInventoryRepository _repo;
 
-        public  DeleteProduct(IMediator mediator)
+        public  DeleteProduct(IInventoryRepository repo)
         {
-            _mediator = mediator;
+            _repo = repo;
         }
 
         public override void Configure()
@@ -30,11 +33,7 @@ namespace Inventory.Products.Endpoints
             HandleAsync(DeleteProductRequest req,
                         CancellationToken ct)
         {
-            var command = new DeleteProductCommand(
-                 req.Id);
-             await _mediator!.
-                Send(command, ct);
-
+            await _repo.DeleteProductAsync(new ProductDto(req.Id, string.Empty, Guid.Empty));
             return TypedResults.Ok(); //todo fix 
             
         }
