@@ -1,4 +1,5 @@
 ﻿
+
 namespace Category.Products.Endpoints
 {
     using FastEndpoints;
@@ -35,7 +36,7 @@ namespace Category.Products.Endpoints
                         CancellationToken ct)
         {
 
-            if (!_repository.InventoryFatherIdExists(req.FatherId))
+            if (!_repository.CategoryIdExists(req.FatherId))
             {
                 AddError("FatherId does not exist ");
                 ThrowIfAnyErrors(); // If there are errors, execution shouldn't go beyond this point

@@ -10,9 +10,9 @@ namespace Inventory.Products.Repositories
         public InventoryRepository(ProductsDbContext context)
         { _context = context; }
 
-        public bool InventoryFatherIdExists(Guid FatherId)
+        public bool InventoryIdExists(Guid Id)
         {
-            return _context.Categories.Where(p => p.FatherId == FatherId).Count() > 0;
+            return _context.Inventories.Where(p => p.Id == Id).Count() > 0;
         }
 
         public async Task<InventoryDto> AddInventoryAsync(InventoryDto c)
@@ -45,35 +45,84 @@ namespace Inventory.Products.Repositories
         public async Task<ProductDto> AddProductAsync(ProductDto c)
         {
             _context.Products.Add(new Entities.Product()
-            { Description = c.Description, Id = c.Id, InventoryId = c.InventoryId });
+            { Description = c.Description, Id = c.Id, Code = c.Code, InventoryId = c.InventoryId });
+
+            foreach (var m in c.Metrics)
+            {
+                DecideNewOrEdit(m);
+            }
+
             await _context.SaveChangesAsync();
-            return new ProductDto(c.Id, c.Description, c.InventoryId);
+            return new ProductDto(c.Id, c.Description,c.Code, c.InventoryId, c.Metrics);
         }
 
         public async Task<ProductDto> EditProductAsync(ProductDto c)
         {
             Entities.Product e = new Entities.Product()
-            { Description = c.Description, Id = c.Id, InventoryId = c.InventoryId };
+            { Description = c.Description, Id = c.Id, Code = c.Code, InventoryId = c.InventoryId };
             _context.Update(e);
+
+            foreach (var m in c.Metrics)
+            {
+                DecideNewOrEdit(m);
+            }
             await _context.SaveChangesAsync();
-            return new ProductDto(c.Id, c.Description, c.InventoryId);
+            return new ProductDto(c.Id, c.Description,c.Code, c.InventoryId, c.Metrics);
         }
 
+        public  void DecideNewOrEdit(ProductMetricDto m)
+        {
+            if (_context.ProductMetrics.Where
+                (
+                    p => p.MetricId == m.MetricId 
+                         && p.ProductId == m.ProductId 
+                         && p.EffectiveDate == m.EffectiveDate
+                ).Count() > 0)
+            {
+                _context.Update(m);
+            }
+            else
+            {
+                _context.ProductMetrics.Add(new Entities.ProductMetric()
+                {
+                    MetricId = m.MetricId,
+                    EffectiveDate = m.EffectiveDate,
+                    ProductId = m.ProductId,
+                    Value = m.Value
+                });
+
+            }
+        }
 
         public async Task DeleteProductAsync(ProductDto c)
         {
             List<Entities.ProductCategory> pcs = _context.ProductCategories.Where(p => p.ProductId == c.Id).ToList();
             foreach (Entities.ProductCategory pc in pcs)
                 _context.Remove(pc);
+
+            List<Entities.ProductMetric> pms = _context.ProductMetrics.Where(p => p.ProductId == c.Id).ToList();
+            foreach (Entities.ProductMetric pm in pms)
+                _context.Remove(pm);
+
             Entities.Product e = _context.Products.Where(p => p.Id == c.Id).Single();
             _context.Remove(e);
 
             await _context.SaveChangesAsync();
         }
 
-        public bool CategoryFatherIdExists(Guid FatherId)
+        public  bool ProductDescriptionOrCategoryIsUsed(ProductDto c)
         {
-            return _context.Categories.Where(p => p.FatherId == FatherId).Count() > 0;
+            return  _context.Products.Where
+            (
+                        p => (p.Code == c.Code || p.Description == c.Description)
+                        && p.Id != c.Id  
+            ).Count() > 0;
+        }
+
+
+        public bool CategoryIdExists(Guid Id)
+        {
+            return _context.Categories.Where(p => p.Id == Id).Count() > 0;
         }
 
         public async Task<CategoryDto> AddCategoryAsync(CategoryDto c)
@@ -86,8 +135,7 @@ namespace Inventory.Products.Repositories
         public async Task<CategoryDto> EditCategoryAsync(CategoryDto c)
         {
             Entities.Category e = new Entities.Category() { FatherId = c.FatherId, Name = c.Description, Id = c.Id };
-            _context.Attach(e);
-            _context.Entry(e).Property(p => p.Name).IsModified = true;
+            _context.Update(e);
             await _context.SaveChangesAsync();
             return new CategoryDto(c.Id, c.Description, c.FatherId);
         }
@@ -112,9 +160,7 @@ namespace Inventory.Products.Repositories
                 Code = c.Code,
                 Id = c.Id,
                 SourceId = c.SourceId,
-                Value = c.Value,
-                Description = c.Description,
-                EffectiveDate = c.EffectiveDate
+                 Description = c.Description,
             });
             await _context.SaveChangesAsync();
             return new MetricDto(c.Id, c.Description, c.Value, c.EffectiveDate, c.Code, c.SourceId);
@@ -127,9 +173,7 @@ namespace Inventory.Products.Repositories
                 Code = c.Code,
                 Id = c.Id,
                 SourceId = c.SourceId,
-                Value = c.Value,
                 Description = c.Description,
-                EffectiveDate = c.EffectiveDate
             };
             _context.Update(e);
             await _context.SaveChangesAsync();
@@ -148,5 +192,14 @@ namespace Inventory.Products.Repositories
             await _context.SaveChangesAsync();
         }
 
+        public async  Task<SourceDto> AddSourceAsync(SourceDto dto )
+        {
+            Entities.Source e = new Entities.Source() { Id = dto.Id, Description = dto.Description  };
+            _context.Sources.Add(e);
+            await _context.SaveChangesAsync();
+            return new SourceDto(dto.Id, dto.Description);
+        }
+
+      
     }
 }

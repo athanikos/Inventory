@@ -13,6 +13,7 @@ public class ProductsDbContext : DbContext
         public   DbSet<Entities.Inventory> Inventories { get; set; }
         public   DbSet<Entities.Category> Categories { get; set; }
         public   DbSet<Entities.Metric> Metrics { get; set; }
+        public DbSet<Entities.Source> Sources { get; set; }
         public DbSet<Entities.ProductCategory> ProductCategories { get; set; }
         public DbSet<Entities.ProductMetric> ProductMetrics { get; set; }
         public DbSet<Entities.Transaction> Transactions { get; set; }
@@ -31,8 +32,7 @@ public class ProductsDbContext : DbContext
                         .HasMany(e => e.Products);
 
                         modelBuilder.Entity<Entities.Inventory>().ToTable("Inventory");
-
-
+                        modelBuilder.Entity<Entities.Source>().ToTable("Source");
                         modelBuilder.Entity<Entities.Category>().ToTable("Category");
 
                         modelBuilder.Entity<Entities.Product>()
@@ -43,7 +43,8 @@ public class ProductsDbContext : DbContext
                         modelBuilder.Entity<Entities.Product>()
                                     .HasMany(e => e.Metrics)
                                      .WithMany(e => e.Products)
-                                     .UsingEntity<Entities.ProductMetric>();
+                                     .UsingEntity<Entities.ProductMetric>()
+                                     .HasKey(p => new { p.MetricId, p.ProductId, p.EffectiveDate});
 
                         modelBuilder.Entity<Entities.Source>()
                           .HasMany(e => e.Metrics);

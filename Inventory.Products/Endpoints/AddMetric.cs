@@ -40,13 +40,10 @@ namespace Inventory.Metrics.Endpoints
             return TypedResults.Ok<MetricDto>(dto);
         }
     }
-    public record AddMetricRequest
-    (Guid Id,
-    string Description,
-    decimal Value,
-    DateTime EffectiveDate,
-    string Code,
-                        Guid SourceId);
+
+    public record AddMetricRequest (Guid Id, string Description,
+                                    decimal Value,  DateTime EffectiveDate,
+                                    string Code,  Guid SourceId);
 
   
   

@@ -66,7 +66,12 @@
     
 
     
+## Metrics 
 
+   One Metric has a source for the value. Source is a source system.
+   An example of metric is quantity which has source = SELF where self is the system it self. 
+   Transactions affect quantity. 
+   A metric for a product is stored in Product Metric table. so the actual values are stored in this table. 
 
 
 

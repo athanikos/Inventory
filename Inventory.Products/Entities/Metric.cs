@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Inventory.Products.Entities
+﻿namespace Inventory.Products.Entities
 {
     public sealed class
         Metric
@@ -17,10 +10,7 @@ namespace Inventory.Products.Entities
         public string Description { get; internal set; }
             = string.Empty;
 
-        public decimal Value { get; internal set; }
 
-        public DateTime EffectiveDate { get; internal set; }
-            = DateTime.MinValue;
 
         public string Code { get; internal set; }
             = string.Empty;

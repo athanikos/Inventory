@@ -31,7 +31,7 @@ namespace Inventory.Products.Endpoints
             HandleAsync(DeleteProductRequest req,
                         CancellationToken ct)
         {
-            await _repo.DeleteProductAsync(new ProductDto(req.Id, string.Empty, Guid.Empty));
+            await _repo.DeleteProductAsync(new ProductDto(req.Id, string.Empty,string.Empty, Guid.Empty, new List<ProductMetricDto>()));
             return TypedResults.Ok(); //todo fix 
             
         }
