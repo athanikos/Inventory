@@ -31,9 +31,9 @@
         }
     }
 
-    public class CryptoPricesFetcher : PricesFetcher
+    public class CoinGeckoPricesFetcher : PricesFetcher
     {
-        public CryptoPricesFetcher(string targetURL) : base(targetURL)
+        public CoinGeckoPricesFetcher(string targetURL) : base(targetURL)
         {
         }
     }
