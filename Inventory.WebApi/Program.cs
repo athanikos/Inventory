@@ -21,10 +21,12 @@ namespace Inventory.WebApi
 
             List<Assembly> mediatRAssemblies = [typeof(Program).Assembly];
 
-
             Users.ConfigureServices.AddServices(builder.Services, builder.Configuration);
+         
             Products.ConfigureServices.AddServices(builder.Services,
                 builder.Configuration, mediatRAssemblies);
+        
+            Prices.ConfigureServices.AddServices(builder.Services, builder.Configuration, mediatRAssemblies);
 
             // Set up MediatR
             builder.Services.AddMediatR(cfg =>
@@ -32,7 +34,7 @@ namespace Inventory.WebApi
 
             builder.Services.AddFastEndpoints();
 
-
+         
             var app = builder.Build();
  
             if (app.Environment.IsDevelopment()) {
