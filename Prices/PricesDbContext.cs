@@ -1,15 +1,17 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Reflection;
 
 namespace Inventory.Prices;
 
-internal class PricesDbContext : DbContext
+public  class PricesDbContext : DbContext
 {
+    public PricesDbContext() { } // This one
 
-    internal PricesDbContext(DbContextOptions
-            <PricesDbContext> options) :
+    public PricesDbContext(DbContextOptions
+            options) :
             base(options)  { }
            
-        internal    DbSet<Entities.Parameters> Parameters { get; set; }
+        public     DbSet<Entities.PricesParameter> Parameters { get; set; }
      
          protected override void OnModelCreating
          (ModelBuilder modelBuilder)
@@ -17,8 +19,11 @@ internal class PricesDbContext : DbContext
                         base.OnModelCreating(modelBuilder);
                         modelBuilder.HasDefaultSchema("Prices");
 
-                        var config = modelBuilder.Entity<Entities.Parameters>();
-                        modelBuilder.Entity<Entities.Parameters>().ToTable("Parameters");
+                          modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+
+        var config = 
+                        modelBuilder.Entity<Entities.PricesParameter>();
+                        config.ToTable("PricesParameter").HasKey(p=>p.Id);
 
          }
 

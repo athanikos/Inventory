@@ -7,11 +7,9 @@ namespace Inventory.Users
 {
     public class UsersDbContext : IdentityDbContext<IdentityUser>
     {
-        public UsersDbContext (DbContextOptions<UsersDbContext> options) 
-            : base(options) {
-        
-        
-        }
+        public UsersDbContext (
+            DbContextOptions<UsersDbContext> options) 
+            : base(options) {  }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             builder.HasDefaultSchema("Users");

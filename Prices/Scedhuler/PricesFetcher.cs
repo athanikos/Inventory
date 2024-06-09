@@ -2,23 +2,22 @@
 using Inventory.Prices;
 using Inventory.Prices.Entities;
 using RestSharp;
+using Entities = Inventory.Prices.Entities;
 
 namespace Prices
 {
     namespace Inventory.Prices
     {
-        internal abstract class PricesFetcher
+        public abstract class PricesFetcher
         {
             protected string _parameterType = string.Empty;
             protected readonly PricesDbContext _context;
-            protected List<Parameters> Parameters { get; set; }
+            protected List<Entities.PricesParameter> Parameters { get; set; } =
+                new List<Entities.PricesParameter>(); 
 
-            internal PricesFetcher(PricesDbContext context)
-            {
-                _context = context;
-            }
+            public PricesFetcher(PricesDbContext context) => _context = context;
 
-            protected virtual List<Parameters> GetParameters()
+            protected virtual List<Entities.PricesParameter> GetParameters()
             {
                 if (string.IsNullOrEmpty(_parameterType))
                     throw new ArgumentNullException(nameof(_parameterType));
@@ -41,14 +40,14 @@ namespace Prices
                 }
             }
 
-            protected async virtual void DoScedhuledWork(Parameters p)
+            protected async virtual void DoScedhuledWork(Entities.PricesParameter p)
             {
-                var options = new RestClientOptions("https://api.coingecko.com/api/v3/coins/" + p.TargetProductCode);
+                var options = new RestClientOptions("https://api.coingecko.com/api/v3/coins/" + "");// p.TargetProductCode);
                 var client = new RestClient(options);
                 var request = new RestRequest("");
                 request.AddHeader("accept", "application/json");
                 // request.AddHeader("x-cg-demo-api-key", "CG-u6cMtcA6FGKaGxuJChCnCv5G\t");
-                request.AddHeader("x-cg-demo-api-key",p.TargetKey);
+           //     request.AddHeader("x-cg-demo-api-key",p.TargetKey);
                 var response = await client.GetAsync(request);
 
             }

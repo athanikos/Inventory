@@ -1,5 +1,7 @@
 using FastEndpoints;
+using Inventory.Prices;
 using Microsoft.AspNetCore.Identity;
+using Prices.Inventory.Prices;
 using System.Reflection;
 
 namespace Inventory.WebApi
@@ -9,7 +11,7 @@ namespace Inventory.WebApi
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-            builder.Services.AddSwaggerGen();
+           // builder.Services.AddSwaggerGen();
                                   
             builder.Services.AddAuthentication(options =>
             {
@@ -25,8 +27,10 @@ namespace Inventory.WebApi
          
             Products.ConfigureServices.AddServices(builder.Services,
                 builder.Configuration, mediatRAssemblies);
-        
+                     
             Prices.ConfigureServices.AddServices(builder.Services, builder.Configuration, mediatRAssemblies);
+
+          //  Prices.RunServices.Run(builder.Services);
 
             // Set up MediatR
             builder.Services.AddMediatR(cfg =>

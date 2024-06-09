@@ -3,9 +3,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Hangfire;
 using Prices.Inventory.Prices;
-using System;
-using Microsoft.Extensions.Hosting;
-using Microsoft.AspNetCore.Builder;
 
 namespace Inventory.Prices
 {
@@ -17,6 +14,12 @@ namespace Inventory.Prices
             List<System.Reflection.Assembly>  mediatRAssemblies
             )
         {
+
+
+            services.AddDbContext<PricesDbContext>(options =>
+            options.UseSqlServer(configuration.
+            GetConnectionString("Prices")));
+
             services.AddHangfire(
                         (sp, config) =>
                         {
@@ -27,16 +30,20 @@ namespace Inventory.Prices
             services.AddHangfireServer();
             
             mediatRAssemblies.Add(typeof(ConfigureServices).Assembly);
-            services.AddScoped< PricesFetcher ,CoinGeckoPricesFetcher  >();
 
-            services.AddDbContext<PricesDbContext>(options =>
-                                                   options.UseSqlServer(configuration.GetConnectionString("Prices")));
 
-            // Build the intermediate service provider
-            var sp = services.BuildServiceProvider();
-            sp.GetService<PricesFetcher>().ScedhuleJobs();
-          
 
+            services.AddSingleton< PricesFetcher , PricesFetcher>(
+                sp =>
+                {
+                return new CoinGeckoPricesFetcher(sp.GetService<PricesDbContext>());
+                });
+
+
+
+            var serviceProvider = services.BuildServiceProvider();
+            var service = serviceProvider.GetService<PricesFetcher>();
+            //service?.ScedhuleJobs();
 
 
             return services;

@@ -19,14 +19,13 @@ public class ProductsDbContext : DbContext
         public DbSet<Entities.Transaction> Transactions { get; set; }
         public DbSet<Entities.TransactionItem> TransactionItems { get; set; }
 
-    protected override void OnModelCreating
+        protected override void OnModelCreating
             (ModelBuilder modelBuilder)
             {
                         base.OnModelCreating(modelBuilder);
                         modelBuilder.HasDefaultSchema("Products");
 
-                        var config = modelBuilder.Entity<Entities.Product>();
-                        modelBuilder.Entity<Entities.Product>().ToTable("Product");
+                       modelBuilder.Entity<Entities.Product>().ToTable("Product");
 
                         modelBuilder.Entity<Entities.Inventory>()
                         .HasMany(e => e.Products);
