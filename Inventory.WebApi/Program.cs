@@ -30,7 +30,7 @@ namespace Inventory.WebApi
                      
             Prices.ConfigureServices.AddServices(builder.Services, builder.Configuration, mediatRAssemblies);
 
-          //  Prices.RunServices.Run(builder.Services);
+         //   Prices.RunServices.Run(builder.Services);
 
             // Set up MediatR
             builder.Services.AddMediatR(cfg =>

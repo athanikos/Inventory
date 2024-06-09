@@ -14,6 +14,7 @@ namespace Inventory.Prices.Entities
         public string TargetProductCode { get; set; } = string.Empty;
         public string TargetPathForProductCode { get; set; } = string.Empty;
         public Guid MetricId { get; set; }
+        public Guid ProductId { get; set; } 
     }
 
 }

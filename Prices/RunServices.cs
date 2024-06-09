@@ -11,7 +11,7 @@ namespace Inventory.Prices
         {
             var serviceProvider = services.BuildServiceProvider();
             var service = serviceProvider.GetService<PricesFetcher>();
-            //   service?.ScedhuleJobs();
+          //  service?.ScedhuleJobs();
         }
     }
 }
