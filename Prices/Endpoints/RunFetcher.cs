@@ -38,5 +38,5 @@ namespace Inventory.Products.Endpoints
 
     }
 
-    public record RunFetcherRequest();
+    public record RunFetcherRequest(string Id );
 }
