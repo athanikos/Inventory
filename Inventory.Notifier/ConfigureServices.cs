@@ -1,12 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Configuration;
-using Prices.Inventory.Prices;
+﻿
 
 using Hangfire;
-using Serilog;
+using Inventory.Prices;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace Inventory.Prices
+namespace Inventory.Notifier
 {
     public static class ConfigureServices
     {
@@ -18,7 +18,7 @@ namespace Inventory.Prices
         {
 
 
-            services.AddDbContext<PricesDbContext>(options =>
+            services.AddDbContext<NotifierDbContext>(options =>
             options.UseSqlServer(configuration.
             GetConnectionString("Prices")));
 
@@ -34,24 +34,10 @@ namespace Inventory.Prices
 
             GlobalConfiguration.Configuration
             .UseSqlServerStorage("Server=localhost;Database=Hangfire;Integrated Security=SSPI;Encrypt=False;");
+
             services.AddHangfireServer();
-
-         
+            
             mediatRAssemblies.Add(typeof(ConfigureServices).Assembly);
-
-           
-
-            var logger  = new LoggerConfiguration()
-            .MinimumLevel.Debug()
-            .WriteTo.File("logs/Net6Tester.txt", rollingInterval: RollingInterval.Day)
-            .CreateLogger();
-
-            logger.Information("start");
-
-            services.AddScoped<IPricesFetcher, PricesFetcher>(
-            sp =>
-            {    return new PricesFetcher(sp.GetRequiredService<PricesDbContext>(), logger); });
-                               
 
             return services;
         }

@@ -8,6 +8,7 @@ namespace Inventory.Products.Endpoints
     using System.Threading.Tasks;
     using Inventory.Products.Dto;
     using Inventory.Products.Repositories;
+    using Inventory.Products.Contracts.Dto;
 
     public class EditProduct :
         Endpoint<EditProductRequest>

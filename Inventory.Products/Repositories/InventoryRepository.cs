@@ -1,5 +1,5 @@
 ﻿using Inventory.Products.Dto;
-
+using Inventory.Products.Contracts.Dto;
 
 namespace Inventory.Products.Repositories
 {
@@ -68,6 +68,12 @@ namespace Inventory.Products.Repositories
             }
             await _context.SaveChangesAsync();
             return new ProductDto(c.Id, c.Description,c.Code, c.InventoryId, c.Metrics);
+        }
+
+        public async Task AddOrEditProductMetric(ProductMetricDto m)
+        {
+            DecideNewOrEdit(m);
+            await _context.SaveChangesAsync();
         }
 
         public  void DecideNewOrEdit(ProductMetricDto m)

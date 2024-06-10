@@ -1,8 +1,8 @@
 using FastEndpoints;
-using Inventory.Prices;
 using Microsoft.AspNetCore.Identity;
-using Prices.Inventory.Prices;
 using System.Reflection;
+using Hangfire.AspNetCore;
+using Hangfire;
 
 namespace Inventory.WebApi
 {
@@ -11,7 +11,7 @@ namespace Inventory.WebApi
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-           // builder.Services.AddSwaggerGen();
+            builder.Services.AddSwaggerGen();
                                   
             builder.Services.AddAuthentication(options =>
             {
@@ -30,7 +30,7 @@ namespace Inventory.WebApi
                      
             Prices.ConfigureServices.AddServices(builder.Services, builder.Configuration, mediatRAssemblies);
 
-         //   Prices.RunServices.Run(builder.Services);
+            Prices.RunServices.Run(builder.Services);
 
             // Set up MediatR
             builder.Services.AddMediatR(cfg =>
@@ -40,7 +40,9 @@ namespace Inventory.WebApi
 
          
             var app = builder.Build();
- 
+
+
+          
             if (app.Environment.IsDevelopment()) {
                 app.UseSwagger();
                 app.UseSwaggerUI();
@@ -48,8 +50,14 @@ namespace Inventory.WebApi
             }
             app.UseFastEndpoints();
 
+            //app.UseHangfireDashboard("/hangfire", new DashboardOptions(), new SqlServerStorage("HangfirePOCCx"));
+
+
             app.MapIdentityApi<IdentityUser>();
             app.Run();
         }
+       
+        
+       
     }
 }

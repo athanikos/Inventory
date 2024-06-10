@@ -1,4 +1,4 @@
-﻿namespace Inventory.Products.Dto
+﻿namespace Inventory.Products.Contracts.Dto
 {
 
     public class ProductMetricDto

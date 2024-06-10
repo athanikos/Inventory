@@ -2,6 +2,7 @@
 namespace Inventory.Products.Endpoints
 {
     using FastEndpoints;
+    using Inventory.Products.Contracts.Dto;
     using Inventory.Products.Dto;
     using Inventory.Products.Repositories;
     using Microsoft.AspNetCore.Http;

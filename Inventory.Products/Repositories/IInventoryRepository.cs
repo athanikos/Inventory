@@ -1,6 +1,5 @@
 ﻿using Inventory.Products.Dto;
-using Microsoft.EntityFrameworkCore.Diagnostics;
-using System.Diagnostics;
+using Inventory.Products.Contracts.Dto;
 
 namespace Inventory.Products.Repositories
 {
@@ -15,6 +14,9 @@ namespace Inventory.Products.Repositories
         Task<ProductDto> EditProductAsync(ProductDto c);
         Task DeleteProductAsync(ProductDto c);
         bool ProductDescriptionOrCategoryIsUsed(ProductDto c);
+
+        Task AddOrEditProductMetric(ProductMetricDto m);
+
 
         Task<MetricDto> AddMetricAsync(MetricDto dto);
         Task<MetricDto> EditMetricAsync(MetricDto c);
