@@ -27,9 +27,8 @@
 
 ## Prices Module 
 
-    dotnet ef migrations add pPricesv3 -c  PricesDbContext -p C:\projects\Inventory\Inventory\Prices\Inventory.Prices.csproj -s C:\projects\Inventory\Inventory\Inventory.WebApi\Inventory.WebApi.csproj -o Data/Migrations
-
-  dotnet ef database update  pPricesv3 -c PricesDbContext
+    dotnet ef migrations add pPricesv3 -c  PricesDbContext -p C:\projects\Inventory\Inventory\Prices\Inventory.Prices.csproj -s     C:\projects\Inventory\Inventory\Inventory.WebApi\Inventory.WebApi.csproj -o Data/Migrations
+    dotnet ef database update  pPricesv3 -c PricesDbContext
 
 
   
