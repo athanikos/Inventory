@@ -11,7 +11,9 @@ namespace Inventory.WebApi
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-            builder.Services.AddSwaggerGen();
+           
+            // comment on migration run 
+           // builder.Services.AddSwaggerGen();
                                   
             builder.Services.AddAuthentication(options =>
             {
@@ -23,29 +25,26 @@ namespace Inventory.WebApi
 
             List<Assembly> mediatRAssemblies = [typeof(Program).Assembly];
 
+            builder.Services.AddMediatR(cfg =>
+              cfg.RegisterServicesFromAssemblies(mediatRAssemblies.ToArray()));
+
             Users.ConfigureServices.AddServices(builder.Services, builder.Configuration);
          
             Products.ConfigureServices.AddServices(builder.Services,
                 builder.Configuration, mediatRAssemblies);
                      
             Prices.ConfigureServices.AddServices(builder.Services, builder.Configuration, mediatRAssemblies);
-
-            Prices.RunServices.Run(builder.Services);
-
-            // Set up MediatR
-            builder.Services.AddMediatR(cfg =>
-              cfg.RegisterServicesFromAssemblies(mediatRAssemblies.ToArray()));
+           
+            // comment on migration run 
+            // Prices.RunServices.Run(builder.Services);
 
             builder.Services.AddFastEndpoints();
-
-         
             var app = builder.Build();
 
-
-          
             if (app.Environment.IsDevelopment()) {
-                app.UseSwagger();
-                app.UseSwaggerUI();
+             //   app.UseSwagger();
+             //
+             //app.UseSwaggerUI();
             
             }
             app.UseFastEndpoints();

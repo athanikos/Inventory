@@ -1,5 +1,7 @@
 ﻿using Inventory.Products.Dto;
 using Inventory.Products.Contracts.Dto;
+using Microsoft.EntityFrameworkCore;
+using System.Reflection.Metadata;
 
 namespace Inventory.Products.Repositories
 {
@@ -15,9 +17,10 @@ namespace Inventory.Products.Repositories
         Task DeleteProductAsync(ProductDto c);
         bool ProductDescriptionOrCategoryIsUsed(ProductDto c);
 
+        List<string?> GetDistinctProductCodes();
+        List<string?> GetDistinctMetricCodes();
+
         Task AddOrEditProductMetric(ProductMetricDto m);
-
-
         Task<MetricDto> AddMetricAsync(MetricDto dto);
         Task<MetricDto> EditMetricAsync(MetricDto c);
         Task DeleteMetricAsync(MetricDto c);
@@ -27,5 +30,11 @@ namespace Inventory.Products.Repositories
         Task<CategoryDto> EditCategoryAsync(CategoryDto c);
         Task DeleteCategoryAsync(CategoryDto c);
         Task<SourceDto> AddSourceAsync(SourceDto sourceDto);
+
+
+        ProductMetricDto GetProductMetric(string ProductCode, string MetricCode);
+        
+       
+
     }
 }

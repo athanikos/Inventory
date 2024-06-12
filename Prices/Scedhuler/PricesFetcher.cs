@@ -2,8 +2,9 @@
 using Inventory.Prices;
 using RestSharp;
 using Entities = Inventory.Prices.Entities;
-using Microsoft.Extensions.Logging;
-using Azure.Core;
+using Newtonsoft.Json.Linq;
+using Inventory.Products.Contracts;
+using MediatR;
 
 
 
@@ -16,15 +17,17 @@ namespace Prices
             private string _parameterType = "COINGECKO";
            
             private readonly PricesDbContext _context;
-            private readonly Serilog.ILogger _logger;   
+            private readonly Serilog.ILogger _logger;
+            private readonly IMediator _mediator;
 
             private List<Entities.PricesParameter> Parameters { get; set; } =
                 new List<Entities.PricesParameter>();
 
-            public PricesFetcher(PricesDbContext context, Serilog.ILogger logger)
+            public PricesFetcher(PricesDbContext context, IMediator mediator, Serilog.ILogger logger)
             { 
                 _logger = logger;   
-                _context = context; 
+                _context = context;
+                _mediator = mediator;
             }
             
             protected virtual List<Entities.PricesParameter> GetParameters()
@@ -46,32 +49,23 @@ namespace Prices
                     RecurringJob.AddOrUpdate(p.Id.ToString(), () => DoScedhuledWork(p), Cron.Minutely);
                 }
             }
-            /// <summary>
-            ///             //    request.AddHeader("x-cg-demo-api-key", "CG-u6cMtcA6FGKaGxuJChCnCv5G\t");
-            /// </summary>
-            /// <param name="p"></param>
+
             public void DoScedhuledWork(Entities.PricesParameter p)
             {
-                try
-                {
-
-                    _logger.Information("in DoScedhuledWork");
-
-
                     var options = new RestClientOptions(p.TargetURL + p.TargetProductCode);
                     var client = new RestClient(options);
+                    
                     var request = new RestRequest("");
                     request.AddHeader("accept", "application/json");
                     request.AddHeader("x-cg-demo-api-key", p.TargetKey);
+                  
                     var response = client.Get(request);
-
-                    _logger.Information(request?.ToString());
-                    _logger.Information(response.ToString());
-                }
-                catch (Exception ex)
-                {
-                    _logger.Information("error"  + ex.Message.ToString());
-                }
+                    JObject o = JObject.Parse(response.Content);
+                    var value = decimal.Parse(o.SelectToken(p.TargetPathForProductCode).ToString());
+                  
+                
+                    var command = new AddProductMetricCommand(p.ProductId, p.MetricId, value, DateTime.Now, p.TargetCurrency);
+                    _mediator.Send(command);
 
             }
 

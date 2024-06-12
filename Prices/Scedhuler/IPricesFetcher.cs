@@ -6,6 +6,6 @@ namespace Prices.Inventory.Prices
     {
         void DoScedhuledWork();
         void DoScedhuledWork(PricesParameter p);
-        void  ScedhuleJobs();
+        void ScedhuleJobs();
     }
 }

@@ -6,15 +6,15 @@ namespace Inventory.Products.Endpoints
     using Microsoft.AspNetCore.Http.HttpResults;
     using System.Threading;
     using System.Threading.Tasks;
-    using Inventory.Products.Dto;
     using Inventory.Products.Repositories;
+    using Inventory.Products.Contracts.Dto;
 
     public class EditMetric :
         Endpoint<EditMetricRequest>
     {
         private readonly IInventoryRepository _repo;
 
-        public  EditMetric(IInventoryRepository repo)
+        public EditMetric(IInventoryRepository repo)
         {
             _repo = repo;
         }
@@ -31,16 +31,14 @@ namespace Inventory.Products.Endpoints
                         CancellationToken ct)
         {
         
-            var dto =  await _repo.EditMetricAsync(new MetricDto(req.Id, req.Description, req.Value, 
-                req.EffectiveDate, req.Code, req.SourceId));
+            var dto =  await _repo.EditMetricAsync(new MetricDto(
+                req.Id, req.Description, req.Code, req.SourceId));
 
             return TypedResults.Ok(dto);
         }
     }
     public record EditMetricRequest(Guid Id,
     string Description,
-    decimal Value,
-    DateTime EffectiveDate,
     string Code,
     Guid SourceId);
    

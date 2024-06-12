@@ -13,6 +13,7 @@ namespace Inventory.Products.Entities
         { get; set; } = new List<Product>();
 
 
+
     }
 
 }

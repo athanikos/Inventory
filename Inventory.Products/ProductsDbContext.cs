@@ -53,6 +53,13 @@ public class ProductsDbContext : DbContext
 
         }
 
+     protected override void ConfigureConventions(
+     ModelConfigurationBuilder configurationBuilder)
+        {
+        configurationBuilder.Properties<decimal>()
+          .HavePrecision(18, 6);
+        }
+
 
 
 }

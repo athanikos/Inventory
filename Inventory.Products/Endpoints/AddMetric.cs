@@ -2,7 +2,7 @@
 namespace Inventory.Metrics.Endpoints
 {
     using FastEndpoints;
-    using Inventory.Products.Dto;
+    using Inventory.Products.Contracts.Dto;
     using Inventory.Products.Repositories;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Http.HttpResults;
@@ -33,17 +33,17 @@ namespace Inventory.Metrics.Endpoints
         {
             
             
-            var dto =   await _repo.AddMetricAsync(new MetricDto(req.Id, req.Description, req.Value, req.EffectiveDate,
-            req.Code, req.SourceId));
+            var dto =   await _repo.AddMetricAsync(new MetricDto(req.Id,
+                                                                 req.Description,  
+                                                                 req.Code, 
+                                                                 req.SourceId));
 
 
             return TypedResults.Ok<MetricDto>(dto);
         }
     }
 
-    public record AddMetricRequest (Guid Id, string Description,
-                                    decimal Value,  DateTime EffectiveDate,
-                                    string Code,  Guid SourceId);
+    public record AddMetricRequest (Guid Id, string Description,string Code,  Guid SourceId);
 
   
   

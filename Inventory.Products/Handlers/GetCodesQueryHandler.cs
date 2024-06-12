@@ -1,0 +1,31 @@
+﻿using Inventory.Products.Contracts;
+using Inventory.Products.Repositories;
+using MediatR;
+
+namespace Inventory.Products.Handlers
+{
+    internal class CodesQueryHandler :
+    IRequestHandler<CodesQuery, CodesResponse>
+    {
+
+        private readonly IInventoryRepository _repo;
+
+
+        public CodesQueryHandler(InventoryRepository repo)
+        {
+            _repo = repo;
+        }
+
+        public async Task<CodesResponse> Handle(CodesQuery request, CancellationToken cancellationToken)
+        {
+            await Task.CompletedTask;
+            return new CodesResponse()
+            {
+                   ProductCodes =  _repo.GetDistinctProductCodes(),
+                   MetricCodes = _repo.GetDistinctMetricCodes()   
+            };        
+        }
+
+
+    }
+}

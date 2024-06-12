@@ -23,4 +23,8 @@
     <PackageReference Include="Serilog.AspNetCore" Version="8.0.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Prices\Inventory.Prices.csproj" />
+  </ItemGroup>
+
 </Project>

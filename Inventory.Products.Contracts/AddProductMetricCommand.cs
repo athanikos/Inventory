@@ -13,13 +13,17 @@ namespace Inventory.Products.Contracts
         public decimal Value { get; set; }
 
         public DateTime EffectiveDate { get; set; }        = DateTime.MinValue;
-        
-        public AddProductMetricCommand(Guid ProductId, Guid MetricId, decimal Value, DateTime EffectiveDate)
+
+        public string Currency { get; set; } = string.Empty;
+
+
+        public AddProductMetricCommand(Guid ProductId, Guid MetricId, decimal Value, DateTime EffectiveDate, string Curtrency)
         {
             this.ProductId = ProductId;
             this.MetricId = MetricId;
             this.Value = Value;
             this.EffectiveDate = EffectiveDate; 
+            this.Currency = Curtrency;
         }
 
  

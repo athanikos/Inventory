@@ -17,13 +17,17 @@ namespace Inventory.Products.Handlers
 
         public async Task<dto.ProductMetricDto> Handle(AddProductMetricCommand request, CancellationToken cancellationToken)
         {
-            var dto = new dto.ProductMetricDto()
-            {
-                EffectiveDate = DateTime.UtcNow,
-                MetricId = request.MetricId,
-                ProductId = request.ProductId,
-                Value = request.Value
-            };
+            var dto = new dto.ProductMetricDto(request.ProductId,
+                                               request.MetricId,
+                                               request.Value,
+                                               request.EffectiveDate,
+                                               request.Currency,
+                                               string.Empty,
+                                               string.Empty
+                         );
+
+
+
             
            await  _repository.AddOrEditProductMetric(dto);
            return dto;

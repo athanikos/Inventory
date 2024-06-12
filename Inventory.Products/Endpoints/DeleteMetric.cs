@@ -2,6 +2,7 @@
 namespace Inventory.Metrics.Endpoints
 {
     using FastEndpoints;
+    using Inventory.Products.Contracts.Dto;
     using Inventory.Products.Dto;
     using Inventory.Products.Repositories;
     using Microsoft.AspNetCore.Http;
@@ -31,8 +32,7 @@ namespace Inventory.Metrics.Endpoints
             HandleAsync(DeleteMetricRequest req,
                         CancellationToken ct)
         {
-            //todo default 
-            await _repo.DeleteMetricAsync(new MetricDto(req.Id, string.Empty, 0, DateTime.MinValue, string.Empty, Guid.Empty));
+            await _repo.DeleteMetricAsync(new MetricDto(req.Id));
             return TypedResults.Ok();
         }
     }
