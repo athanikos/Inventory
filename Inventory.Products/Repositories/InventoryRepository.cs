@@ -7,7 +7,10 @@ namespace Inventory.Products.Repositories
     public class InventoryRepository : IInventoryRepository
     {
         private readonly Products.ProductsDbContext _context;
-        
+
+        public InventoryRepository()
+        { }
+
         public InventoryRepository(ProductsDbContext context)
         { _context = context; }
 

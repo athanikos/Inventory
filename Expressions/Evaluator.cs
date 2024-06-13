@@ -1,5 +1,7 @@
 ﻿using MediatR;
 using Inventory.Products.Contracts;
+using System.Text;
+using Microsoft.Extensions.ObjectPool;
 
 namespace Expressions
 {
@@ -28,12 +30,10 @@ namespace Expressions
             _mediator = mediator;   
         }
 
-        public async void Execute()
+        public async Task<string> Execute()
         {
             GetCodes();
-            string computedExpression = await  ComputeTokens(ParseTokens());
-
-           
+            return  await  ComputeTokens(ParseTokens());
         }
 
         public void GetCodes()

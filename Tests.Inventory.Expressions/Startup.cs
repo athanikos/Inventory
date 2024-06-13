@@ -1,5 +1,8 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Inventory.Products.Repositories;
+using Inventory.Products;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
@@ -31,15 +34,25 @@ namespace Tests.Inventory.Expressions
             services.AddMediatR(cfg =>
             cfg.RegisterServicesFromAssemblies(mediatRAssemblies.ToArray()));
 
+            services.AddDbContext<ProductsDbContext>(options =>
+            options.UseSqlServer(Configuration.
+            GetConnectionString("Products")));
+
+            services.AddScoped<ITransactionRepository, TransactionRepository>();
+            services.AddScoped<IInventoryRepository, InventoryRepository>();
         }
         
         
         public virtual void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
         }
-
-
-
        
     }
+
+
+
+
+
+
 }
+

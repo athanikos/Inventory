@@ -1,7 +1,5 @@
 ﻿using Inventory.Products.Dto;
 using Inventory.Products.Contracts.Dto;
-using Microsoft.EntityFrameworkCore;
-using System.Reflection.Metadata;
 
 namespace Inventory.Products.Repositories
 {
