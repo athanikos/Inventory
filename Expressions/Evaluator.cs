@@ -1,26 +1,26 @@
 ﻿using MediatR;
 using Inventory.Products.Contracts;
-using Microsoft.Identity.Client;
 
 namespace Expressions
 {
     public class Evaluator
     {
 
-
         private string _expression = string.Empty;
         private string _computedExpression = string.Empty;
-
         private readonly IMediator _mediator; 
-
-
         private char[] operators = new char[] { '*', '/', '+', '-' };
         private List<string> _productCodes = new List<string>();    
         private List<string> _metricCodes = new List<string>();
 
+
         /// <summary>
+        ///      todo move top readme    
         ///      MetricCode(ProductCode,EffectiveDateTime) > 100     
-        ///      i.e. Quantity(Ada,Latest) > 100  --> the latest quantity for ada 
+        ///      example of expression : Quantity(Ada,Latest) > 100  --> the latest quantity for ada 
+        ///      another example : Value(ADA) = PRICE(ADA) * QUANTITY(ADA) 
+        ///      this should create a new metric called Value for product ADA 
+        ///      effective date should be the date created 
         /// </summary>
         public Evaluator(IMediator mediator ,String expression)
         {
@@ -28,10 +28,11 @@ namespace Expressions
             _mediator = mediator;   
         }
 
-        public void Execute()
+        public async void Execute()
         {
             GetCodes();
-            ComputeTokens(ParseTokens());
+            string computedExpression = await  ComputeTokens(ParseTokens());
+
            
         }
 
@@ -46,31 +47,35 @@ namespace Expressions
             return _expression.Split(operators, StringSplitOptions.RemoveEmptyEntries).ToList<string>();
         }
 
-        public void ComputeTokens(List<string> tokens)
+        public async Task<string> ComputeTokens(List<string> tokens)
         {      
+            var resultedExpression = string.Empty;
             foreach (var token in tokens)
                 if (IsFunction(token))
-                {
-                   
-                }           
+                    resultedExpression += (await  ComputeFunction(token)).ToString();
+                else
+                   resultedExpression += token.ToString();   
+            
+            return resultedExpression;  
         }
 
 
         /// <summary>
-        ///     i.e. Quantity(Ada,Latest) 
+        ///     Parses a formual of the following   Quantity(Ada,Latest)
+        ///     and gets the value in product metric table 
+        ///     and returns that value 
         /// </summary>
         /// <param name="token"></param>
-        public void ComputeFunction(string token)
+        public async Task<decimal> ComputeFunction(string token)
         {
             int firstParenthesis = token.IndexOf(@"(");
             int firstComma = token.IndexOf(@",");
             int productCodeSize = firstComma - firstParenthesis - 1;
             string metricCode = token.Substring(0, firstParenthesis);
             string productCode = token.Substring(firstParenthesis + 1, productCodeSize);
-          
-            
-            var ProductMetricValue = _mediator.Send(new GetProductMetricValueQuery(productCode, metricCode));    
-
+                   
+            return (await _mediator.
+                   Send(new GetProductMetricValueQuery(productCode, metricCode, DateTime.Now))).Value;
 
         }
 

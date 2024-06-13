@@ -4,7 +4,7 @@ using MediatR;
 namespace Inventory.Products.Contracts
 {
     public  record GetProductMetricValueQuery
-        (string ProductCode, string MetricCode) :  IRequest<ProductMetricDto>;
+        (string ProductCode, string MetricCode, DateTime EffectiveDate ) :  IRequest<ProductMetricDto>;
 
 
 

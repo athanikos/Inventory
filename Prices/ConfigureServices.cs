@@ -29,8 +29,10 @@ namespace Inventory.Prices
                 );
 
             GlobalConfiguration.Configuration
-            .UseSqlServerStorage("Server=localhost;Database=Hangfire;Integrated Security=SSPI;Encrypt=False;");
+            .UseSqlServerStorage(str);
             services.AddHangfireServer();
+
+
             mediatRAssemblies.Add(typeof(ConfigureServices).Assembly);
 
             var logger  = new LoggerConfiguration()

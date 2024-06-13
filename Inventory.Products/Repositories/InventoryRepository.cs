@@ -285,10 +285,18 @@ namespace Inventory.Products.Repositories
             return new SourceDto(dto.Id, dto.Description);
         }
 
-        public  ProductMetricDto GetProductMetric(string ProductCode, string MetricCode)
-        {
 
-        
+        /// <summary>
+        /// returns the latest by effective date product metric row 
+        /// </summary>
+        /// <param name="ProductCode"></param>
+        /// <param name="MetricCode"></param>
+        /// <returns></returns>
+        public  ProductMetricDto GetProductMetric(string ProductCode, string MetricCode)
+        {       
+                ProductCode = ProductCode.ToUpper();
+                MetricCode = MetricCode.ToUpper();
+
                 return  _context.ProductMetrics.
                 Where(i=>i.ProductCode== ProductCode && i.MetricCode == MetricCode).
                 OrderByDescending(i=>i.EffectiveDate).
