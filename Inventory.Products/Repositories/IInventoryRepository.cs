@@ -31,8 +31,8 @@ namespace Inventory.Products.Repositories
 
 
         ProductMetricDto GetProductMetric(string ProductCode, string MetricCode);
-        
-       
+
+        void EmptyDB();
 
     }
 }

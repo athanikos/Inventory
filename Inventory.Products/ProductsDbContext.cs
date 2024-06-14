@@ -25,7 +25,7 @@ public class ProductsDbContext : DbContext
                         base.OnModelCreating(modelBuilder);
                         modelBuilder.HasDefaultSchema("Products");
 
-                       modelBuilder.Entity<Entities.Product>().ToTable("Product");
+                        modelBuilder.Entity<Entities.Product>().ToTable("Product");
 
                         modelBuilder.Entity<Entities.Inventory>()
                         .HasMany(e => e.Products);

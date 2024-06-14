@@ -4,14 +4,14 @@ using MediatR;
 
 namespace Inventory.Products.Handlers
 {
-    internal class CodesQueryHandler :
+    public  class CodesQueryHandler :
     IRequestHandler<CodesQuery, CodesResponse>
     {
 
         private readonly IInventoryRepository _repo;
 
 
-        public CodesQueryHandler(InventoryRepository repo)
+        public CodesQueryHandler(IInventoryRepository repo)
         {
             _repo = repo;
         }

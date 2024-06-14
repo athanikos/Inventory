@@ -1,6 +1,7 @@
 ﻿using Inventory.Products.Dto;
 using Inventory.Products.Contracts.Dto;
 using Inventory.Products.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace Inventory.Products.Repositories
 {
@@ -8,11 +9,44 @@ namespace Inventory.Products.Repositories
     {
         private readonly Products.ProductsDbContext _context;
 
-        public InventoryRepository()
-        { }
+     
 
         public InventoryRepository(ProductsDbContext context)
         { _context = context; }
+       
+        
+        public void EmptyDB()
+        {
+         
+            _context.Sources.RemoveRange(_context.Sources);
+            _context.SaveChanges();
+
+            _context.Inventories.RemoveRange(_context.Inventories);
+            _context.SaveChanges();
+
+            _context.Metrics.RemoveRange(_context.Metrics);
+            _context.SaveChanges();
+
+            _context.Categories.RemoveRange(_context.Categories);
+            _context.SaveChanges();
+
+            _context.ProductCategories.RemoveRange(_context.ProductCategories);
+            _context.SaveChanges();
+
+            _context.ProductMetrics.RemoveRange(_context.ProductMetrics);
+            _context.SaveChanges();
+
+            _context.Products.RemoveRange(_context.Products);
+            _context.SaveChanges();
+
+            _context.TransactionItems.RemoveRange(_context.TransactionItems);
+            _context.SaveChanges();
+
+            _context.Transactions.RemoveRange(_context.Transactions);
+            _context.SaveChanges();
+
+        }
+
 
         public bool InventoryIdExists(Guid Id)
         {

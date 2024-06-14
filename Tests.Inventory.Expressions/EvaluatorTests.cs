@@ -5,9 +5,15 @@ using Inventory.Products.Repositories;
 using MediatR;
 using Xunit.Abstractions;
 using Xunit.Microsoft.DependencyInjection.Abstracts;
+using Inventory.Products.Contracts;
+using Inventory.Products;
+using System.Reflection;
 
 namespace Tests.Inventory.Expressions
 {
+
+
+
 
     /// <summary>
     /// https://github.com/Umplify/xunit-dependency-injection/blob/main/examples/Xunit.Microsoft.DependencyInjection.ExampleTests/CalculatorTests.cs
@@ -21,22 +27,22 @@ namespace Tests.Inventory.Expressions
 
         }
 
-        private void EmptyDB()
+
+        private void DeleteEntity()
         {
 
         }
-
 
         [Fact]
         public async Task TestComputeTokens()
         {
 
-
-
-
-
             var _mediator = _fixture.GetService<IMediator>(_testOutputHelper)!;
             var _repo = _fixture.GetService<IInventoryRepository>(_testOutputHelper)!;
+
+
+
+            _repo.EmptyDB();
 
             var InventoryId = (await _repo.AddInventoryAsync(new InventoryDto(Guid.NewGuid(), "CRYPTO"))).Id;
             var sourceId = (await _repo.AddSourceAsync(new SourceDto(Guid.NewGuid(), "SOURCE"))).Id;
@@ -52,7 +58,7 @@ namespace Tests.Inventory.Expressions
             Evaluator instance = new Evaluator(_mediator, "QUANTITY(ADA)");
             string result = await instance.Execute();
 
-            Assert.Equal(1, 1);
+            Assert.Equal("1.000000",result);
 
 
         }

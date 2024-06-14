@@ -1,7 +1,5 @@
 ﻿using MediatR;
 using Inventory.Products.Contracts;
-using System.Text;
-using Microsoft.Extensions.ObjectPool;
 
 namespace Expressions
 {
@@ -36,9 +34,12 @@ namespace Expressions
             return  await  ComputeTokens(ParseTokens());
         }
 
-        public void GetCodes()
+        public async void GetCodes()
         {
-             var response =   _mediator.Send(new CodesQuery());
+             var response =  await  _mediator.Send(new CodesQuery());
+            _productCodes = response.ProductCodes;
+            _metricCodes = response.MetricCodes;    
+
         }
 
      
@@ -69,8 +70,13 @@ namespace Expressions
         public async Task<decimal> ComputeFunction(string token)
         {
             int firstParenthesis = token.IndexOf(@"(");
-            int firstComma = token.IndexOf(@",");
-            int productCodeSize = firstComma - firstParenthesis - 1;
+            int nextToendOfProductCodeIndex = token.IndexOf(@",");
+            if (nextToendOfProductCodeIndex== -1)
+            {
+                nextToendOfProductCodeIndex = token.IndexOf(@")");
+            }
+
+            int productCodeSize = nextToendOfProductCodeIndex - firstParenthesis - 1;
             string metricCode = token.Substring(0, firstParenthesis);
             string productCode = token.Substring(firstParenthesis + 1, productCodeSize);
                    
@@ -83,11 +89,11 @@ namespace Expressions
 
         public bool IsFunction(string token ) {
             foreach (var item in _productCodes)
-                if (item.Contains(token))
+                if (token.Contains(item))
                     return true;
 
             foreach (var item in _metricCodes)
-                if (item.Contains(token))
+                if (token.Contains(item))
                     return true;
 
             return false;   

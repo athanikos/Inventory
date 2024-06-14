@@ -11,7 +11,7 @@ namespace Inventory.Products.Handlers
 
         private readonly IInventoryRepository _repo;
 
-        public GetProductMetricValueHandler(InventoryRepository repo)
+        public GetProductMetricValueHandler(IInventoryRepository repo)
         {
             _repo = repo;
         }
