@@ -13,7 +13,7 @@ namespace Inventory.WebApi
             var builder = WebApplication.CreateBuilder(args);
            
             // comment on migration run 
-            builder.Services.AddSwaggerGen();
+           // builder.Services.AddSwaggerGen();
                                   
             builder.Services.AddAuthentication(options =>
             {
@@ -36,7 +36,7 @@ namespace Inventory.WebApi
             Prices.ConfigureServices.AddServices(builder.Services, builder.Configuration, mediatRAssemblies);
            
             // comment on migration run 
-            Prices.RunServices.Run(builder.Services);
+           // Prices.RunServices.Run(builder.Services);
 
             builder.Services.AddFastEndpoints();
             var app = builder.Build();

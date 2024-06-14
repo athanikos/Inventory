@@ -6,9 +6,9 @@ public class ProductMetric
 
     public Guid MetricId { get; set; }
 
-    public string ProductCode { get; } = string.Empty;
+    public string ProductCode { get; set; } = string.Empty;
 
-    public string MetricCode { get; } = string.Empty;
+    public string MetricCode { get; set;  } = string.Empty;
 
     public decimal Value { get; internal set; }
 

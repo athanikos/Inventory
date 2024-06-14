@@ -111,6 +111,7 @@ namespace Inventory.Products.Repositories
 
         public async Task AddOrEditProductMetric(ProductMetricDto m)
         {
+            UpdateProductMetricCodes(m);
             DecideNewOrEdit(m);
             await _context.SaveChangesAsync();
         }
@@ -118,10 +119,10 @@ namespace Inventory.Products.Repositories
         public void UpdateProductMetricCodes(ProductMetricDto m)
         {
             string productCode = _context.Products.
-                                 Where(p => p.Id == m.MetricId).
+                                 Where(p => p.Id == m.ProductId).
                                  Select(i => i.Code).Single();
 
-            string metricCode = _context.Products.
+            string metricCode = _context.Metrics.
                           Where(p => p.Id == m.MetricId).
                           Select(i => i.Code).Single();
 
@@ -152,7 +153,10 @@ namespace Inventory.Products.Repositories
                 EffectiveDate = m.EffectiveDate,
                 ProductId = m.ProductId,
                 Value = m.Value,
-                Currency = m.Currency
+                Currency = m.Currency,
+                ProductCode = m.ProductCode,
+                MetricCode = m.MetricCode
+               
             };
         }
 
