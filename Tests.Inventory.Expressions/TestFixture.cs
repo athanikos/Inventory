@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 using Xunit.Microsoft.DependencyInjection;
+using Expressions;
 
 namespace Tests.Inventory.Expressions
 {
@@ -15,7 +16,7 @@ namespace Tests.Inventory.Expressions
     {
         protected override void AddServices(IServiceCollection services, IConfiguration? configuration)
         {
-            List<Assembly> mediatRAssemblies = [typeof(Startup).Assembly];
+            List<Assembly> mediatRAssemblies = [typeof(EvaluatorTests).Assembly];
             mediatRAssemblies.Add(typeof(ConfigureServices).Assembly);
             services.AddMediatR(cfg =>
             cfg.RegisterServicesFromAssemblies(mediatRAssemblies.ToArray()));

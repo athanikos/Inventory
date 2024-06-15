@@ -137,7 +137,7 @@ namespace Inventory.Products.Repositories
         public List<string?> GetDistinctMetricCodes()
         {
             if (_context.Metrics.Count() == 0) return new List<string?>();
-            return _context.Products.Select(i => i.Code.Trim().ToUpper())
+            return _context.Metrics.Select(i => i.Code.Trim().ToUpper())
                 .GroupBy(p => p)
                 .Select(o => o.FirstOrDefault())
                 .ToList();
@@ -334,22 +334,29 @@ namespace Inventory.Products.Repositories
         /// <param name="MetricCode"></param>
         /// <returns></returns>
         public  ProductMetricDto GetProductMetric(string ProductCode, string MetricCode)
-        {       
-                ProductCode = ProductCode.ToUpper();
-                MetricCode = MetricCode.ToUpper();
+        {
+            try
+            {
+                ProductCode = ProductCode.ToUpper().Trim();
+                MetricCode = MetricCode.ToUpper().Trim();
 
-                return  _context.ProductMetrics.
-                Where(i=>i.ProductCode== ProductCode && i.MetricCode == MetricCode).
-                OrderByDescending(i=>i.EffectiveDate).
-                Select(i=>new ProductMetricDto(i.ProductId,
+                return _context.ProductMetrics.
+                Where(i => i.ProductCode == ProductCode && i.MetricCode == MetricCode).
+                OrderByDescending(i => i.EffectiveDate).
+                Select(i => new ProductMetricDto(i.ProductId,
                                             i.MetricId,
                                             i.Value,
                                             i.EffectiveDate,
                                             i.Currency,
                                             i.ProductCode,
                                             i.MetricCode)).First();
-               
-                
+
+            }
+            catch (Exception ex)
+            {
+                return null;   
+            }
+
         }
 
         

@@ -11,7 +11,7 @@ public class ExpressionDbContext : DbContext
     base(options)
     { }
 
-    public DbSet<Expression> Parameters { get; set; }
+    public DbSet<SimpleExpression> Parameters { get; set; }
 
     protected override void OnModelCreating
     (ModelBuilder modelBuilder)
@@ -22,7 +22,7 @@ public class ExpressionDbContext : DbContext
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
         var config =
-                        modelBuilder.Entity<Expression>();
+                        modelBuilder.Entity<SimpleExpression>();
         config.ToTable("Expression").HasKey(p => p.Id);
 
     }

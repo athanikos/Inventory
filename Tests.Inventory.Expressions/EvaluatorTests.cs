@@ -28,44 +28,74 @@ namespace Tests.Inventory.Expressions
         }
 
 
-        private void DeleteEntity()
-        {
-
-        }
-
+        /// <summary>
+        /// QUANTITY(ADA) test 
+        /// </summary>
+        /// <returns></returns>
         [Fact]
-        public async Task TestComputeTokens()
+        public async Task TestEvaluatorQuantityOfProduct()
         {
+            string expression = "QUANTITY(ADA)";
 
             var _mediator = _fixture.GetService<IMediator>(_testOutputHelper)!;
             var _repo = _fixture.GetService<IInventoryRepository>(_testOutputHelper)!;
-
-
-
+            //  todo extract string to const
+            // todo extract preparation steps , services and empty db 
             _repo.EmptyDB();
 
             var InventoryId = (await _repo.AddInventoryAsync(new InventoryDto(Guid.NewGuid(), "CRYPTO"))).Id;
             var sourceId = (await _repo.AddSourceAsync(new SourceDto(Guid.NewGuid(), "SOURCE"))).Id;
-            var metricId = (await _repo.AddMetricAsync(NewMetricDto(sourceId))).Id;
+            var metricId = (await _repo.AddMetricAsync(NewMetricDto(sourceId, "QUANTITY"    ))).Id;
 
             ProductDto prodDto = NewProductDto(InventoryId);
-
             var productId = (await _repo.AddProductAsync(prodDto)).Id;
 
-
-            await _repo.AddOrEditProductMetric(NewProdctMetricDto(metricId, productId));
-
-            Evaluator instance = new Evaluator(_mediator, "QUANTITY(ADA)");
+            await _repo.AddOrEditProductMetric(NewProdctMetricDto(metricId, productId, 1, "EUR", "ADA", "QUANTITY"));
+            Evaluator instance = new Evaluator(_mediator, expression);
             string result = await instance.Execute();
-
             Assert.Equal("1.000000",result);
-
-
         }
 
-        private static ProductMetricDto NewProdctMetricDto(Guid metricId, Guid productId)
+        /// <summary>
+        /// QUANTITY(ADA) * PRICE(ADA) test 
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        public async Task TestEvaluatorBalanceOfProduct()
         {
-            return new ProductMetricDto(productId, metricId, 1, DateTime.MinValue, "EUR", "ADA", "QUANTITY");
+            string expression = "QUANTITY(ADA) * PRICE(ADA)";
+
+
+            var _mediator = _fixture.GetService<IMediator>(_testOutputHelper)!;
+            var _repo = _fixture.GetService<IInventoryRepository>(_testOutputHelper)!;
+            //  todo extract string to const
+            // todo extract preparation steps , services and empty db 
+
+            _repo.EmptyDB();
+            var InventoryId = (await _repo.AddInventoryAsync(new InventoryDto(Guid.NewGuid(), "CRYPTO"))).Id;
+            var sourceId = (await _repo.AddSourceAsync(new SourceDto(Guid.NewGuid(), "SOURCE"))).Id;
+          
+            
+            var quantityId = (await _repo.AddMetricAsync(NewMetricDto(sourceId,"QUANTITY"))).Id;
+            var priceId = (await _repo.AddMetricAsync(NewMetricDto(sourceId, "PRICE"))).Id;
+
+
+            ProductDto prodDto = NewProductDto(InventoryId);
+            var productId = (await _repo.AddProductAsync(prodDto)).Id;
+           
+            await _repo.AddOrEditProductMetric(NewProdctMetricDto(quantityId, productId,1,"EUR","ADA","QUANTITY"));
+            await _repo.AddOrEditProductMetric(NewProdctMetricDto(priceId, productId, 5, "EUR", "ADA", "PRICE"));
+
+
+            Evaluator instance = new Evaluator(_mediator, expression);
+            string result = await instance.Execute();
+            Assert.Equal("1.000000*5.000000", result);
+        }
+
+        private static ProductMetricDto NewProdctMetricDto(Guid metricId, Guid productId,
+            int quantity, string currency, string productCode, string metricCode   )
+        {
+            return new ProductMetricDto(productId, metricId, quantity, DateTime.MinValue, currency, productCode, metricCode);
         }
 
         private static  ProductDto NewProductDto(Guid InventoryId )
@@ -76,9 +106,9 @@ namespace Tests.Inventory.Expressions
                                          InventoryId,
                                          new List<ProductMetricDto>());
         }
-        private static MetricDto NewMetricDto(Guid SourceId )
+        private static MetricDto NewMetricDto(Guid SourceId,string MetricCode )
         {
-            return new MetricDto(Guid.NewGuid(), "", "QUANTITY", SourceId);
+            return new MetricDto(Guid.NewGuid(), "", MetricCode, SourceId);
         }
     }
 }

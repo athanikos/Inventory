@@ -34,6 +34,9 @@ namespace Inventory.Prices
 
 
             mediatRAssemblies.Add(typeof(ConfigureServices).Assembly);
+            mediatRAssemblies.Add(typeof(Products.Contracts.AddProductMetricCommand).Assembly);
+            mediatRAssemblies.Add(typeof(Products.ConfigureServices).Assembly);
+
 
             var logger  = new LoggerConfiguration()
             .MinimumLevel.Debug()

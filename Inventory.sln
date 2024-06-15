@@ -32,7 +32,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Expressions", "Expressions"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Inventory.Expressions", "Expressions\Inventory.Expressions.csproj", "{87C42F9B-2E72-425D-83E8-FC887C66175E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.Inventory.Expressions", "Tests.Inventory.Expressions\Tests.Inventory.Expressions.csproj", "{DAB154A1-13EB-4921-B98A-CCD68A54709A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests.Inventory", "Tests.Inventory.Expressions\Tests.Inventory.csproj", "{DAB154A1-13EB-4921-B98A-CCD68A54709A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{C888E672-23E1-484A-9314-D3AF664ED03A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -83,7 +85,7 @@ Global
 		{302F89CA-2D96-449B-A142-B362D2D479AB} = {FC7F9F24-A6CD-4F29-9A04-866E01A39B73}
 		{6F10D302-0340-4F4A-BA54-C2A3FE67A1D1} = {ED2847C0-EB93-4BCC-82A3-19613A02DBCB}
 		{87C42F9B-2E72-425D-83E8-FC887C66175E} = {BF59840D-EBEE-4E3A-8DB0-ACB79CD1D488}
-		{DAB154A1-13EB-4921-B98A-CCD68A54709A} = {BF59840D-EBEE-4E3A-8DB0-ACB79CD1D488}
+		{DAB154A1-13EB-4921-B98A-CCD68A54709A} = {C888E672-23E1-484A-9314-D3AF664ED03A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {582FC159-BB6D-4F86-A864-9DCDBC25735B}

@@ -52,6 +52,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Inventory.Products.Contracts\Inventory.Products.Contracts.csproj" />
+    <ProjectReference Include="..\Inventory.Products\Inventory.Products.csproj" />
   </ItemGroup>
 
 </Project>

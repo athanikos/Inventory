@@ -25,8 +25,7 @@ namespace Inventory.WebApi
 
             List<Assembly> mediatRAssemblies = [typeof(Program).Assembly];
 
-            builder.Services.AddMediatR(cfg =>
-              cfg.RegisterServicesFromAssemblies(mediatRAssemblies.ToArray()));
+   
 
             Users.ConfigureServices.AddServices(builder.Services, builder.Configuration);
          
@@ -34,7 +33,11 @@ namespace Inventory.WebApi
                 builder.Configuration, mediatRAssemblies);
                      
             Prices.ConfigureServices.AddServices(builder.Services, builder.Configuration, mediatRAssemblies);
-           
+       
+            builder.Services.AddMediatR(cfg =>
+             cfg.RegisterServicesFromAssemblies(mediatRAssemblies.ToArray()));
+            
+            
             // comment on migration run 
             Prices.RunServices.Run(builder.Services);
 

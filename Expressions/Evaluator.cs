@@ -15,7 +15,7 @@ namespace Expressions
 
 
         /// <summary>
-        ///      todo move top readme    
+        ///      todo move to readme    
         ///      MetricCode(ProductCode,EffectiveDateTime) > 100     
         ///      example of expression : Quantity(Ada,Latest) > 100  --> the latest quantity for ada 
         ///      another example : Value(ADA) = PRICE(ADA) * QUANTITY(ADA) 
@@ -45,7 +45,27 @@ namespace Expressions
      
         public List<string> ParseTokens()
         {
-            return _expression.Split(operators, StringSplitOptions.RemoveEmptyEntries).ToList<string>();
+            List<string> resultedList = new List<string>();
+            string currentToken = string.Empty;    
+            
+            for (int i = 0; i < _expression.Length; i++)
+            {
+                if (operators.Contains(_expression[i]))
+                {
+                    if(currentToken!=string.Empty)
+                        resultedList.Add(currentToken);
+                    currentToken = string.Empty;
+                    
+                    resultedList.Add(_expression[i].ToString());
+                }
+                else
+                    currentToken += _expression[i].ToString();  
+            }
+
+            if (currentToken != string.Empty)
+                resultedList.Add(currentToken);
+
+            return resultedList;
         }
 
         public async Task<string> ComputeTokens(List<string> tokens)
@@ -70,7 +90,9 @@ namespace Expressions
         public async Task<decimal> ComputeFunction(string token)
         {
             int firstParenthesis = token.IndexOf(@"(");
+            
             int nextToendOfProductCodeIndex = token.IndexOf(@",");
+       
             if (nextToendOfProductCodeIndex== -1)
             {
                 nextToendOfProductCodeIndex = token.IndexOf(@")");
