@@ -40,10 +40,17 @@ Effective From will allways be min Value in this case since there wil be no chan
     
 A hangfire hob that updates productMetric table. 
 
+
+
+
 ### Expressions module 
 
 Supports a simple formula like  METRICCODE(PRODUCTOCODE,UPPERBOUNDEFFECTIVEDATE) where upperbound Effective date.
 it parses metric code , product code and date time and finds the latest product metric row for that perticular date else the latest. 
+
+Todo support an aggregate formula 
+    i.e. sum all product prices per inventory 
+
 
 ### Tests Module 
 
@@ -61,9 +68,8 @@ ClaimType = CLIENTINVENTORY claimValue = <InventoryId>
    
 
 ## migrations 
-comment out //  builder.Services.AddSwaggerGen(); in startup for the migrations to work
+    comment out //  builder.Services.AddSwaggerGen(); in startup for the migrations to work
     
-
     dotnet tool install --global dotnet-ef
     
     cd C:\projects\Inventory\Inventory\Inventory.WebApi
@@ -71,19 +77,11 @@ comment out //  builder.Services.AddSwaggerGen(); in startup for the migrations 
     dotnet add package Microsoft.EntityFrameworkCore
     
     dotnet ef migrations add Initial -c  UsersDbContext -p C:\projects\Inventory\Inventory\Inventory.Users\Inventory.Users.csproj -s C:\projects\Inventory\Inventory\Inventory.WebApi\Inventory.WebApi.csproj -o Data/Migrations
-    
-    
     dotnet ef database update Initial
 
 
     C:\projects\Inventory\Inventory\Inventory.WebApi>dotnet ef migrations add Initial -c  ProductsDbContext -p C:\projects\Inventory\Inventory\Inventory.Products\Inventory.Products.csproj -s C:\projects\Inventory\Inventory\Inventory.WebApi\Inventory.WebApi.csproj -o Data/Migrations
-
-
     dotnet ef database update Initial
-
-
-
-### Prices Module 
 
     dotnet ef migrations add pPricesv3 -c  PricesDbContext -p C:\projects\Inventory\Inventory\Prices\Inventory.Prices.csproj -s     C:\projects\Inventory\Inventory\Inventory.WebApi\Inventory.WebApi.csproj -o Data/Migrations
     dotnet ef database update  pPricesv3 -c PricesDbContext
@@ -99,6 +97,20 @@ comment out //  builder.Services.AddSwaggerGen(); in startup for the migrations 
    A metric for a product is stored in Product Metric table. so the actual values are stored in this table. 
 
 
+
+### Use cases
+
+#### Read Invoices module (extract text and insert) 
+
+#### Notify on threshold 
+       Set a threshold and notify
+        
+#### Compute total portofolio value & display   
+    Sum all balances 
+
+#### any product pricing through ebay ?
+
+#### Betting portofolio support 
 
 
     
