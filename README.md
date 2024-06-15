@@ -11,8 +11,8 @@
     Source represents a system. used to mark a live metric as being updated from some kind of system. For example COINGECKO for crypto values.  
 
 #### Product Metrics example 
-One Product has some description. A mtric can be acquired value. 
-A product batch was acquired (5 out of toital 20) was acquired at 10 euros but some other batch of 5 items was acquired at 9. 
+One Product has some description. A metric can be acquired value. 
+A product batch was acquired (5 out of toital 20)at 10 euros but some other batch of 5 items was acquired at 9. 
 
     ProductId Description  
     1         5
