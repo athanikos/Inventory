@@ -8,7 +8,7 @@
     Each product may have any kind of  metric via the product metric table.  
     Some metric need to have a hard coded type that means something to the system.
     for example QUANTITY should be incremented decremented by transactions. Perhaps need to insert those predefined metric types.
-    Souurce represents a system. used to mark a live metric as being updated from some kind of system. For example COINGECKO for crypto values.  
+    Source represents a system. used to mark a live metric as being updated from some kind of system. For example COINGECKO for crypto values.  
 
 #### Product Metrics example 
     One Product has some description. A mtric can be acquired value. 
