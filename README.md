@@ -2,26 +2,15 @@
 
 
 ### Products module 
-    Manage products. Categorize products Categories are just labels. 
-    Categories support tree like structure where its node keeps track mef its father.
-    Each product may have any kind of  metric via the product metric table. 
+    Manage products. Manage Categories and metrics. 
+    Products Categories are just labels. 
+    Categories support tree like structure where its node keeps track of its father.
+    Each product may have any kind of  metric via the product metric table.  
     Some metric need to have a hard coded type that means something to the system.
-    for example QUANTITY should be incremen
-    
+    for example QUANTITY should be incremented decremented by transactions. Perhaps need to insert those predefined metric types.
+    Souurce represents a system. used to mark a live metric as being updated from some kind of system. For example COINGECKO for crypto values.  
 
-    
-    One Inventory has many products.
-    Many Products have manny categories.
-    Many Products have many metrics. 
-    
-    Authorization rules are applied per user per inventory.
-    Claims are Admin (read write on inventory) 
-    where claimValue = <InventoryId> and 
-    ClaimType = ADMININVENTORY
-        
-    Client can order from inventory. For an inventory to be able to order 
-    claimType = CLIENTINVENTORY claimValue = <InventoryId>
-
+#### Product Metrics example 
     One Product has some description. A mtric can be acquired value. 
     A product batch was acquired (5 out of toital 20) was acquired at 10 euros but some other batch of 5 items was acquired at 9. 
 
@@ -50,6 +39,33 @@
     
 
 
+
+### Prices module 
+    
+    A hangfire hob that updates productMetric table. 
+
+### Expressions module 
+
+    Supports a simple formula like  METRICCODE(PRODUCTOCODE,UPPERBOUNDEFFECTIVEDATE) where upperbound Effective date.
+    It parses metric code , product code and date time and finds the latest product metric row for that perticular date else the latest. 
+
+
+
+### Tests Module 
+
+    Runs end to end testing 
+    
+### Authorization rules 
+    
+    Authorization rules are applied per user per inventory.
+    Claims are Admin (read write on inventory) 
+    where claimValue = <InventoryId> and 
+    ClaimType = ADMININVENTORY
+        
+    Client can order from inventory. For an inventory to be able to order 
+    claimType = CLIENTINVENTORY claimValue = <InventoryId>
+
+    
 
 ## migrations 
     comment out //  builder.Services.AddSwaggerGen(); in startup for the migrations to work
