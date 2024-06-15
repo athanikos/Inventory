@@ -2,7 +2,14 @@
 
 
 ### Products module 
+    Manage products. Categorize products Categories are just labels. 
+    Categories support tree like structure where its node keeps track mef its father.
+    Each product may have any kind of  metric via the product metric table. 
+    Some metric need to have a hard coded type that means something to the system.
+    for example QUANTITY should be incremen
+    
 
+    
     One Inventory has many products.
     Many Products have manny categories.
     Many Products have many metrics. 
