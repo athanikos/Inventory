@@ -11,8 +11,8 @@
     Source represents a system. used to mark a live metric as being updated from some kind of system. For example COINGECKO for crypto values.  
 
 #### Product Metrics example 
-    One Product has some description. A mtric can be acquired value. 
-    A product batch was acquired (5 out of toital 20) was acquired at 10 euros but some other batch of 5 items was acquired at 9. 
+One Product has some description. A mtric can be acquired value. 
+A product batch was acquired (5 out of toital 20) was acquired at 10 euros but some other batch of 5 items was acquired at 9. 
 
     ProductId Description  
     1         5
@@ -25,9 +25,7 @@
     MetricId     Description  
     1            AcquiredPrice
 
-    Effective From will allways be min Value in this case since there wil be no change . Acquired also means the inventory bought it increases quantity (?)
-
-
+Effective From will allways be min Value in this case since there wil be no change . Acquired also means the inventory bought it increases quantity (?)
 
     For selling price 
     productId MetricId Quantity Value           EffectiveFrom    
@@ -38,37 +36,32 @@
     2            SellingPrice
     
 
-
-
 ### Prices module 
     
-    A hangfire hob that updates productMetric table. 
+A hangfire hob that updates productMetric table. 
 
 ### Expressions module 
 
-    Supports a simple formula like  METRICCODE(PRODUCTOCODE,UPPERBOUNDEFFECTIVEDATE) where upperbound Effective date.
-    It parses metric code , product code and date time and finds the latest product metric row for that perticular date else the latest. 
-
-
+Supports a simple formula like  METRICCODE(PRODUCTOCODE,UPPERBOUNDEFFECTIVEDATE) where upperbound Effective date.
+it parses metric code , product code and date time and finds the latest product metric row for that perticular date else the latest. 
 
 ### Tests Module 
 
-    Runs end to end testing 
+Runs end to end testing 
     
 ### Authorization rules 
     
-    Authorization rules are applied per user per inventory.
-    Claims are Admin (read write on inventory) 
-    where claimValue = <InventoryId> and 
-    ClaimType = ADMININVENTORY
+Authorization rules are applied per user per inventory.
+Claims are Admin (read write on inventory) 
+where claimValue = <InventoryId> and 
+ClaimType = ADMININVENTORY
         
-    Client can order from inventory. For an inventory to be able to order 
-    claimType = CLIENTINVENTORY claimValue = <InventoryId>
-
-    
+Client can order from inventory. For an inventory to be able to order 
+ClaimType = CLIENTINVENTORY claimValue = <InventoryId>
+   
 
 ## migrations 
-    comment out //  builder.Services.AddSwaggerGen(); in startup for the migrations to work
+comment out //  builder.Services.AddSwaggerGen(); in startup for the migrations to work
     
 
     dotnet tool install --global dotnet-ef
