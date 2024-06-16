@@ -1,15 +1,20 @@
-﻿using MediatR;
+﻿
+using MediatR;
 using Inventory.Products.Contracts;
 
 namespace Expressions
 {
     public class Evaluator
     {
-
+        private const string OpenBracket = "[";
+        private const string ClosingBracket = "]";
         private string _expression = string.Empty;
         private string _computedExpression = string.Empty;
         private readonly IMediator _mediator; 
         private char[] operators = new char[] { '*', '/', '+', '-' };
+        private string[] aggregateFunctions = new string[] { "SUM", "AVG"};
+        private string ALLSpecifier = "FUNC(ALL)" ;
+
         private List<string> _productCodes = new List<string>();    
         private List<string> _metricCodes = new List<string>();
 
@@ -72,44 +77,92 @@ namespace Expressions
         {      
             var resultedExpression = string.Empty;
             foreach (var token in tokens)
-                if (IsFunction(token))
-                    resultedExpression += (await  ComputeFunction(token)).ToString();
+            {
+                if (IsComplexFunction(token))
+                    resultedExpression += (await ComputeComplexFunction(token)).ToString();
+                else if (IsSimpleFunction(token))
+                    resultedExpression += (await ComputeSimpleFunction(token)).ToString();
                 else
-                   resultedExpression += token.ToString();   
-            
+                    resultedExpression += token.ToString();
+            }
             return resultedExpression;  
         }
 
 
         /// <summary>
-        ///     Parses a formual of the following   Quantity(Ada,Latest)
-        ///     and gets the value in product metric table 
-        ///     and returns that value 
+        ///     Parses a formula  of the following  
+        ///     SUM( VALUE([FUNC(ALL)],Latest))
+        ///     SUM( VALUE([ADA,XRP],Latest))
+        ///     SUM(
+        ///     one prod one metric 
+        ///     returns the value in product metric table 
         /// </summary>
         /// <param name="token"></param>
-        public async Task<decimal> ComputeFunction(string token)
+        public async Task<string> ComputeComplexFunction(string token)
         {
-            int firstParenthesis = token.IndexOf(@"(");
+            DateTime upperboundDate = DateTime.MaxValue;    
+            List<string> productCodesToCompute = new List<string>();
+            string metricCode = string.Empty;
+
+            foreach (var item in _metricCodes)
+                if (token.Contains(item))
+                    metricCode = item;
             
-            int nextToendOfProductCodeIndex = token.IndexOf(@",");
-       
-            if (nextToendOfProductCodeIndex== -1)
+            if (token.Contains(ALLSpecifier))
+                productCodesToCompute.AddRange(_productCodes);
+            else
             {
-                nextToendOfProductCodeIndex = token.IndexOf(@")");
+               int startIndexOfProducts = token.IndexOf(OpenBracket) + 1 ;
+                int endIndexOfProducts = token.IndexOf(ClosingBracket) - 1; 
+
+
+
             }
 
-            int productCodeSize = nextToendOfProductCodeIndex - firstParenthesis - 1;
-            string metricCode = token.Substring(0, firstParenthesis);
-            string productCode = token.Substring(firstParenthesis + 1, productCodeSize);
-                   
-            return (await _mediator.
-                   Send(new GetProductMetricValueQuery(productCode, metricCode, DateTime.Now))).Value;
 
+
+            string result = string.Empty;
+   
+
+            foreach (var productCode in productCodesToCompute)
+                result +=  (await _mediator.
+                  Send(new GetProductMetricValueQuery(productCode, metricCode, upperboundDate))).Value;
+
+            return result;
         }
 
-     
 
-        public bool IsFunction(string token ) {
+        /// <summary>
+        ///     Parses a formula  of the following   Quantity(Ada,Latest)
+        ///     one prod one metric 
+        ///     returns the value in product metric table 
+        /// </summary>
+        /// <param name="token"></param>
+        public async Task<string> ComputeSimpleFunction(string token)
+        {
+            string productCode = string.Empty;
+            string metricCode = string.Empty;
+            DateTime upperboundDate = DateTime.Now;    
+      
+            foreach (var item in _productCodes)
+                if (token.Contains(item))
+                    productCode = item;
+
+            foreach (var item in _metricCodes)
+                if (token.Contains(item))
+                    metricCode = item;
+
+             return (await _mediator.
+                   Send(new GetProductMetricValueQuery(productCode, metricCode, upperboundDate))).Value.ToString();
+        }
+
+
+
+
+        public bool IsSimpleFunction(string token ) {
+        
+            if (IsComplexFunction(token)) return false;    
+
             foreach (var item in _productCodes)
                 if (token.Contains(item))
                     return true;
@@ -121,7 +174,40 @@ namespace Expressions
             return false;   
         }
 
+        /// <summary>
+        /// if contains any of aggregates then it is an aggregate 
+        /// aggregates my have multiple products or the ALL products 
+        /// </summary>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        public bool IsComplexFunction(string token)
+        {
+            foreach (var item in aggregateFunctions)
+                if (token.Contains(item))
+                    return true;
+
+         
+           if (token.Contains(ALLSpecifier))
+                 return true;
+
+            var numberOfProducts = 0;
+            foreach (var item in _productCodes)
+                if (token.Contains(item))
+                    numberOfProducts++;
+            if (numberOfProducts>1)
+                return true;
+                        
+            return false;
+        }
 
 
     }
+
+    enum TokenType
+    { 
+          _operator = 0 ,
+          _simpleFunction =1 ,
+          _aggregateFunction =2   
+    }
+
 }

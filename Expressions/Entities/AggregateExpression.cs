@@ -1,10 +1,17 @@
-﻿namespace Inventory.Expressions.Entities
+﻿using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
+
+namespace Inventory.Expressions.Entities
 {
 
 
-    /// <summary>
-    /// SUM(
-    /// </summary>
+    // <summary>
+    // TOTAL VALUE = SUM( VALUE (ADA,UpperBoundDate) )
+    //  or
+    //  VALUE([ADA, XRP] , UpperBoundDate) )
+    //  or
+    //  VALUE(ALL , UpperBound)
+    // </summary>
     public  class AggregateExpression
     {
         public Guid Id { get; set; }
