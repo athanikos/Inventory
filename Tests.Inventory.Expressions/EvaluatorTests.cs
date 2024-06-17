@@ -57,7 +57,7 @@ namespace Tests.Inventory.Expressions
             await _repo.AddOrEditProductMetric(NewProdctMetricDto(metricId, productId, 1, Currency, ADAProductCode, QuantityCode));
             Evaluator instance = new Evaluator(_mediator, expression);
             string result = await instance.Execute();
-            Assert.Equal("1.000000",result);
+            Assert.Equal("1",result);
         }
 
         /// <summary>
@@ -93,7 +93,7 @@ namespace Tests.Inventory.Expressions
 
             Evaluator instance = new Evaluator(_mediator, expression);
             string result = await instance.Execute();
-            Assert.Equal("1.000000*5.000000", result);
+            Assert.Equal("5", result);
         }
 
         private static async Task<Tuple<Guid,Guid>> SetupInventoryAndSource(IInventoryRepository _repo)
@@ -106,7 +106,7 @@ namespace Tests.Inventory.Expressions
         [Fact]
         public async Task TestEvaluatorComplexSingleProduct()
         {
-            string expression = "SUM(VALUE(ADA,LATEST))";
+            string expression = "SUM(VALUE([ADA],LATEST))";
 
 
             var _mediator = _fixture.GetService<IMediator>(_testOutputHelper)!;
@@ -131,14 +131,14 @@ namespace Tests.Inventory.Expressions
 
             Evaluator instance = new Evaluator(_mediator, expression);
             string result = await instance.Execute();
-            Assert.Equal("1.000000*5.000000", result);
+            Assert.Equal("10", result);
         }
 
 
         [Fact]
         public async Task TestEvaluatorComplexALLProduct()
         {
-            string expression = "SUM(VALUE(ALL,LATEST))";
+            string expression = "SUM(VALUE([ALL],LATEST))";
 
 
             var _mediator = _fixture.GetService<IMediator>(_testOutputHelper)!;
@@ -167,7 +167,7 @@ namespace Tests.Inventory.Expressions
 
             Evaluator instance = new Evaluator(_mediator, expression);
             string result = await instance.Execute();
-            Assert.Equal("100.0000000+10.000000", result);
+            Assert.Equal("110", result);
         }
 
         [Fact]
@@ -201,10 +201,10 @@ namespace Tests.Inventory.Expressions
 
             Evaluator instance = new Evaluator(_mediator, expression);
             string result = await instance.Execute();
-            Assert.Equal("10.000000+11.000000", result);
+            Assert.Equal("21", result);
         }
 
-
+         
         /// todo: move factories to dto's 
 
         private static ProductMetricDto NewProdctMetricDto(Guid metricId, Guid productId,

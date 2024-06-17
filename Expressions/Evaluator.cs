@@ -1,6 +1,8 @@
 ﻿
 using MediatR;
 using Inventory.Products.Contracts;
+using System.Collections.Generic;
+using NCalc;
 
 namespace Expressions
 {
@@ -8,17 +10,19 @@ namespace Expressions
     {
         private const string OpenBracket = "[";
         private const string ClosingBracket = "]";
+        private const char Comma = ',';
+        private const string OpenParenthesis = "(";
+        private const string SUM = "SUM";
+        private char[] operators = ['*', '/', '+', '-'];
+        private string[] aggregateFunctions = ["SUM", "AVG"];
+        private string ALLSpecifier = "[ALL]";
+
         private string _expression = string.Empty;
         private string _computedExpression = string.Empty;
         private readonly IMediator _mediator; 
-        private char[] operators = new char[] { '*', '/', '+', '-' };
-        private string[] aggregateFunctions = new string[] { "SUM", "AVG"};
-        private string ALLSpecifier = "FUNC(ALL)" ;
 
         private List<string> _productCodes = new List<string>();    
         private List<string> _metricCodes = new List<string>();
-
-
         /// <summary>
         ///      todo move to readme    
         ///      MetricCode(ProductCode,EffectiveDateTime) > 100     
@@ -42,6 +46,9 @@ namespace Expressions
         public async void GetCodes()
         {
              var response =  await  _mediator.Send(new CodesQuery());
+             if (response == null)
+                throw new ArgumentNullException();
+
             _productCodes = response.ProductCodes;
             _metricCodes = response.MetricCodes;    
 
@@ -78,27 +85,38 @@ namespace Expressions
             var resultedExpression = string.Empty;
             foreach (var token in tokens)
             {
-                if (IsComplexFunction(token))
-                    resultedExpression += (await ComputeComplexFunction(token)).ToString();
+                 if (IsComplexFunction(token))
+                    resultedExpression += (await ComputeComplexFunction(token,
+                                                 ExtractAggregateFunction(token))).ToString().Trim();
                 else if (IsSimpleFunction(token))
-                    resultedExpression += (await ComputeSimpleFunction(token)).ToString();
+                    resultedExpression += (await ComputeSimpleFunction(token)).ToString().Trim();
                 else
-                    resultedExpression += token.ToString();
+                    resultedExpression += token.ToString().Trim();
             }
-            return resultedExpression;  
+
+            var expression = new Expression(resultedExpression);
+            if (expression == null)
+                return string.Empty;
+            return expression.Evaluate().ToString();  
         }
 
+        public string ExtractAggregateFunction(string token)
+        {
+            int indexOfParenthesis = token.IndexOf(OpenParenthesis);
+            return token.Substring(0, indexOfParenthesis);
+        }
+
+        // todo: per inventoryId 
 
         /// <summary>
         ///     Parses a formula  of the following  
-        ///     SUM( VALUE([FUNC(ALL)],Latest))
+        ///     SUM( VALUE(FUNC(ALL),Latest))
         ///     SUM( VALUE([ADA,XRP],Latest))
-        ///     SUM(
         ///     one prod one metric 
         ///     returns the value in product metric table 
         /// </summary>
         /// <param name="token"></param>
-        public async Task<string> ComputeComplexFunction(string token)
+        public async Task<string> ComputeComplexFunction(string token, string aggregateFunction)
         {
             DateTime upperboundDate = DateTime.MaxValue;    
             List<string> productCodesToCompute = new List<string>();
@@ -111,24 +129,37 @@ namespace Expressions
             if (token.Contains(ALLSpecifier))
                 productCodesToCompute.AddRange(_productCodes);
             else
-            {
-               int startIndexOfProducts = token.IndexOf(OpenBracket) + 1 ;
-                int endIndexOfProducts = token.IndexOf(ClosingBracket) - 1; 
-
-
-
-            }
-
-
-
+                productCodesToCompute.AddRange(ExtractProducts(token).Split(Comma));
+      
             string result = string.Empty;
-   
-
             foreach (var productCode in productCodesToCompute)
-                result +=  (await _mediator.
-                  Send(new GetProductMetricValueQuery(productCode, metricCode, upperboundDate))).Value;
+            {
+                if (aggregateFunction == SUM)
+                {
+                    if (result!=string.Empty)
+                         result += "+" + (await _mediator.
+                                   Send(new GetProductMetricValueQuery(productCode, metricCode, upperboundDate))).Value;
 
+                    else 
+                        result += (await _mediator.
+                        Send(new GetProductMetricValueQuery(productCode, metricCode, upperboundDate))).Value;
+
+                }
+                else
+                {
+                    throw new ArgumentException(); 
+                }
+            }
             return result;
+        }
+
+        private static string ExtractProducts(string token)
+        {
+            int startIndexOfProducts = token.IndexOf(OpenBracket) + 1;
+            int endIndexOfProducts = token.IndexOf(ClosingBracket) - 1;
+            var length = endIndexOfProducts - startIndexOfProducts;
+            string products = token.Substring(startIndexOfProducts, length + 1);
+            return products;
         }
 
 
@@ -157,8 +188,7 @@ namespace Expressions
         }
 
 
-
-
+       
         public bool IsSimpleFunction(string token ) {
         
             if (IsComplexFunction(token)) return false;    
@@ -175,8 +205,6 @@ namespace Expressions
         }
 
         /// <summary>
-        /// if contains any of aggregates then it is an aggregate 
-        /// aggregates my have multiple products or the ALL products 
         /// </summary>
         /// <param name="token"></param>
         /// <returns></returns>
@@ -199,15 +227,6 @@ namespace Expressions
                         
             return false;
         }
-
-
-    }
-
-    enum TokenType
-    { 
-          _operator = 0 ,
-          _simpleFunction =1 ,
-          _aggregateFunction =2   
     }
 
 }

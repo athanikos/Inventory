@@ -335,8 +335,7 @@ namespace Inventory.Products.Repositories
         /// <returns></returns>
         public  ProductMetricDto GetProductMetric(string ProductCode, string MetricCode)
         {
-            try
-            {
+          
                 ProductCode = ProductCode.ToUpper().Trim();
                 MetricCode = MetricCode.ToUpper().Trim();
 
@@ -351,11 +350,7 @@ namespace Inventory.Products.Repositories
                                             i.ProductCode,
                                             i.MetricCode)).First();
 
-            }
-            catch (Exception ex)
-            {
-                return null;   
-            }
+         
 
         }
 
