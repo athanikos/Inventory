@@ -2,13 +2,9 @@
 
 
 ### Products module 
-    Manage products. Manage Categories and metrics. 
-    Products Categories are just labels. 
-    Categories support tree like structure where its node keeps track of its father.
-    Each product may have any kind of  metric via the product metric table.  
-    Some metric need to have a hard coded type that means something to the system.
-    for example QUANTITY should be incremented decremented by transactions. Perhaps need to insert those predefined metric types.
-    Source represents a system. used to mark a live metric as being updated from some kind of system. For example COINGECKO for crypto values.  
+Manage products. Manage Categories and metrics. Products Categories are just labels. Categories support tree like structure where its node keeps track of its father. Each product may have any kind of  metric via the product metric table.  
+Some metric need to have a hard coded type that means something to the system. For example QUANTITY should be incremented decremented by transactions. Perhaps need to insert those predefined metric types. Source represents a system. used to mark a live metric as being updated from some kind of system. 
+For example COINGECKO for crypto values.  
 
 #### Product Metrics example 
 One Product has some description. A metric can be acquired value. 
