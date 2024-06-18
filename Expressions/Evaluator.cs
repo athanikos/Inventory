@@ -4,8 +4,6 @@ using Inventory.Products.Contracts;
 using Hangfire;
 using Microsoft.EntityFrameworkCore;
 using Inventory.Expressions;
-using Newtonsoft.Json.Linq;
-using Inventory.Products.Contracts.Dto;
 
 namespace Expressions
 {
@@ -16,20 +14,17 @@ namespace Expressions
         private const char Comma = ',';
         private const string OpenParenthesis = "(";
         private const string SUM = "SUM";
-        private char[] operators = ['*', '/', '+', '-'];
+        private char[] _operators = ['*', '/', '+', '-'];
         private string[] aggregateFunctions = ["SUM", "AVG"];
         private string ALLSpecifier = "[ALL]";
-
         private string _expression = string.Empty;
-        private string _computedExpression = string.Empty;
         private readonly IMediator _mediator;
         private readonly ExpressionsDbContext _context;
+     
+        private List<string> _allProductCodes;
+        private List<string> _allMetricCodes;
+
         private Guid _inventoryId;
-
-
-        private List<ProductMetricDto> _products = new List<ProductMetricDto>();
-        private List<string?> _productCodes;
-        private List<string?> _metricCodes;
 
 
         /// <summary>
@@ -46,7 +41,7 @@ namespace Expressions
             _context = context;
         }
 
-        public async Task<string> Execute(Guid inventoryId,  string expression)
+        public async Task<decimal> Execute(Guid inventoryId,  string expression)
         {
             _expression = expression;
             _inventoryId = inventoryId;
@@ -56,30 +51,32 @@ namespace Expressions
 
         private async void GetCodes()
         {
-            var response = await _mediator.Send(new CodesQuery());
+            var response = await _mediator.Send(new CodesQuery(_inventoryId));
             if (response == null)
                 throw new ArgumentNullException();
 
-            _productCodes = response.ProductCodes;
-            _metricCodes = response.MetricCodes;
+            _allProductCodes = response.ProductCodes;
+            _allMetricCodes = response.MetricCodes;
         }
 
-        private async Task<string> ComputeTokens(List<string> tokens)
+        private async Task<decimal> ComputeTokens(List<string> tokens)
         {
             var resultedExpression = string.Empty;
             foreach (var token in tokens)
             {
-                if (IsComplexFunction(token))
+                if (IsOperator(token))   
+                    resultedExpression += token.ToString().Trim();
+                else if (IsInventoryBasedFormula(token))
                     resultedExpression += (await ComputeComplexFunction(token,
                                                  ExtractAggregateFunction(token))).ToString().Trim();
-                else if (IsSimpleFunction(token))
+                else if (IsProductBasedFormula(token))
                     resultedExpression += (await ComputeSimpleFunction(_inventoryId, token)).ToString().Trim();
-                else
-                    resultedExpression += token.ToString().Trim();
+                
+                   
             }
 
-            return new NCalc.Expression(resultedExpression).Evaluate()
-              .ToString();
+            return decimal.Parse(new NCalc.Expression(resultedExpression).Evaluate()
+              .ToString());
         }
 
         private List<string> ParseTokens()
@@ -89,7 +86,7 @@ namespace Expressions
 
             for (int i = 0; i < _expression.Length; i++)
             {
-                if (operators.Contains(_expression[i]))
+                if (_operators.Contains(_expression[i]))
                 {
                     if (currentToken != string.Empty)
                         resultedList.Add(currentToken);
@@ -136,16 +133,10 @@ namespace Expressions
             {
                 if (aggregateFunction == SUM)
                 {
-                    var dto = (await _mediator.
-                        Send(new GetProductMetricQuery(_inventoryId, productCode, metricCode
-                        , upperboundDate)));
+                    var dto = (await _mediator.Send(
+                               new GetProductMetricQuery(_inventoryId, productCode, metricCode,upperboundDate)));
 
-                    if (result != string.Empty)
-                        result += "+" + dto.Value;
-                    else
-                        result += dto.Value;
-
-                    _products.Add(dto);
+                      result += result != string.Empty ? "+" : string.Empty + dto.Value;
                 }
                 else
                     throw new ArgumentException("aggregate function not supported: " + aggregateFunction);
@@ -156,7 +147,7 @@ namespace Expressions
 
         private string  ExtractMetricCode(string token)
         {
-            foreach (var item in _metricCodes)
+            foreach (var item in _allMetricCodes)
                 if (token.Contains(item))
                      return  item;
 
@@ -167,7 +158,7 @@ namespace Expressions
         {
             List<string> items = new List<string>();
             if (token.Contains(ALLSpecifier))
-                items.Add(ALLSpecifier);
+                items.AddRange(_allProductCodes);
             else
                 items.AddRange(ExtractProducts(token).Split(Comma));
             return items;
@@ -195,11 +186,11 @@ namespace Expressions
             string metricCode = string.Empty;
             DateTime upperboundDate = DateTime.Now;
 
-            foreach (var item in _productCodes)
+            foreach (var item in _allProductCodes)
                 if (token.Contains(item))
                     productCode = item;
 
-            foreach (var item in _metricCodes)
+            foreach (var item in _allMetricCodes)
                 if (token.Contains(item))
                     metricCode = item;
 
@@ -207,86 +198,124 @@ namespace Expressions
                   Send(new GetProductMetricQuery(InventoryId, productCode, metricCode, upperboundDate))).Value.ToString();
         }
 
+        private formulaType _type = formulaType.undefined;
 
-
-        private bool IsSimpleFunction(string token)
+        public enum formulaType
         {
-
-            if (IsComplexFunction(token)) return false;
-
-            foreach (var item in _productCodes)
-                if (token.Contains(item))
-                    return true;
-
-            foreach (var item in _metricCodes)
-                if (token.Contains(item))
-                    return true;
-
-            return false;
+            undefined = -1, 
+            productBased = 0,
+            inventoryBased =1
         }
 
-        /// <summary>
-        /// </summary>
-        /// <param name="token"></param>
-        /// <returns></returns>
-        private bool IsComplexFunction(string token)
+        private bool IsProductBasedFormula(string token)
+        {
+
+            if (IsInventoryBasedFormula(token))
+                _type  = formulaType.inventoryBased;
+
+            foreach (var item in _allProductCodes)
+                if (token.Contains(item))
+                    _type = formulaType.productBased;
+
+            foreach (var item in _allMetricCodes)
+                if (token.Contains(item))
+                    _type = formulaType.productBased;
+
+            return formulaType.productBased == _type;
+        }
+
+
+        private bool IsOperator (string token)
+        {
+            return token.Length == 1 && _operators.Contains(token[0]);
+        }
+            /// <summary>
+            /// </summary>
+            /// <param name="token"></param>
+            /// <returns></returns>
+            private bool IsInventoryBasedFormula(string token)
         {
             foreach (var item in aggregateFunctions)
                 if (token.Contains(item))
-                    return true;
+                {
+                    _type = formulaType.inventoryBased;
+                    return formulaType.inventoryBased == _type;
+                }
 
             if (token.Contains(ALLSpecifier))
-                return true;
-
+            {
+                _type = formulaType.inventoryBased;
+                return formulaType.inventoryBased == _type;
+            }
             var numberOfProducts = 0;
-            foreach (var item in _productCodes)
+            foreach (var item in _allProductCodes)
                 if (token.Contains(item))
                     numberOfProducts++;
             if (numberOfProducts > 1)
-                return true;
-
-            return false;
+                _type = formulaType.inventoryBased;
+               
+            
+            return formulaType.inventoryBased == _type;
         }
 
-        public List<Entities.ProductExpression> GetParameters()
+        public List<Entities.ProductExpression> GetProductExpressions()
         {
-            return [.. _context.SingleProductExpressions];
+            return [.. _context.ProductExpressions];
+        }
+
+        public List<Entities.InventoryExpression> GetInventoryExpressions()
+        {
+            return [.. _context.InventoryExpressions];
         }
 
 
         public void ScedhuleJobs()
         {
-            var parameters = GetParameters();
-
-            foreach (var p in parameters)
-            {
+            var productExpressions = GetProductExpressions();
+            foreach (var p in productExpressions)
                 RecurringJob.AddOrUpdate(p.Id.ToString(), () => DoScedhuledWork(p), Cron.Minutely);
+
+            var inventoryExpressions = GetInventoryExpressions();
+            foreach (var p in inventoryExpressions)
+                RecurringJob.AddOrUpdate(p.Id.ToString(), () => DoScedhuledWork(p), Cron.Minutely);
+
+        }
+        public async void DoScedhuledWork(Entities.InventoryExpression p)
+        {
+            var result = await Execute(p.TargetInventoryId, p.Expression);
+
+            if (_type == formulaType.inventoryBased)
+            {
+                var command = new AddInventoryMetricCommand(p.TargetInventoryId,
+                                                    p.TargetMetricId,
+                                                    result,
+                                                    DateTime.Now, "EUR"); //todo get from prod
+                await _mediator.Send(command);
             }
         }
 
         public async  void DoScedhuledWork(Entities.ProductExpression p)
         {
             var result =   await  Execute(p.InventoryId, p.Expression);
-         
-            foreach (var item in _products)
+
+            if (_type == formulaType.undefined)
+                throw new ArgumentException(_type.ToString());
+
+
+            if (_type == formulaType.productBased)
             {
-                // inventory metrics 
-               
-
-                //var command = new AddProductMetricCommand(p.TargetProductId,
-                //   item.MetricId, item.Value, DateTime.Now, item.Currency);
-                // 
-                // _mediator.Send(command);
-
-                //    Send(new GetProductMetricValueQuery(_inventoryId, item, 
-                //      MetricCodeToCompute, upperboundDate))).Value;
+                var command = new AddProductMetricCommand(p.TargetProductId,
+                                                          p.TargetMetricId,
+                                                          result,
+                                                          DateTime.Now, "EUR"); //todo get from prod
+                await _mediator.Send(command);
             }
         }
 
 
         public void DoScedhuledWork()
         {
-            foreach (var p in GetParameters())
+            foreach (var p in GetProductExpressions())
                 DoScedhuledWork(p);
         }
 

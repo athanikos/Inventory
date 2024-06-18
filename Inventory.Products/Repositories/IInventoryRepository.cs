@@ -15,13 +15,18 @@ namespace Inventory.Products.Repositories
         Task DeleteProductAsync(ProductDto c);
         bool ProductDescriptionOrCategoryIsUsed(ProductDto c);
 
-        List<string?> GetDistinctProductCodes();
-        List<string?> GetDistinctMetricCodes();
+        List<string> GetDistinctProductCodes(Guid InventoryId);
+        List<string> GetDistinctMetricCodes();
 
         Task AddOrEditProductMetric(ProductMetricDto m);
         Task<MetricDto> AddMetricAsync(MetricDto dto);
         Task<MetricDto> EditMetricAsync(MetricDto c);
         Task DeleteMetricAsync(MetricDto c);
+
+        Task AddOrEditInventoryMetric(InventoryMetricDto m);
+
+
+
 
         Task<CategoryDto> AddCategoryAsync(CategoryDto dto);
         bool CategoryIdExists(Guid Id);

@@ -19,6 +19,10 @@
         public ICollection<Product> Products { get; internal set; }
             = new List<Product>();
 
+
+        public ICollection<Inventory> Inventories  { get; internal set; }
+    = new List<Inventory>();
+
         /// <summary>
         /// System the attribute value came from 
         /// </summary>

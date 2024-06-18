@@ -125,18 +125,20 @@ namespace Inventory.Products.Repositories
 
 
 
-        public List<string?> GetDistinctProductCodes()
+        public List<string> GetDistinctProductCodes(Guid InventoryId)
         {
-            if (_context.Products.Count() == 0) return new List<string?>();
-            return _context.Products.Select(i => i.Code.Trim().ToUpper())
+            if (_context.Products.Count() == 0) return new List<string>();
+            return _context.Products
+                 .Where(p=>p.InventoryId==InventoryId)
+                 .Select(i => i.Code.Trim().ToUpper())
                 .GroupBy(p => p)
                 .Select(o => o.FirstOrDefault())
                 .ToList();
         }
 
-        public List<string?> GetDistinctMetricCodes()
+        public List<string> GetDistinctMetricCodes()
         {
-            if (_context.Metrics.Count() == 0) return new List<string?>();
+            if (_context.Metrics.Count() == 0) return new List<string>();
             return _context.Metrics.Select(i => i.Code.Trim().ToUpper())
                 .GroupBy(p => p)
                 .Select(o => o.FirstOrDefault())

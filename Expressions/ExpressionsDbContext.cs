@@ -1,19 +1,23 @@
 ﻿using Expressions.Entities;
-using Inventory.Expressions.Entities;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 
 namespace Inventory.Expressions;
 
-public  class ExpressionsDbContext : DbContext
+public class ExpressionsDbContext : DbContext
 {
-    public ExpressionsDbContext(DbContextOptions<ExpressionsDbContext>
-            options) :
+
+    public ExpressionsDbContext()
+    { }
+
+
+    public ExpressionsDbContext(
+        DbContextOptions<ExpressionsDbContext>    options) :
             base(options)  { }
            
 
-         public DbSet<MultipleProductExpression> MultipleProductExpressions { get; set; }
-         public DbSet<ProductExpression> SingleProductExpressions { get; set; }
+         public DbSet<InventoryExpression> InventoryExpressions { get; set; }
+         public DbSet<ProductExpression> ProductExpressions { get; set; }
 
 
 
@@ -26,15 +30,15 @@ public  class ExpressionsDbContext : DbContext
                         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
                         var config = 
-                        modelBuilder.Entity<MultipleProductExpression>();
-                        config.ToTable("MultipleProductExpression").HasKey(p=>p.Id);
+                        modelBuilder.Entity<InventoryExpression>();
+                        config.ToTable("InventoryExpression").HasKey(p=>p.Id);
 
                         modelBuilder.Entity<ProductExpression>();
                         config.ToTable("ProductExpression").HasKey(p => p.Id);
 
 
 
-    }
+         }
 
 }
 

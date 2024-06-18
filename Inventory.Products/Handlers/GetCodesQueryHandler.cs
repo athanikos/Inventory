@@ -21,7 +21,7 @@ namespace Inventory.Products.Handlers
             await Task.CompletedTask;
             return new CodesResponse()
             {
-                   ProductCodes =  _repo.GetDistinctProductCodes(),
+                   ProductCodes =  _repo.GetDistinctProductCodes(request.InventoryId),
                    MetricCodes = _repo.GetDistinctMetricCodes()   
             };        
         }

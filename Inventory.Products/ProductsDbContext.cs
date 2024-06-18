@@ -1,5 +1,4 @@
-﻿using Entities = Inventory.Products.Entities;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 namespace Inventory.Products;
 
 public class ProductsDbContext : DbContext
@@ -16,6 +15,7 @@ public class ProductsDbContext : DbContext
         public DbSet<Entities.Source> Sources { get; set; }
         public DbSet<Entities.ProductCategory> ProductCategories { get; set; }
         public DbSet<Entities.ProductMetric> ProductMetrics { get; set; }
+        public DbSet<Entities.InventoryMetric> InventoryMetrics { get; set; }
         public DbSet<Entities.Transaction> Transactions { get; set; }
         public DbSet<Entities.TransactionItem> TransactionItems { get; set; }
 
@@ -41,11 +41,20 @@ public class ProductsDbContext : DbContext
 
                         modelBuilder.Entity<Entities.Product>()
                                     .HasMany(e => e.Metrics)
-                                     .WithMany(e => e.Products)
+                                    .WithMany(e => e.Products)
                                      .UsingEntity<Entities.ProductMetric>()
                                      .HasKey(p => new { p.MetricId, p.ProductId, p.EffectiveDate});
 
-                        modelBuilder.Entity<Entities.Source>()
+                        modelBuilder.Entity<Entities.Inventory>()
+                        .HasMany(e => e.Metrics)
+                        .WithMany(e => e.Inventories)
+                        .UsingEntity<Entities.InventoryMetric>()
+                        .HasKey(p => new { p.MetricId, p.InventoryId, p.EffectiveDate });
+
+
+
+
+        modelBuilder.Entity<Entities.Source>()
                           .HasMany(e => e.Metrics);
                    
 

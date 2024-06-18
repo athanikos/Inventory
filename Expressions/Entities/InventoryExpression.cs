@@ -1,4 +1,4 @@
-﻿namespace Inventory.Expressions.Entities
+﻿namespace Expressions.Entities
 {
     // <summary>
     // TOTAL VALUE = SUM( VALUE (ADA,UpperBoundDate) )
@@ -7,14 +7,16 @@
     //  or
     //  VALUE(ALL , UpperBound)
     // </summary>
-    public  class MultipleProductExpression
+    public  class InventoryExpression
     {
         public Guid Id { get; set; }
 
-        public string Text { get; set; } = string.Empty;
+        public string Expression { get; set; } = string.Empty;
 
         public int RunEveryMinutes { get; set; }
 
-        public Guid InventoryId { get; set; }
+        public Guid TargetInventoryId { get; set; }
+
+        public Guid TargetMetricId { get; set; }  
     }
 }

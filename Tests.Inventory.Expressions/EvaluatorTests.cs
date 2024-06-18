@@ -60,8 +60,8 @@ namespace Tests.Inventory.Expressions
 
             await _repo.AddOrEditProductMetric(NewProdctMetricDto(metricId, productId, 1, Currency, ADAProductCode, QuantityCode));
             Evaluator instance = new Evaluator(_mediator, _expressionDbContext  );
-            string result = await instance.Execute(InventoryId, expression);
-            Assert.Equal("1",result);
+            decimal result = await instance.Execute(InventoryId, expression);
+            Assert.Equal(1,result);
         }
 
         /// <summary>
@@ -97,8 +97,8 @@ namespace Tests.Inventory.Expressions
 
 
             Evaluator instance = new Evaluator(_mediator, _expressionDbContext);
-            string result = await instance.Execute(InventoryId, expression);
-            Assert.Equal("5", result);
+            var result = await instance.Execute(InventoryId, expression);
+            Assert.Equal(5, result);
         }
 
         private static async Task<Tuple<Guid,Guid>> SetupInventoryAndSource(IInventoryRepository _repo)
@@ -138,8 +138,8 @@ namespace Tests.Inventory.Expressions
       
 
             Evaluator instance = new Evaluator(_mediator, _expressionDbContext  );
-            string result = await instance.Execute(InventoryId,expression);
-            Assert.Equal("10", result);
+            var result = await instance.Execute(InventoryId,expression);
+            Assert.Equal(10, result);
         }
 
 
@@ -176,8 +176,8 @@ namespace Tests.Inventory.Expressions
 
 
             Evaluator instance = new Evaluator(_mediator, _expressionDbContext  );
-            string result = await instance.Execute(InventoryId,expression);
-            Assert.Equal("110", result);
+            var result = await instance.Execute(InventoryId,expression);
+            Assert.Equal(110, result);
         }
 
         [Fact]
@@ -212,8 +212,8 @@ namespace Tests.Inventory.Expressions
 
 
             Evaluator instance = new Evaluator(_mediator, _expressionDbContext  );
-            string result = await instance.Execute(InventoryId, expression);
-            Assert.Equal("21", result);
+            var result = await instance.Execute(InventoryId, expression);
+            Assert.Equal(21, result);
         }
 
          

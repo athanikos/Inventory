@@ -15,6 +15,7 @@ namespace Inventory.Products.Entities
         { get; set; } = new List<Product>();
 
 
+        public ICollection<Metric> Metrics { get; set; } = new List<Metric>();
 
     }
 

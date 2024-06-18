@@ -6,7 +6,7 @@
 
         public Guid MetricId { get; set; }
 
-        public string ProductCode { get; set; } = string.Empty;
+        public string InventoryCode { get; set; } = string.Empty;
 
         public string MetricCode { get; set; } = string.Empty;
 

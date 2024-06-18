@@ -9,7 +9,7 @@ namespace Expressions
         void DoScedhuledWork(ProductExpression p);
         void ScedhuleJobs();
 
-        Task<string> Execute(Guid inventoryId, string expression);
+        Task<decimal> Execute(Guid inventoryId, string expression);
 
 
     }

@@ -18,7 +18,7 @@ namespace Inventory.Expressions
         {
             services.AddDbContext<ExpressionsDbContext>(options =>
             options.UseSqlServer(configuration.
-            GetConnectionString("Prices")));
+            GetConnectionString("Expressions")));
 
 
             // allready added in Prices 
