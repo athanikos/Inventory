@@ -6,7 +6,7 @@ using MediatR;
 namespace Inventory.Products.Handlers
 {
     public class GetProductMetricValueHandler : 
-        IRequestHandler<GetProductMetricValueQuery, ProductMetricDto>
+        IRequestHandler<GetProductMetricQuery, ProductMetricDto>
     {
 
         private readonly IInventoryRepository _repo;
@@ -16,7 +16,7 @@ namespace Inventory.Products.Handlers
             _repo = repo;
         }
 
-        public async  Task<ProductMetricDto> Handle(GetProductMetricValueQuery request, 
+        public async  Task<ProductMetricDto> Handle(GetProductMetricQuery request, 
             CancellationToken cancellationToken)
         {
             await Task.CompletedTask;

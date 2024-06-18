@@ -5,7 +5,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 using Xunit.Microsoft.DependencyInjection;
-using Expressions;
+using Products = Inventory.Products;
+using Inventory.Expressions;
 
 namespace Tests.Inventory.Expressions
 {
@@ -17,11 +18,14 @@ namespace Tests.Inventory.Expressions
         protected override void AddServices(IServiceCollection services, IConfiguration? configuration)
         {
             List<Assembly> mediatRAssemblies = [typeof(EvaluatorTests).Assembly];
-            mediatRAssemblies.Add(typeof(ConfigureServices).Assembly);
+            mediatRAssemblies.Add(typeof(Products.ConfigureServices).Assembly);
             services.AddMediatR(cfg =>
             cfg.RegisterServicesFromAssemblies(mediatRAssemblies.ToArray()));
 
-        
+            services.AddDbContext<ExpressionsDbContext>(options =>
+            options.UseSqlServer(configuration.
+            GetConnectionString("Expressions")));
+
             services.AddDbContext<ProductsDbContext>(options =>
             options.UseSqlServer(configuration.
             GetConnectionString("Products")));

@@ -194,6 +194,66 @@ namespace Inventory.Products.Repositories
             };
         }
 
+
+
+
+        public async Task AddOrEditInventoryMetric(InventoryMetricDto m)
+        {
+            UpdateInventoryMetricCodes(m);
+            DecideNewOrEdit(m);
+            await _context.SaveChangesAsync();
+        }
+
+        public void UpdateInventoryMetricCodes(InventoryMetricDto m)
+        {
+            string InventoryCode = _context.Inventories.
+                                 Where(p => p.Id == m.InventoryId).
+                                 Select(i => i.Code).Single();
+
+            string metricCode = _context.Metrics.
+                          Where(p => p.Id == m.MetricId).
+                          Select(i => i.Code).Single();
+
+            m.InventoryCode = InventoryCode;
+            m.MetricCode = metricCode;
+
+        }
+
+
+        public void DecideNewOrEdit(InventoryMetricDto m)
+        {
+            if (_context.InventoryMetrics.Where
+                (
+                    p => p.MetricId == m.MetricId
+                         && p.InventoryId == m.InventoryId
+                         && p.EffectiveDate == m.EffectiveDate
+                ).Count() > 0)
+                _context.Update(m);
+            else
+                _context.InventoryMetrics.Add(CreateInventoryMetric(m));
+        }
+
+        private static InventoryMetric CreateInventoryMetric(InventoryMetricDto m)
+        {
+            return new Entities.InventoryMetric()
+            {
+                MetricId = m.MetricId,
+                EffectiveDate = m.EffectiveDate,
+                InventoryId = m.InventoryId,
+                Value = m.Value,
+                Currency = m.Currency,
+                InventoryCode = m.InventoryCode,
+                MetricCode = m.MetricCode
+
+            };
+        }
+
+
+
+
+
+
+
         public async Task DeleteProductAsync(ProductDto c)
         {
             List<Entities.ProductCategory> pcs = _context.ProductCategories.Where(p => p.ProductId == c.Id).ToList();
@@ -340,7 +400,9 @@ namespace Inventory.Products.Repositories
                 MetricCode = MetricCode.ToUpper().Trim();
 
                 return _context.ProductMetrics.
-                Where(i => i.ProductCode == ProductCode && i.MetricCode == MetricCode).
+                Where(i => i.ProductCode == ProductCode 
+                && i.MetricCode == MetricCode
+                ).
                 OrderByDescending(i => i.EffectiveDate).
                 Select(i => new ProductMetricDto(i.ProductId,
                                             i.MetricId,

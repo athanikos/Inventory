@@ -1,12 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
-using Prices.Inventory.Prices;
 using Hangfire;
 using Serilog;
 using MediatR;
+using Expressions;
 
-namespace Inventory.Prices
+namespace Inventory.Expressions
 {
     public static class ConfigureServices
     {
@@ -16,22 +16,24 @@ namespace Inventory.Prices
             List<System.Reflection.Assembly>  mediatRAssemblies
             )
         {
-            services.AddDbContext<PricesDbContext>(options =>
+            services.AddDbContext<ExpressionsDbContext>(options =>
             options.UseSqlServer(configuration.
             GetConnectionString("Prices")));
 
-            var str = configuration.GetConnectionString("Hangfire");
 
-            services.AddHangfire(configuration => configuration
-                .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
-                .UseSimpleAssemblyNameTypeSerializer()
-                .UseRecommendedSerializerSettings()
-                .UseSqlServerStorage(str)
-                );
+            // allready added in Prices 
+            //var str = configuration.GetConnectionString("Hangfire");
 
-            GlobalConfiguration.Configuration
-            .UseSqlServerStorage(str);
-            services.AddHangfireServer();
+            //services.AddHangfire(configuration => configuration
+            //    .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+            //    .UseSimpleAssemblyNameTypeSerializer()
+            //    .UseRecommendedSerializerSettings()
+            //    .UseSqlServerStorage(str)
+            //    );
+
+            //GlobalConfiguration.Configuration
+            //.UseSqlServerStorage(str);
+            //services.AddHangfireServer();
 
 
             mediatRAssemblies.Add(typeof(ConfigureServices).Assembly);
@@ -44,12 +46,10 @@ namespace Inventory.Prices
             .WriteTo.File("logs/Net6Tester.txt", rollingInterval: RollingInterval.Day)
             .CreateLogger();
 
-            services.AddScoped<IPricesFetcher, PricesFetcher>(
+            services.AddScoped<IEvaluator, Evaluator>(
             sp =>
-            {   
-                return new PricesFetcher(sp.GetRequiredService<PricesDbContext>(), 
-                                          sp.GetRequiredService<IMediator>(), 
-                                          logger);
+            {
+                return new Evaluator(sp.GetRequiredService<IMediator>(), sp.GetRequiredService<ExpressionsDbContext>());
             }
             );
                                

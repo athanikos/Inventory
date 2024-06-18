@@ -1,4 +1,5 @@
 ﻿using Expressions;
+using Inventory.Expressions;
 using Inventory.Products.Contracts.Dto;
 using Inventory.Products.Dto;
 using Inventory.Products.Repositories;
@@ -43,6 +44,9 @@ namespace Tests.Inventory.Expressions
 
             var _mediator = _fixture.GetService<IMediator>(_testOutputHelper)!;
             var _repo = _fixture.GetService<IInventoryRepository>(_testOutputHelper)!;
+            var _expressionDbContext = _fixture.GetService<ExpressionsDbContext>(_testOutputHelper)!;
+
+
             //  todo extract string to const
             // todo extract preparation steps , services and empty db 
             _repo.EmptyDB();
@@ -55,8 +59,8 @@ namespace Tests.Inventory.Expressions
             var productId = (await _repo.AddProductAsync(prodDto)).Id;
 
             await _repo.AddOrEditProductMetric(NewProdctMetricDto(metricId, productId, 1, Currency, ADAProductCode, QuantityCode));
-            Evaluator instance = new Evaluator(_mediator, expression);
-            string result = await instance.Execute();
+            Evaluator instance = new Evaluator(_mediator, _expressionDbContext  );
+            string result = await instance.Execute(InventoryId, expression);
             Assert.Equal("1",result);
         }
 
@@ -72,6 +76,7 @@ namespace Tests.Inventory.Expressions
 
             var _mediator = _fixture.GetService<IMediator>(_testOutputHelper)!;
             var _repo = _fixture.GetService<IInventoryRepository>(_testOutputHelper)!;
+            var _expressionDbContext = _fixture.GetService<ExpressionsDbContext>(_testOutputHelper)!;
             //  todo extract string to const
             // todo extract preparation steps , services and empty db 
 
@@ -91,8 +96,8 @@ namespace Tests.Inventory.Expressions
             await _repo.AddOrEditProductMetric(NewProdctMetricDto(priceId, productId, 5, Currency, ADAProductCode, PriceCode));
 
 
-            Evaluator instance = new Evaluator(_mediator, expression);
-            string result = await instance.Execute();
+            Evaluator instance = new Evaluator(_mediator, _expressionDbContext);
+            string result = await instance.Execute(InventoryId, expression);
             Assert.Equal("5", result);
         }
 
@@ -111,6 +116,9 @@ namespace Tests.Inventory.Expressions
 
             var _mediator = _fixture.GetService<IMediator>(_testOutputHelper)!;
             var _repo = _fixture.GetService<IInventoryRepository>(_testOutputHelper)!;
+            var _expressionDbContext = _fixture.GetService<ExpressionsDbContext>(_testOutputHelper)!;
+
+
             //  todo extract string to const
             // todo extract preparation steps , services and empty db 
 
@@ -129,8 +137,8 @@ namespace Tests.Inventory.Expressions
             await _repo.AddOrEditProductMetric(NewProdctMetricDto(valueId, productId, 10, Currency, ADAProductCode,ValueCode));
       
 
-            Evaluator instance = new Evaluator(_mediator, expression);
-            string result = await instance.Execute();
+            Evaluator instance = new Evaluator(_mediator, _expressionDbContext  );
+            string result = await instance.Execute(InventoryId,expression);
             Assert.Equal("10", result);
         }
 
@@ -143,6 +151,8 @@ namespace Tests.Inventory.Expressions
 
             var _mediator = _fixture.GetService<IMediator>(_testOutputHelper)!;
             var _repo = _fixture.GetService<IInventoryRepository>(_testOutputHelper)!;
+            var _expressionDbContext = _fixture.GetService<ExpressionsDbContext>(_testOutputHelper)!;
+
             //  todo extract string to const
             // todo extract preparation steps , services and empty db 
 
@@ -165,8 +175,8 @@ namespace Tests.Inventory.Expressions
 
 
 
-            Evaluator instance = new Evaluator(_mediator, expression);
-            string result = await instance.Execute();
+            Evaluator instance = new Evaluator(_mediator, _expressionDbContext  );
+            string result = await instance.Execute(InventoryId,expression);
             Assert.Equal("110", result);
         }
 
@@ -178,6 +188,8 @@ namespace Tests.Inventory.Expressions
 
             var _mediator = _fixture.GetService<IMediator>(_testOutputHelper)!;
             var _repo = _fixture.GetService<IInventoryRepository>(_testOutputHelper)!;
+            var _expressionDbContext = _fixture.GetService<ExpressionsDbContext>(_testOutputHelper)!;
+
             //  todo extract string to const
             // todo extract preparation steps , services and empty db 
 
@@ -199,8 +211,8 @@ namespace Tests.Inventory.Expressions
             await _repo.AddOrEditProductMetric(NewProdctMetricDto(valueId, productId, 11, Currency, XRPProductCode, ValueCode));
 
 
-            Evaluator instance = new Evaluator(_mediator, expression);
-            string result = await instance.Execute();
+            Evaluator instance = new Evaluator(_mediator, _expressionDbContext  );
+            string result = await instance.Execute(InventoryId, expression);
             Assert.Equal("21", result);
         }
 
