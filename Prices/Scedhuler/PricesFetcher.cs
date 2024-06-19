@@ -17,15 +17,13 @@ namespace Prices
             private string _parameterType = "COINGECKO";
            
             private readonly PricesDbContext _context;
-            private readonly Serilog.ILogger _logger;
             private readonly IMediator _mediator;
 
             private List<Entities.PricesParameter> Parameters { get; set; } =
                 new List<Entities.PricesParameter>();
 
-            public PricesFetcher(PricesDbContext context, IMediator mediator, Serilog.ILogger logger)
+            public PricesFetcher(PricesDbContext context, IMediator mediator)
             { 
-                _logger = logger;   
                 _context = context;
                 _mediator = mediator;
             }
@@ -37,28 +35,35 @@ namespace Prices
                 return [.. _context.Parameters.Where(p => p.ParameterType == _parameterType)];
             }
 
-            public void ScedhuleJobs()
+            public void ScedhuleJobs(IServiceProvider serviceProvider)
             {
                 Parameters = GetParameters();
 
                 if (string.IsNullOrEmpty(_parameterType))
                     throw new ArgumentNullException(nameof(_parameterType));
 
-                foreach (var p in GetParameters())
+                foreach (var p in Parameters)
                 {
-                    RecurringJob.AddOrUpdate(p.Id.ToString(), () => DoScedhuledWork(p), Cron.Minutely);
+                        RecurringJob.AddOrUpdate(p.Id.ToString(), () => DoScheduledWork(p), Cron.Minutely);
+                    
                 }
+                
+
+
+
             }
 
-            public void DoScedhuledWork(Entities.PricesParameter p)
+            public void DoScheduledWork(Entities.PricesParameter p)
             {
-                    var options = new RestClientOptions(p.TargetURL + p.TargetProductCode);
+
+             
+                   var options = new RestClientOptions(p.TargetURL + p.TargetProductCode);
                     var client = new RestClient(options);
                     
                     var request = new RestRequest("");
                     request.AddHeader("accept", "application/json");
                     request.AddHeader("x-cg-demo-api-key", p.TargetKey);
-                  
+                
                     var response = client.Get(request);
                     JObject o = JObject.Parse(response.Content);
                     var value = decimal.Parse(o.SelectToken(p.TargetPathForProductCode).ToString());
@@ -73,9 +78,8 @@ namespace Prices
             public void DoScedhuledWork()
             {
                 foreach (var p in GetParameters())
-                    DoScedhuledWork(p);
+                    DoScheduledWork(p);
             }
-
 
         }
 

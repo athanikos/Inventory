@@ -1,8 +1,7 @@
 using FastEndpoints;
 using Microsoft.AspNetCore.Identity;
 using System.Reflection;
-using Hangfire.AspNetCore;
-using Hangfire;
+using Quartz;
 
 namespace Inventory.WebApi
 {
@@ -13,7 +12,7 @@ namespace Inventory.WebApi
             var builder = WebApplication.CreateBuilder(args);
            
             // comment on migration run 
-          //  builder.Services.AddSwaggerGen();
+            builder.Services.AddSwaggerGen();
                                   
             builder.Services.AddAuthentication(options =>
             {
@@ -22,10 +21,14 @@ namespace Inventory.WebApi
             }).AddBearerToken(IdentityConstants.BearerScheme);
 
             builder.Services.AddAuthorizationBuilder();
+            builder.Services.AddQuartz();
+            builder.Services.AddQuartzHostedService(opt =>
+            {
+                opt.WaitForJobsToComplete = false;
+            });
+
 
             List<Assembly> mediatRAssemblies = [typeof(Program).Assembly];
-
-   
 
             Users.ConfigureServices.AddServices(builder.Services, builder.Configuration);
          
@@ -37,25 +40,24 @@ namespace Inventory.WebApi
             Expressions.ConfigureServices.AddServices(builder.Services, builder.Configuration, mediatRAssemblies);
 
 
-
             builder.Services.AddMediatR(cfg =>
-             cfg.RegisterServicesFromAssemblies(mediatRAssemblies.ToArray()));
+            cfg.RegisterServicesFromAssemblies(mediatRAssemblies.ToArray()));
             
             
             // comment on migration run 
-           // Prices.RunServices.Run(builder.Services);
+            Prices.RunServices.Run(builder.Services);
 
             builder.Services.AddFastEndpoints();
             var app = builder.Build();
 
             if (app.Environment.IsDevelopment()) {
-                //app.UseSwagger();
-                //app.UseSwaggerUI();
+                app.UseSwagger();
+                app.UseSwaggerUI();
             }
             app.UseFastEndpoints();
 
-            //app.UseHangfireDashboard("/hangfire", new DashboardOptions(), new SqlServerStorage("HangfirePOCCx"));
 
+           
 
             app.MapIdentityApi<IdentityUser>();
             app.Run();

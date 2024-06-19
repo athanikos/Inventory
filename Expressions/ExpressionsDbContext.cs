@@ -29,14 +29,9 @@ public class ExpressionsDbContext : DbContext
 
                         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
-                        var config = 
-                        modelBuilder.Entity<InventoryExpression>();
-                        config.ToTable("InventoryExpression").HasKey(p=>p.Id);
+                        modelBuilder.Entity<InventoryExpression>().ToTable("InventoryExpression");
 
-                        modelBuilder.Entity<ProductExpression>();
-                        config.ToTable("ProductExpression").HasKey(p => p.Id);
-
-
+                        modelBuilder.Entity<ProductExpression>().ToTable("ProductExpression");
 
          }
 

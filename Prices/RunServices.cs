@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Prices.Inventory.Prices;
 
+
 namespace Inventory.Prices
 {
     public static class RunServices
@@ -11,9 +12,12 @@ namespace Inventory.Prices
         {
             var serviceProvider = services.BuildServiceProvider();
             var service = serviceProvider.GetRequiredService<IPricesFetcher>();
-            
-            service?.ScedhuleJobs();
+            service.ScedhuleJobs(serviceProvider);
         }
+
+
+       
+
     }
 }
 

@@ -1,9 +1,10 @@
-﻿using Expressions;
+﻿
+using Expressions;
 using Microsoft.Extensions.DependencyInjection;
 
 
 
-namespace Inventory.Prices
+namespace Inventory.Expressions
 {
     public static class RunServices
     {
@@ -14,7 +15,7 @@ namespace Inventory.Prices
             var serviceProvider = services.BuildServiceProvider();
             var service = serviceProvider.GetRequiredService<IEvaluator>();
             
-            service?.ScedhuleJobs();
+            service?.ScheduleJobs(serviceProvider);
         }
     }
 }

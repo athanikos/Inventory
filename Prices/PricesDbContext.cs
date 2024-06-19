@@ -5,7 +5,7 @@ namespace Inventory.Prices;
 
 public  class PricesDbContext : DbContext
 {
-        public PricesDbContext(DbContextOptions
+        public PricesDbContext(DbContextOptions<PricesDbContext>
             options) :
             base(options)  { }
            

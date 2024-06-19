@@ -1,0 +1,8 @@
+﻿{
+
+  "expression": "QUANTITY(ADA) * PRICE(ADA)",
+  "runEveryMinutes": 1,
+  "targetProductId": "CA9ADA05-9A3F-4EE5-757A-08DC853BB21D",
+  "targetMetricId": "4BB7236D-DE5B-465F-E697-08DC892A574A",
+  "inventoryId": "B77CFE31-1D18-4E19-42FE-08DC853A6EC8"
+}

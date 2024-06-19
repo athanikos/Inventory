@@ -5,6 +5,7 @@ using Prices.Inventory.Prices;
 using Hangfire;
 using Serilog;
 using MediatR;
+using Quartz;
 
 namespace Inventory.Prices
 {
@@ -22,6 +23,7 @@ namespace Inventory.Prices
 
             var str = configuration.GetConnectionString("Hangfire");
 
+      
             services.AddHangfire(configuration => configuration
                 .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
                 .UseSimpleAssemblyNameTypeSerializer()
@@ -31,7 +33,6 @@ namespace Inventory.Prices
 
             GlobalConfiguration.Configuration
             .UseSqlServerStorage(str);
-            services.AddHangfireServer();
 
 
             mediatRAssemblies.Add(typeof(ConfigureServices).Assembly);
@@ -39,7 +40,9 @@ namespace Inventory.Prices
             mediatRAssemblies.Add(typeof(Products.ConfigureServices).Assembly);
 
 
-            var logger  = new LoggerConfiguration()
+           
+
+             Log.Logger  = new LoggerConfiguration()
             .MinimumLevel.Debug()
             .WriteTo.File("logs/Net6Tester.txt", rollingInterval: RollingInterval.Day)
             .CreateLogger();
@@ -48,11 +51,14 @@ namespace Inventory.Prices
             sp =>
             {   
                 return new PricesFetcher(sp.GetRequiredService<PricesDbContext>(), 
-                                          sp.GetRequiredService<IMediator>(), 
-                                          logger);
+                                          sp.GetRequiredService<IMediator>()
+                                          );
             }
             );
-                               
+
+            services.AddHangfireServer();
+
+
             return services;
         }
 

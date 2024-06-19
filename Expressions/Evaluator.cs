@@ -5,6 +5,7 @@ using Hangfire;
 using Microsoft.EntityFrameworkCore;
 using Inventory.Expressions;
 
+
 namespace Expressions
 {
     public class Evaluator : IEvaluator
@@ -269,20 +270,24 @@ namespace Expressions
         }
 
 
-        public void ScedhuleJobs()
+        public void ScheduleJobs(IServiceProvider serviceProvider)
         {
             var productExpressions = GetProductExpressions();
             foreach (var p in productExpressions)
-                RecurringJob.AddOrUpdate(p.Id.ToString(), () => DoScedhuledWork(p), Cron.Minutely);
+                DoScheduledWork(p);
+             
 
             var inventoryExpressions = GetInventoryExpressions();
-            foreach (var p in inventoryExpressions)
-                RecurringJob.AddOrUpdate(p.Id.ToString(), () => DoScedhuledWork(p), Cron.Minutely);
-
+            foreach (var i in inventoryExpressions)
+                DoScheduledWork(i);
+            
         }
-        public async void DoScedhuledWork(Entities.InventoryExpression p)
+        public async void DoScheduledWork(Entities.InventoryExpression p)
         {
             var result = await Execute(p.TargetInventoryId, p.Expression);
+
+            if (_type == formulaType.undefined)
+                throw new ArgumentException(_type.ToString());
 
             if (_type == formulaType.inventoryBased)
             {
@@ -294,7 +299,7 @@ namespace Expressions
             }
         }
 
-        public async  void DoScedhuledWork(Entities.ProductExpression p)
+        public async  void DoScheduledWork(Entities.ProductExpression p)
         {
             var result =   await  Execute(p.InventoryId, p.Expression);
 
@@ -313,13 +318,16 @@ namespace Expressions
         }
 
 
-        public void DoScedhuledWork()
+        public void DoScheduledWork()
         {
             foreach (var p in GetProductExpressions())
-                DoScedhuledWork(p);
+                DoScheduledWork(p);
+
+            foreach (var i in GetInventoryExpressions())
+                DoScheduledWork(i);
         }
 
-     
+  
     }
 
 }
