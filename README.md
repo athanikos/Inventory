@@ -39,13 +39,18 @@ A hangfire hob that updates productMetric table.
 
 
 
-### Expressions module 
+### Expressions module
+
+#### product expression
 
 Supports a simple formula like  METRICCODE(PRODUCTOCODE,UPPERBOUNDEFFECTIVEDATE) where upperbound Effective date.
 it parses metric code , product code and date time and finds the latest product metric row for that perticular date else the latest. 
 
+#### inventory expression 
+
 Todo support an aggregate formula 
     i.e. sum all product prices per inventory 
+
 
 
 ### Tests Module 
