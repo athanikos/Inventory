@@ -88,7 +88,9 @@ ClaimType = CLIENTINVENTORY claimValue = <InventoryId>
     dotnet ef database update  pPricesv3 -c PricesDbContext
 
 
-  
+  dotnet ef migrations add Exprv3 -c  ExpressionsDbContext -p C:\projects
+\Inventory\Inventory\Expressions\Inventory.Expressions.csproj -s C:\projects\Inventory\Inventory\Inventory.WebApi\Invent
+ory.WebApi.csproj -o Data/Migrations
     
 ### Metrics 
 
