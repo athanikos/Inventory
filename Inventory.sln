@@ -22,9 +22,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Inventory.Prices", "Prices\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Inventory.Products.Contracts", "Inventory.Products.Contracts\Inventory.Products.Contracts.csproj", "{302F89CA-2D96-449B-A142-B362D2D479AB}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Notifier", "Notifier", "{ED2847C0-EB93-4BCC-82A3-19613A02DBCB}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Notifications", "Notifications", "{ED2847C0-EB93-4BCC-82A3-19613A02DBCB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Inventory.Notifier", "Inventory.Notifier\Inventory.Notifier.csproj", "{6F10D302-0340-4F4A-BA54-C2A3FE67A1D1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Inventory.Notifications", "Inventory.Notifier\Inventory.Notifications.csproj", "{6F10D302-0340-4F4A-BA54-C2A3FE67A1D1}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Prices", "Prices", "{4EDD68F9-FA56-44A8-A297-8383D03789A6}"
 EndProject
@@ -35,6 +35,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests.Inventory", "Tests.Inventory.Expressions\Tests.Inventory.csproj", "{DAB154A1-13EB-4921-B98A-CCD68A54709A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{C888E672-23E1-484A-9314-D3AF664ED03A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inventory.Notifications.Contracts", "Inventory.Notifications.Contracts\Inventory.Notifications.Contracts.csproj", "{67952AEF-5FAC-414D-B88C-C59A8CF85570}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -74,6 +76,10 @@ Global
 		{DAB154A1-13EB-4921-B98A-CCD68A54709A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DAB154A1-13EB-4921-B98A-CCD68A54709A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DAB154A1-13EB-4921-B98A-CCD68A54709A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{67952AEF-5FAC-414D-B88C-C59A8CF85570}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{67952AEF-5FAC-414D-B88C-C59A8CF85570}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{67952AEF-5FAC-414D-B88C-C59A8CF85570}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{67952AEF-5FAC-414D-B88C-C59A8CF85570}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -86,6 +92,7 @@ Global
 		{6F10D302-0340-4F4A-BA54-C2A3FE67A1D1} = {ED2847C0-EB93-4BCC-82A3-19613A02DBCB}
 		{87C42F9B-2E72-425D-83E8-FC887C66175E} = {BF59840D-EBEE-4E3A-8DB0-ACB79CD1D488}
 		{DAB154A1-13EB-4921-B98A-CCD68A54709A} = {C888E672-23E1-484A-9314-D3AF664ED03A}
+		{67952AEF-5FAC-414D-B88C-C59A8CF85570} = {ED2847C0-EB93-4BCC-82A3-19613A02DBCB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {582FC159-BB6D-4F86-A864-9DCDBC25735B}

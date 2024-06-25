@@ -18,10 +18,12 @@ public class ExpressionsDbContext : DbContext
 
          public DbSet<InventoryExpression> InventoryExpressions { get; set; }
          public DbSet<ProductExpression> ProductExpressions { get; set; }
+         
+         public DbSet<BooleanExpression> BooleanExpressions { get; set; }
 
 
 
-         protected override void OnModelCreating
+    protected override void OnModelCreating
          (ModelBuilder modelBuilder)
          {
                         base.OnModelCreating(modelBuilder);
@@ -32,8 +34,11 @@ public class ExpressionsDbContext : DbContext
                         modelBuilder.Entity<InventoryExpression>().ToTable("InventoryExpression");
 
                         modelBuilder.Entity<ProductExpression>().ToTable("ProductExpression");
+        
+                        modelBuilder.Entity<BooleanExpression>().ToTable("BooleanExpression");
 
-         }
+
+    }
 
 }
 

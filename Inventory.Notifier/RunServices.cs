@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-namespace Inventory.Prices
+namespace Inventory.Notifications
 {
     public static class RunServices
     {

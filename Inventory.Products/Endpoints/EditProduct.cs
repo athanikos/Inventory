@@ -39,12 +39,12 @@ namespace Inventory.Products.Endpoints
                 return new ProblemDetails(ValidationFailures);
             }
 
-            if (_repo.ProductDescriptionOrCategoryIsUsed(dto))
-            {
-                AddError("Product code or descr is used  ");
-                ThrowIfAnyErrors(); // If there are errors, execution shouldn't go beyond this point
-                return new ProblemDetails(ValidationFailures);
-            }
+            //if (_repo.ProductDescriptionOrCategoryIsUsed(dto))
+            //{
+            //    AddError("Product code or descr is used  ");
+            //    ThrowIfAnyErrors(); // If there are errors, execution shouldn't go beyond this point
+            //    return new ProblemDetails(ValidationFailures);
+            //}
 
             dto =   await _repo.EditProductAsync(dto);
             return TypedResults.Ok<ProductDto>(dto);

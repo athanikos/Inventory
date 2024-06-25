@@ -4,6 +4,7 @@ using Inventory.Expressions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Inventory.Expressions.Data.Migrations
 {
     [DbContext(typeof(ExpressionsDbContext))]
-    partial class ExpressionsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240625082952_Exprv3")]
+    partial class Exprv3
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -71,7 +74,7 @@ namespace Inventory.Expressions.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ProductExpression", "Expressions");
+                    b.ToTable("BooleanExpression", "Expressions");
                 });
 
             modelBuilder.Entity("Inventory.Expressions.Entities.BooleanExpression", b =>
@@ -92,7 +95,7 @@ namespace Inventory.Expressions.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("BooleanExpression", "Expressions");
+                    b.ToTable("BooleanExpressions", "Expressions");
                 });
 #pragma warning restore 612, 618
         }

@@ -10,10 +10,10 @@ namespace Inventory.WebApi
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-           
-            // comment on migration run 
+
+          //  comment on migration run
             builder.Services.AddSwaggerGen();
-                                  
+
             builder.Services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = IdentityConstants.BearerScheme;
@@ -42,10 +42,12 @@ namespace Inventory.WebApi
 
             builder.Services.AddMediatR(cfg =>
             cfg.RegisterServicesFromAssemblies(mediatRAssemblies.ToArray()));
-            
-            
+
+
             // comment on migration run 
             Prices.RunServices.Run(builder.Services);
+            Expressions.RunServices.Run(builder.Services);
+
 
             builder.Services.AddFastEndpoints();
             var app = builder.Build();

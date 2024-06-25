@@ -21,19 +21,6 @@ namespace Inventory.Expressions
             GetConnectionString("Expressions")));
 
 
-            // allready added in Prices 
-            //var str = configuration.GetConnectionString("Hangfire");
-
-            //services.AddHangfire(configuration => configuration
-            //    .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
-            //    .UseSimpleAssemblyNameTypeSerializer()
-            //    .UseRecommendedSerializerSettings()
-            //    .UseSqlServerStorage(str)
-            //    );
-
-            //GlobalConfiguration.Configuration
-            //.UseSqlServerStorage(str);
-            //services.AddHangfireServer();
 
 
             mediatRAssemblies.Add(typeof(ConfigureServices).Assembly);

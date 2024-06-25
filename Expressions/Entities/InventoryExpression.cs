@@ -6,6 +6,8 @@
     //  VALUE([ADA, XRP] , UpperBoundDate) )
     //  or
     //  VALUE(ALL , UpperBound)
+    // an expression of  inventory grain 
+    // saves to inventory metric table 
     // </summary>
     public  class InventoryExpression
     {

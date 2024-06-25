@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Inventory.Notifications.Entities;
+using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 
 namespace Inventory.Prices;
@@ -11,18 +12,18 @@ public  class NotifierDbContext : DbContext
             options) :
             base(options)  { }
            
-        public     DbSet<Entities.NotifierParameter> Parameters { get; set; }
+        public     DbSet<Notification> Notifications { get; set; }
      
          protected override void OnModelCreating
          (ModelBuilder modelBuilder)
          {
                         base.OnModelCreating(modelBuilder);
-                        modelBuilder.HasDefaultSchema("Notifier");
+                        modelBuilder.HasDefaultSchema("Notifications");
                         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
                         var config = 
-                        modelBuilder.Entity<Entities.NotifierParameter>();
-                        config.ToTable("NotifierParameter").HasKey(p=>p.Id);
+                        modelBuilder.Entity<Notification>();
+                        config.ToTable("Notification").HasKey(p=>p.Id);
 
          }
 

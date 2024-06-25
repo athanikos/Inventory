@@ -19,29 +19,13 @@ namespace Inventory.Products.Repositories
         {
          
             _context.Sources.RemoveRange(_context.Sources);
-            _context.SaveChanges();
-
             _context.Inventories.RemoveRange(_context.Inventories);
-            _context.SaveChanges();
-
             _context.Metrics.RemoveRange(_context.Metrics);
-            _context.SaveChanges();
-
             _context.Categories.RemoveRange(_context.Categories);
-            _context.SaveChanges();
-
             _context.ProductCategories.RemoveRange(_context.ProductCategories);
-            _context.SaveChanges();
-
             _context.ProductMetrics.RemoveRange(_context.ProductMetrics);
-            _context.SaveChanges();
-
             _context.Products.RemoveRange(_context.Products);
-            _context.SaveChanges();
-
             _context.TransactionItems.RemoveRange(_context.TransactionItems);
-            _context.SaveChanges();
-
             _context.Transactions.RemoveRange(_context.Transactions);
             _context.SaveChanges();
 
@@ -89,6 +73,7 @@ namespace Inventory.Products.Repositories
             _context.Products.Add(new Entities.Product()
             { Description = c.Description, Id = c.Id, Code = c.Code, InventoryId = c.InventoryId });
 
+            if (c.Metrics!= null)   
             foreach (var m in c.Metrics)
             {
                 DecideNewOrEdit(m);
@@ -133,6 +118,7 @@ namespace Inventory.Products.Repositories
                  .Select(i => i.Code.Trim().ToUpper())
                 .GroupBy(p => p)
                 .Select(o => o.FirstOrDefault())
+                .Where(i=>!string.IsNullOrEmpty(i))
                 .ToList();
         }
 
@@ -142,6 +128,7 @@ namespace Inventory.Products.Repositories
             return _context.Metrics.Select(i => i.Code.Trim().ToUpper())
                 .GroupBy(p => p)
                 .Select(o => o.FirstOrDefault())
+                .Where(i => !string.IsNullOrEmpty(i))
                 .ToList();
         }
 
@@ -172,11 +159,23 @@ namespace Inventory.Products.Repositories
         {
             if (_context.ProductMetrics.Where
                 (
-                    p => p.MetricId == m.MetricId 
-                         && p.ProductId == m.ProductId 
+                    p => p.MetricId == m.MetricId
+                         && p.ProductId == m.ProductId
                          && p.EffectiveDate == m.EffectiveDate
                 ).Count() > 0)
-                _context.Update(m);
+            {
+                ProductMetric pm = new();
+                pm.ProductId = m.ProductId;
+                pm.Value = m.Value; 
+                pm.Currency = m.Currency;
+                pm.ProductCode = m.ProductCode;
+                pm.Currency = m.Currency;
+                pm.EffectiveDate = m.EffectiveDate; 
+                pm.MetricCode = m.MetricCode;   
+                pm.MetricId = m.MetricId;   
+                _context.Attach(pm);
+                _context.Update(pm);
+            }
             else
                 _context.ProductMetrics.Add(CreateProductMetric(m));
         }
