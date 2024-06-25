@@ -1,7 +1,4 @@
-﻿
-
-using Hangfire;
-using Inventory.Prices;
+﻿using Inventory.Notifications;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,22 +17,9 @@ namespace Inventory.Notifier
 
             services.AddDbContext<NotifierDbContext>(options =>
             options.UseSqlServer(configuration.
-            GetConnectionString("Prices")));
+            GetConnectionString("Notifications")));
 
 
-            var str = configuration.GetConnectionString("Hangfire");
-
-            services.AddHangfire(configuration => configuration
-                .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
-                .UseSimpleAssemblyNameTypeSerializer()
-                .UseRecommendedSerializerSettings()
-                .UseSqlServerStorage(str)
-                );
-
-            GlobalConfiguration.Configuration
-            .UseSqlServerStorage("Server=localhost;Database=Hangfire;Integrated Security=SSPI;Encrypt=False;");
-
-            services.AddHangfireServer();
             
             mediatRAssemblies.Add(typeof(ConfigureServices).Assembly);
 

@@ -11,7 +11,7 @@ namespace Inventory.WebApi
         {
             var builder = WebApplication.CreateBuilder(args);
 
-          //  comment on migration run
+            //  comment on migration run
             builder.Services.AddSwaggerGen();
 
             builder.Services.AddAuthentication(options =>
@@ -36,9 +36,8 @@ namespace Inventory.WebApi
                 builder.Configuration, mediatRAssemblies);
                      
             Prices.ConfigureServices.AddServices(builder.Services, builder.Configuration, mediatRAssemblies);
-       
             Expressions.ConfigureServices.AddServices(builder.Services, builder.Configuration, mediatRAssemblies);
-
+            Notifier.ConfigureServices.AddServices(builder.Services, builder.Configuration, mediatRAssemblies);
 
             builder.Services.AddMediatR(cfg =>
             cfg.RegisterServicesFromAssemblies(mediatRAssemblies.ToArray()));

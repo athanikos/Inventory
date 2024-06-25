@@ -2,17 +2,19 @@
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 
-namespace Inventory.Prices;
+namespace Inventory.Notifications;
 
 public  class NotifierDbContext : DbContext
 {
-    public NotifierDbContext() { } // This one
-
-    public NotifierDbContext(DbContextOptions
+ 
+    public NotifierDbContext(DbContextOptions<NotifierDbContext>
             options) :
             base(options)  { }
-           
-        public     DbSet<Notification> Notifications { get; set; }
+
+    public NotifierDbContext() { } // This one
+
+
+    public     DbSet<Notification> Notifications { get; set; }
      
          protected override void OnModelCreating
          (ModelBuilder modelBuilder)
