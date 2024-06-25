@@ -88,10 +88,14 @@ ClaimType = CLIENTINVENTORY claimValue = <InventoryId>
     dotnet ef database update  pPricesv3 -c PricesDbContext
 
 
-  dotnet ef migrations add Exprv3 -c  ExpressionsDbContext -p C:\projects
-\Inventory\Inventory\Expressions\Inventory.Expressions.csproj -s C:\projects\Inventory\Inventory\Inventory.WebApi\Invent
-ory.WebApi.csproj -o Data/Migrations
+      dotnet ef migrations add Exprv3 -c  ExpressionsDbContext -p C:\projects
+    \Inventory\Inventory\Expressions\Inventory.Expressions.csproj -s C:\projects\Inventory\Inventory\Inventory.WebApi\Invent
+    ory.WebApi.csproj -o Data/Migrations
+
+
+    dotnet ef migrations add iniial -c NotifierDbContext -p C:\projects\Inventory\Inventory\Inventory.Notifier\Inventory.Notifications.csproj -s  C:\projects\Inventory\Inventory\Inventory.WebApi\Inventory.WebApi.csproj -o Data/Migrations
     
+        
 ### Metrics 
 
    One Metric has a source for the value. Source is a source system.
