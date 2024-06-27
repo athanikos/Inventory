@@ -19,10 +19,11 @@ namespace Expressions.Endpoints
         private readonly IMediator _mediator;
         private readonly ExpressionsDbContext _context;
 
-        public AddBooleanExpression(IMediator mediator, ExpressionsDbContext context)
+        public AddBooleanExpression(IMediator mediator,
+            ExpressionsDbContext context)
         {
             _mediator = mediator;
-            _context = context;    
+            _context = context;
             _context = context;
         }
 
@@ -50,8 +51,8 @@ namespace Expressions.Endpoints
             _context.BooleanExpressions.Add(entity);
             await _context.SaveChangesAsync();
 
-            return   TypedResults.Ok(new BooleanExpressionDto(
-                entity.Id,entity.Expression,entity.RunEveryMinutes,entity.InventoryId
+            return TypedResults.Ok(new BooleanExpressionDto(
+                entity.Id, entity.Expression, entity.RunEveryMinutes, entity.InventoryId
                 ));
 
 
@@ -59,7 +60,7 @@ namespace Expressions.Endpoints
     }
 
 
-    public record AddBooleanExpressionRequest(Guid Id, 
+    public record AddBooleanExpressionRequest(Guid Id,
           string Expression,
           int RunEveryMinutes,
           Guid InventoryId);

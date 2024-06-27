@@ -9,7 +9,6 @@ namespace Inventory.Notifications.Endpoints
     using System.Threading.Tasks;
     using System;
     using Inventory.Notifications.Contracts;
-    using Inventory.Prices;
     using Microsoft.AspNetCore.Http;
 
     public class AddNotification :

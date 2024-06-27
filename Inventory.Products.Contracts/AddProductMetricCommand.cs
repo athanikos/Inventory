@@ -4,7 +4,8 @@ using MediatR;
 
 namespace Inventory.Products.Contracts
 {
-    public  class AddProductMetricCommand : IRequest<ProductMetricDto>
+    public  class
+        AddProductMetricCommand : IRequest<ProductMetricDto>
     {
         public Guid ProductId { get; set; }
 

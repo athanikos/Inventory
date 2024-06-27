@@ -257,7 +257,7 @@ namespace Tests.Inventory.Expressions
 
 
         [Fact]
-        public async Task TestEvaluator()
+        public async Task TestEvaluatorValueGreaterThan100()
         {
             string expression = "VALUE([ADA]) > 100 ";
 
@@ -292,10 +292,132 @@ namespace Tests.Inventory.Expressions
             Assert.Equal("False", result.Result);
         }
 
+        [Fact]
+        public async Task TestEvaluatorPriceGreaterThan1()
+        {
+            string expression = "PRICE([ADA]) > 1 ";
+
+
+            var _mediator = _fixture.GetService<IMediator>(_testOutputHelper)!;
+            var _repo = _fixture.GetService<IInventoryRepository>(_testOutputHelper)!;
+            var _expressionDbContext = _fixture.GetService<ExpressionsDbContext>(_testOutputHelper)!;
+
+            //  todo extract string to const
+            // todo extract preparation steps , services and empty db 
+
+            _repo.EmptyDB();
+            Guid InventoryId, sourceId;
+            var tuple = (await SetupInventoryAndSource(_repo));
+            InventoryId = tuple.Item1;
+            sourceId = tuple.Item2;
+
+            var valueId = (await _repo.AddMetricAsync(NewMetricDto(sourceId, PriceCode))).Id;
+
+
+            ProductDto prodDto = NewProductDto(InventoryId, ADAProductCode);
+            var productId = (await _repo.AddProductAsync(prodDto)).Id;
+            await _repo.AddOrEditProductMetric(NewProdctMetricDto(valueId, productId, 2, Currency, ADAProductCode, PriceCode));
+
+    
+            Evaluator instance = new Evaluator(_mediator, _expressionDbContext);
+            var result = await instance.Execute(InventoryId, expression);
+            Assert.Equal("True", result.Result);
+        }
+
+
+        [Fact]
+        public async Task TestEvaluatorPriceWhenItDoesNotExist()
+        {
+            string expression = "PRICE([ADA]) > 1 ";
+
+
+            var _mediator = _fixture.GetService<IMediator>(_testOutputHelper)!;
+            var _repo = _fixture.GetService<IInventoryRepository>(_testOutputHelper)!;
+            var _expressionDbContext = _fixture.GetService<ExpressionsDbContext>(_testOutputHelper)!;
+
+      
+            _repo.EmptyDB();
+            Guid InventoryId, sourceId;
+            var tuple = (await SetupInventoryAndSource(_repo));
+            InventoryId = tuple.Item1;
+            sourceId = tuple.Item2;
+
+            Evaluator instance = new Evaluator(_mediator, _expressionDbContext);
+            var result = await instance.Execute(InventoryId, expression);
+            Assert.Equal(EvaluatorResult.EvaluatorResultType.undefined, result.Type);
+        }
+
+
+        [Fact]
+        public async Task TestEvaluatorPriceIfGreaterThanSomefloat()
+        {
+            string expression = "PRICE([ADA]) > 0.35 ";
+
+
+            var _mediator = _fixture.GetService<IMediator>(_testOutputHelper)!;
+            var _repo = _fixture.GetService<IInventoryRepository>(_testOutputHelper)!;
+            var _expressionDbContext = _fixture.GetService<ExpressionsDbContext>(_testOutputHelper)!;
+
+            //  todo extract string to const
+            // todo extract preparation steps , services and empty db 
+
+            _repo.EmptyDB();
+            Guid InventoryId, sourceId;
+            var tuple = (await SetupInventoryAndSource(_repo));
+            InventoryId = tuple.Item1;
+            sourceId = tuple.Item2;
+
+            var priceId = (await _repo.AddMetricAsync(NewMetricDto(sourceId, PriceCode))).Id;
+            ProductDto prodDto = NewProductDto(InventoryId, ADAProductCode);
+            var productId = (await _repo.AddProductAsync(prodDto)).Id;
+            await _repo.AddOrEditProductMetric(NewProdctMetricDto(priceId, productId, 1, Currency, ADAProductCode, PriceCode));
 
 
 
+            Evaluator instance = new Evaluator(_mediator, _expressionDbContext);
+            var result = await instance.Execute(InventoryId, expression);
+          
+            Assert.Equal(EvaluatorResult.EvaluatorResultType.boolean, result.Type);
+            Assert.Equal("True", result.Result);
 
+
+        }
+
+
+        [Fact]
+        public async Task TestEvaluatorPriceIfGreaterThan070()
+        {
+            string expression = "PRICE([ADA]) > 0.70 ";
+
+
+            var _mediator = _fixture.GetService<IMediator>(_testOutputHelper)!;
+            var _repo = _fixture.GetService<IInventoryRepository>(_testOutputHelper)!;
+            var _expressionDbContext = _fixture.GetService<ExpressionsDbContext>(_testOutputHelper)!;
+
+            //  todo extract string to const
+            // todo extract preparation steps , services and empty db 
+
+            _repo.EmptyDB();
+            Guid InventoryId, sourceId;
+            var tuple = (await SetupInventoryAndSource(_repo));
+            InventoryId = tuple.Item1;
+            sourceId = tuple.Item2;
+
+            var priceId = (await _repo.AddMetricAsync(NewMetricDto(sourceId, PriceCode))).Id;
+            ProductDto prodDto = NewProductDto(InventoryId, ADAProductCode);
+            var productId = (await _repo.AddProductAsync(prodDto)).Id;
+            await _repo.AddOrEditProductMetric(NewProdctMetricDto(priceId, productId, 1, Currency, ADAProductCode, PriceCode));
+
+
+
+            Evaluator instance = new Evaluator(_mediator, _expressionDbContext);
+            var result = await instance.Execute(InventoryId, expression);
+
+            Assert.Equal(EvaluatorResult.EvaluatorResultType.boolean, result.Type);
+            Assert.Equal("True", result.Result);
+
+
+        }
         /// todo: move factories to dto's 
 
         private static ProductMetricDto NewProdctMetricDto(Guid metricId, Guid productId,

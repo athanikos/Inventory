@@ -1,13 +1,13 @@
 ﻿using Inventory.Products.Dto;
 using Inventory.Products.Contracts.Dto;
 using Inventory.Products.Entities;
-using Microsoft.EntityFrameworkCore;
+using Serilog;
 
 namespace Inventory.Products.Repositories
 {
     public class InventoryRepository : IInventoryRepository
     {
-        private readonly Products.ProductsDbContext _context;
+        private readonly ProductsDbContext _context;
 
      
 
@@ -112,7 +112,8 @@ namespace Inventory.Products.Repositories
 
         public List<string> GetDistinctProductCodes(Guid InventoryId)
         {
-            if (_context.Products.Count() == 0) return new List<string>();
+            if (!_context.Products.Any()) return new List<string>();
+      
             return _context.Products
                  .Where(p=>p.InventoryId==InventoryId)
                  .Select(i => i.Code.Trim().ToUpper())
@@ -124,7 +125,8 @@ namespace Inventory.Products.Repositories
 
         public List<string> GetDistinctMetricCodes()
         {
-            if (_context.Metrics.Count() == 0) return new List<string>();
+            if (!_context.Metrics.Any()) return new List<string>();
+        
             return _context.Metrics.Select(i => i.Code.Trim().ToUpper())
                 .GroupBy(p => p)
                 .Select(o => o.FirstOrDefault())
@@ -134,9 +136,11 @@ namespace Inventory.Products.Repositories
 
         public async Task AddOrEditProductMetric(ProductMetricDto m)
         {
-            UpdateProductMetricCodes(m);
-            DecideNewOrEdit(m);
-            await _context.SaveChangesAsync();
+                Log.Information("AddOrEditProductMetric" );
+                Log.Information(m.ToString());
+                UpdateProductMetricCodes(m);
+                DecideNewOrEdit(m);
+                await _context.SaveChangesAsync();
         }
 
         public void UpdateProductMetricCodes(ProductMetricDto m)
@@ -399,6 +403,9 @@ namespace Inventory.Products.Repositories
           
                 ProductCode = ProductCode.ToUpper().Trim();
                 MetricCode = MetricCode.ToUpper().Trim();
+
+
+                
 
                 return _context.ProductMetrics.
                 Where(i => i.ProductCode == ProductCode 

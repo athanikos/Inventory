@@ -1,7 +1,7 @@
 using FastEndpoints;
 using Microsoft.AspNetCore.Identity;
+using Serilog;
 using System.Reflection;
-using Quartz;
 
 namespace Inventory.WebApi
 {
@@ -21,12 +21,7 @@ namespace Inventory.WebApi
             }).AddBearerToken(IdentityConstants.BearerScheme);
 
             builder.Services.AddAuthorizationBuilder();
-            builder.Services.AddQuartz();
-            builder.Services.AddQuartzHostedService(opt =>
-            {
-                opt.WaitForJobsToComplete = false;
-            });
-
+        
 
             List<Assembly> mediatRAssemblies = [typeof(Program).Assembly];
 
@@ -37,7 +32,7 @@ namespace Inventory.WebApi
                      
             Prices.ConfigureServices.AddServices(builder.Services, builder.Configuration, mediatRAssemblies);
             Expressions.ConfigureServices.AddServices(builder.Services, builder.Configuration, mediatRAssemblies);
-            Notifier.ConfigureServices.AddServices(builder.Services, builder.Configuration, mediatRAssemblies);
+            Notifications.ConfigureServices.AddServices(builder.Services, builder.Configuration, mediatRAssemblies);
 
             builder.Services.AddMediatR(cfg =>
             cfg.RegisterServicesFromAssemblies(mediatRAssemblies.ToArray()));
@@ -46,14 +41,15 @@ namespace Inventory.WebApi
             // comment on migration run 
             Prices.RunServices.Run(builder.Services);
             Expressions.RunServices.Run(builder.Services);
-
+            Notifications.RunServices.Run(builder.Services);
 
             builder.Services.AddFastEndpoints();
             var app = builder.Build();
 
             if (app.Environment.IsDevelopment()) {
+                // comment on migration run 
                 app.UseSwagger();
-                app.UseSwaggerUI();
+               app.UseSwaggerUI();
             }
             app.UseFastEndpoints();
 
@@ -61,7 +57,12 @@ namespace Inventory.WebApi
            
 
             app.MapIdentityApi<IdentityUser>();
-            app.Run();
+
+
+             Log.Information("about to app.Run();");
+             app.Run();
+ 
+         
         }
        
         

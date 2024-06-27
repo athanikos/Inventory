@@ -16,7 +16,7 @@ namespace Inventory.Expressions
             List<System.Reflection.Assembly>  mediatRAssemblies
             )
         {
-            services.AddDbContext<ExpressionsDbContext>(options =>
+             services.AddDbContext<ExpressionsDbContext>(options =>
             options.UseSqlServer(configuration.
             GetConnectionString("Expressions")));
 
@@ -26,12 +26,6 @@ namespace Inventory.Expressions
             mediatRAssemblies.Add(typeof(ConfigureServices).Assembly);
             mediatRAssemblies.Add(typeof(Products.Contracts.AddProductMetricCommand).Assembly);
             mediatRAssemblies.Add(typeof(Products.ConfigureServices).Assembly);
-
-
-            var logger  = new LoggerConfiguration()
-            .MinimumLevel.Debug()
-            .WriteTo.File("logs/Net6Tester.txt", rollingInterval: RollingInterval.Day)
-            .CreateLogger();
 
             services.AddScoped<IEvaluator, Evaluator>(
             sp =>

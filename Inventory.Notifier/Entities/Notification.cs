@@ -28,6 +28,7 @@
         /// </summary>
         public bool IsActive { get; set; } = true;
 
+        public DateTime SystemDate  { get; set; }
      
     }
 

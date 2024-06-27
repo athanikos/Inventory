@@ -1,7 +1,10 @@
-﻿namespace Inventory.Notifications.Contracts
+﻿using MediatR;
+
+namespace Inventory.Notifications.Contracts
 {
 
     public  class UpdateNotificationExpressionValueCommand
+         : IRequest<NotificationDto>
     {
         public Guid BooleanExpressionId { get; set; }
 

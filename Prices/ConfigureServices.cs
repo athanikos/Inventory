@@ -5,7 +5,7 @@ using Prices.Inventory.Prices;
 using Hangfire;
 using Serilog;
 using MediatR;
-using Quartz;
+
 
 namespace Inventory.Prices
 {

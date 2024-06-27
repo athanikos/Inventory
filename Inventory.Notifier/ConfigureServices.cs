@@ -1,9 +1,8 @@
-﻿using Inventory.Notifications;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Inventory.Notifier
+namespace Inventory.Notifications
 {
     public static class ConfigureServices
     {
@@ -13,7 +12,7 @@ namespace Inventory.Notifier
             List<System.Reflection.Assembly>  mediatRAssemblies
             )
         {
-
+              
 
             services.AddDbContext<NotifierDbContext>(options =>
             options.UseSqlServer(configuration.

@@ -1,11 +1,7 @@
 ﻿using Inventory.Products.Contracts;
 using Inventory.Products.Contracts.Dto;
 using Inventory.Products.Repositories;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Serilog;
 
 namespace Inventory.Products.Handlers
 {
@@ -32,8 +28,16 @@ namespace Inventory.Products.Handlers
 
 
 
+            try
+            {
+                await _repository.AddOrEditInventoryMetric(dto);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+            }
 
-            await _repository.AddOrEditInventoryMetric(dto);
+
             return dto;
         }
 

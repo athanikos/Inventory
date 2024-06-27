@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Inventory.Expressions;
 using Serilog;
 using Inventory.Notifications.Contracts;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 
 namespace Expressions
@@ -19,25 +20,15 @@ namespace Expressions
         private const string SUM = "SUM";
         private char[] _operators = ['*', '/', '+', '-', '>', '<' ];
         private string[] aggregateFunctions = ["SUM", "AVG"];
+        private const string TRUE = "TRUE";
         private string ALLSpecifier = "[ALL]";
         private string _expression = string.Empty;
         private readonly IMediator _mediator;
         private readonly ExpressionsDbContext _context;
-
         private List<string> _allProductCodes;
         private List<string> _allMetricCodes;
-
         private Guid _inventoryId;
 
-
-        /// <summary>
-        ///      todo move to readme    
-        ///      MetricCode(ProductCode,EffectiveDateTime) > 100     
-        ///      example of expression : Quantity(Ada,Latest) > 100  --> the latest quantity for ada 
-        ///      another example : Value(ADA) = PRICE(ADA) * QUANTITY(ADA) 
-        ///      this should create a new metric called Value for product ADA 
-        ///      effective date should be the date created 
-        /// </summary>
         public Evaluator(IMediator mediator, ExpressionsDbContext context)
         {
             _mediator = mediator;
@@ -84,12 +75,29 @@ namespace Expressions
             }
 
             if (string.IsNullOrEmpty(resultedExpression))
-                return EvaluatorResult.NewEvaluatorResult(string.Empty, EvaluatorResult.EvaluatorResultType.undefined);
+                return EvaluatorResult.NewUndefinedResult();
 
-            var value = new NCalc.Expression(resultedExpression).Evaluate().ToString();
-            return EvaluatorResult.NewEvaluatorResult(value.ToString(),EvaluatorResult.EvaluatorResultType.numeric);
+
+            try
+            {
+
+                Log.Information("NCalc.Evaluate:" + resultedExpression);
+                var value = new NCalc.Expression(resultedExpression).Evaluate().ToString();
+                return EvaluatorResult.NewEvaluatorResult(value.ToString());
+
+            }
+            catch (Exception ex)
+            {
+                
+                Log.Error(ex.ToString());
+                return EvaluatorResult.NewUndefinedResult();
+            }
+
         }
-
+        /// <summary>
+        /// breaks expression into list of strings 
+        /// </summary>
+        /// <returns></returns>
         private List<string> ParseTokens()
         {
             List<string> resultedList = new List<string>();
@@ -133,7 +141,8 @@ namespace Expressions
         ///     returns the value in product metric table 
         /// </summary>
         /// <param name="token"></param>
-        private async Task<EvaluatorResult> ComputeComplexFunction(string token, string aggregateFunction)
+        private async Task<EvaluatorResult> ComputeComplexFunction(string token,
+            string aggregateFunction)
         {
             DateTime upperboundDate = DateTime.MaxValue;
             List<string> productCodes = null;
@@ -147,8 +156,7 @@ namespace Expressions
             catch (Exception e)
             {
                 Log.Error(e.ToString());
-                return EvaluatorResult.NewEvaluatorResult(string.Empty, EvaluatorResult.EvaluatorResultType.undefined);
-
+                return EvaluatorResult.NewUndefinedResult();
             }
 
             string result = string.Empty;
@@ -156,27 +164,23 @@ namespace Expressions
             {
                 if (aggregateFunction == SUM)
                 {
-
                     try
                     {
                         var dto = (await _mediator.Send(
                                    new GetProductMetricQuery(_inventoryId, productCode, metricCode, upperboundDate)));
                         result += result != string.Empty ? "+" + dto.Value : string.Empty + dto.Value;
-
                     }
                     catch (Exception e)
                     {
                         Log.Error(e.ToString());
-                       
-                        return EvaluatorResult.NewEvaluatorResult(string.Empty, EvaluatorResult.EvaluatorResultType.undefined);
-
+                        return EvaluatorResult.NewUndefinedResult();
                     }
                 }
                 else
                     throw new ArgumentException("aggregate function not supported: " + aggregateFunction);
 
             }
-            return EvaluatorResult.NewEvaluatorResult(result,EvaluatorResult.EvaluatorResultType.numeric);
+            return EvaluatorResult.NewEvaluatorResult(result);
         }
 
         private string ExtractMetricCode(string token)
@@ -233,13 +237,13 @@ namespace Expressions
                       Send(new GetProductMetricQuery(InventoryId, productCode, metricCode, upperboundDate))).Value.ToString();
               
 
-                return EvaluatorResult.NewEvaluatorResult(result, EvaluatorResult.EvaluatorResultType.numeric);
+                return EvaluatorResult.NewEvaluatorResult(result);
 
             }
             catch (Exception e)
             {
                 Log.Error(e.ToString());
-                return EvaluatorResult.NewEvaluatorResult(string.Empty, EvaluatorResult.EvaluatorResultType.undefined);
+                return EvaluatorResult.NewUndefinedResult();
 
             }
         }
@@ -276,21 +280,9 @@ namespace Expressions
             return token.Length == 1 && _operators.Contains(token[0]);
         }
 
-        /// <summary>
-        ///todo right way?
-        /// </summary>
-        /// <param name="token"></param>
-        /// <returns></returns>
         private bool IsNumeric(string token)
         {
-            try
-            {
-                decimal.Parse(token);
-                return true;
-            }
-            catch {
-                return false; 
-            }
+            return decimal.TryParse(token, out var result);
         }
 
         /// <summary>
@@ -364,6 +356,7 @@ namespace Expressions
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message,ex);
             }
         }
 
@@ -375,7 +368,7 @@ namespace Expressions
             }
             catch (Exception ex)
             {
-
+                Log.Error(ex.Message, ex);
             }
 
         }
@@ -388,13 +381,15 @@ namespace Expressions
             }
             catch (Exception ex)
             {
-
+                Log.Error(ex.Message, ex);
             }
 
         }
 
         public async Task DoScheduledWorkAsync(Entities.InventoryExpression p)
         {
+
+
             var result = await Execute(p.TargetInventoryId, p.Expression);
 
             if (_type == expressionType.undefined)
@@ -402,11 +397,19 @@ namespace Expressions
 
             if (_type == expressionType.inventoryBased)
             {
+
+                Log.Information("AddInventoryMetricCommand");
+
                 var command = new AddInventoryMetricCommand(p.TargetInventoryId,
                                                     p.TargetMetricId,
                                                    decimal.Parse(result.Result),
                                                     DateTime.Now, "EUR"); //todo get from product 
+
+                Log.Information("_mediator.Send(command)");
+
                 await _mediator.Send(command);
+
+
             }
 
         }
@@ -423,6 +426,10 @@ namespace Expressions
 
             if (_type == expressionType.productBased)
             {
+                Log.Information("AddProductMetricCommand");
+
+
+
                 var command = new AddProductMetricCommand(p.TargetProductId,
                                                           p.TargetMetricId,
                                                           decimal.Parse(result.Result),
@@ -433,6 +440,8 @@ namespace Expressions
 
         public async Task DoScheduledWorkAsync(Entities.BooleanExpression p)
         {
+
+            Log.Information("DoScheduledWorkAsync with BooleanExpression");
             var result = await Execute(p.InventoryId, p.Expression);
 
             if (_type == expressionType.undefined)
@@ -443,11 +452,13 @@ namespace Expressions
 
             if (_type == expressionType.productBased)
             {
+                Log.Information("UpdateNotificationExpressionValueCommand");
                 var command = new UpdateNotificationExpressionValueCommand()
                 {
                     ExpressionValue = bool.Parse(result.Result),
                     BooleanExpressionId = p.Id
                 };
+                Log.Information(" _mediator.Send(command);");
 
                 await _mediator.Send(command);
             }
@@ -456,15 +467,23 @@ namespace Expressions
 
         public void DoScheduledWork()
         {
-            foreach (var p in GetProductExpressions())
-                 DoScheduledWork(p);
+            try
+            {
+                foreach (var p in GetProductExpressions())
+                    DoScheduledWork(p);
 
-            foreach (var i in GetInventoryExpressions())
-                DoScheduledWork(i);
+                foreach (var i in GetInventoryExpressions())
+                    DoScheduledWork(i);
 
-            foreach (var b in GetBooleanExpressions())
-                DoScheduledWork(b);
+                foreach (var b in GetBooleanExpressions())
+                    DoScheduledWork(b);
 
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message, ex);
+
+            }
         }
 
 
@@ -473,27 +492,38 @@ namespace Expressions
 
         public class  EvaluatorResult
         {
-                public static EvaluatorResult NewEvaluatorResult(
-                    string result,
-                    EvaluatorResultType type ) 
+                public static EvaluatorResult NewUndefinedResult(
+                   
+                 ) 
                 {
                         var res = new EvaluatorResult();
-                        res.Result = result;
-             
+                        res._result = string.Empty;
+                        res._type = EvaluatorResultType.undefined;
                         return res; 
                 }
 
-                private string _result = string.Empty;
+                public static EvaluatorResult NewEvaluatorResult(
+            string result
+         )
+            {
+            var res = new EvaluatorResult();
+            res._result = result;
+            return res;
+        }
+
+      
+        private string _result = string.Empty;
                 private EvaluatorResultType _type = EvaluatorResultType.undefined;
 
                 public EvaluatorResultType Type {
             
                         get
                         {
-                            if (Result.ToString().ToUpper().Equals("TRUE") || Result.ToString().ToUpper().Equals("FALSE"))
+                            if (Result.ToString().ToUpper().Equals(TRUE) || Result.ToString().ToUpper().Equals("FALSE"))
                                 return EvaluatorResultType.boolean;
                    
-                            if (decimal.TryParse(Result.ToString(), out _)) return EvaluatorResultType.numeric;
+                            if (decimal.TryParse(Result.ToString(), out _))
+                                return EvaluatorResultType.numeric;
 
                             return EvaluatorResultType.undefined;
                         }
@@ -501,7 +531,7 @@ namespace Expressions
                 }
 
 
-        public string Result { get => _result; private  set => _result = value; }
+        public string Result { get => _result;  set => _result = value; }
 
         public enum  EvaluatorResultType
                 {

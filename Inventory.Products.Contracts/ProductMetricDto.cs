@@ -39,6 +39,17 @@
 
         public Guid SourceId { get; set; }
 
+
+        public override string ToString()
+        {
+            return 
+            
+              "ProductId" +
+            ProductId.ToString() + " "+
+              "MetricId" + MetricId.ToString() + " "+
+            Value + " " +
+            EffectiveDate;
+        }
     }
 
 }
