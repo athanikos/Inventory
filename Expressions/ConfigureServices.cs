@@ -1,8 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
-using Hangfire;
-using Serilog;
 using MediatR;
 using Expressions;
 
@@ -22,10 +20,10 @@ namespace Inventory.Expressions
 
 
 
-
+            //todo do i need all these?
             mediatRAssemblies.Add(typeof(ConfigureServices).Assembly);
-            mediatRAssemblies.Add(typeof(Products.Contracts.AddProductMetricCommand).Assembly);
-            mediatRAssemblies.Add(typeof(Products.ConfigureServices).Assembly);
+            //mediatRAssemblies.Add(typeof(Products.Contracts.AddProductMetricCommand).Assembly);
+            //mediatRAssemblies.Add(typeof(Products.ConfigureServices).Assembly);
 
             services.AddScoped<IEvaluator, Evaluator>(
             sp =>

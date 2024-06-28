@@ -37,7 +37,19 @@ namespace Inventory.Notifications.Handlers
                     item.SystemDate = DateTime.Now;
                 }
                 Log.Information("UpdateNotificationExpressionValue  _context.SaveChangesAsync");
-                await _context.SaveChangesAsync();
+
+                try
+
+
+
+                {
+                    await _context.SaveChangesAsync();
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex.Message, ex);  
+
+                }
             }
             //todo: either return nothing or list of dtos
             return new NotificationDto()

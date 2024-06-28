@@ -31,6 +31,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="FastEndpoints" Version="5.26.0" />
     <PackageReference Include="Hangfire.NetCore" Version="1.8.14" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.6" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.6" />
@@ -47,8 +48,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Inventory.Expressions.Contracts\Inventory.Expressions.Contracts.csproj" />
     <ProjectReference Include="..\Inventory.Notifications.Contracts\Inventory.Notifications.Contracts.csproj" />
-    <ProjectReference Include="..\Prices\Inventory.Prices.csproj" />
   </ItemGroup>
 
 </Project>

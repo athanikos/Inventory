@@ -25,6 +25,6 @@
         /// </summary>
         public bool IsActive { get; set; } = true;
 
-
+        public string Expression { get; set; } = string.Empty;
     }
 }

@@ -1,13 +1,10 @@
-﻿
-using MediatR;
+﻿using MediatR;
 using Inventory.Products.Contracts;
 using Hangfire;
 using Microsoft.EntityFrameworkCore;
 using Inventory.Expressions;
 using Serilog;
 using Inventory.Notifications.Contracts;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
-
 
 namespace Expressions
 {
@@ -20,7 +17,7 @@ namespace Expressions
         private const string SUM = "SUM";
         private char[] _operators = ['*', '/', '+', '-', '>', '<' ];
         private string[] aggregateFunctions = ["SUM", "AVG"];
-        private const string TRUE = "TRUE";
+
         private string ALLSpecifier = "[ALL]";
         private string _expression = string.Empty;
         private readonly IMediator _mediator;
@@ -488,58 +485,5 @@ namespace Expressions
 
 
     }
-
-
-        public class  EvaluatorResult
-        {
-                public static EvaluatorResult NewUndefinedResult(
-                   
-                 ) 
-                {
-                        var res = new EvaluatorResult();
-                        res._result = string.Empty;
-                        res._type = EvaluatorResultType.undefined;
-                        return res; 
-                }
-
-                public static EvaluatorResult NewEvaluatorResult(
-            string result
-         )
-            {
-            var res = new EvaluatorResult();
-            res._result = result;
-            return res;
-        }
-
-      
-        private string _result = string.Empty;
-                private EvaluatorResultType _type = EvaluatorResultType.undefined;
-
-                public EvaluatorResultType Type {
-            
-                        get
-                        {
-                            if (Result.ToString().ToUpper().Equals(TRUE) || Result.ToString().ToUpper().Equals("FALSE"))
-                                return EvaluatorResultType.boolean;
-                   
-                            if (decimal.TryParse(Result.ToString(), out _))
-                                return EvaluatorResultType.numeric;
-
-                            return EvaluatorResultType.undefined;
-                        }
-                
-                }
-
-
-        public string Result { get => _result;  set => _result = value; }
-
-        public enum  EvaluatorResultType
-                {
-                        undefined = 0,
-                        numeric = 1,
-                        boolean =2, 
-                }
-
-        }
     
 }

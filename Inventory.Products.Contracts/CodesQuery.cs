@@ -2,7 +2,8 @@
 
 namespace Inventory.Products.Contracts
 {
-    public  record CodesQuery(Guid InventoryId) :  IRequest<CodesResponse>;
+    public  record CodesQuery(Guid InventoryId) :
+        IRequest<CodesResponse>;
    
 
     public class CodesResponse
