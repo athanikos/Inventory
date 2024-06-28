@@ -1,10 +1,10 @@
 ﻿using FastEndpoints;
-using Inventory.Products.Dto;
-using Inventory.Products.Repositories;
+using Inventory.Transactions.Dto;
+using Inventory.Transactions.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 
-namespace TransactionItem.Products.Endpoints
+namespace TransactionItem.Transactions.Endpoints
 {
     public class DeleteTransactionItem :
         Endpoint<DeleteTransactionItemRequest>

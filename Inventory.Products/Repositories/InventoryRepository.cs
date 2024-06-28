@@ -13,8 +13,13 @@ namespace Inventory.Products.Repositories
 
         public InventoryRepository(ProductsDbContext context)
         { _context = context; }
-       
-        
+
+
+        public bool CategoryFatherIdExists(Guid FatherId)
+        {
+            return _context.Categories.Where(p => p.FatherId == FatherId).Count() > 0;
+        }
+
         public void EmptyDB()
         {
          
@@ -25,8 +30,7 @@ namespace Inventory.Products.Repositories
             _context.ProductCategories.RemoveRange(_context.ProductCategories);
             _context.ProductMetrics.RemoveRange(_context.ProductMetrics);
             _context.Products.RemoveRange(_context.Products);
-            _context.TransactionItems.RemoveRange(_context.TransactionItems);
-            _context.Transactions.RemoveRange(_context.Transactions);
+
             _context.SaveChanges();
 
         }

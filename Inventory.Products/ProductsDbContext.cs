@@ -16,9 +16,7 @@ public class ProductsDbContext : DbContext
         public   DbSet<Entities.ProductCategory> ProductCategories { get; set; }
         public   DbSet<Entities.ProductMetric> ProductMetrics { get; set; }
         public   DbSet<Entities.InventoryMetric> InventoryMetrics { get; set; }
-        public   DbSet<Entities.Transaction> Transactions { get; set; }
-        public   DbSet<Entities.TransactionItem> TransactionItems { get; set; }
-
+    
         protected override void OnModelCreating
             (ModelBuilder modelBuilder)
             {
@@ -54,8 +52,8 @@ public class ProductsDbContext : DbContext
 
 
 
-        modelBuilder.Entity<Entities.Source>()
-                          .HasMany(e => e.Metrics);
+                        modelBuilder.Entity<Entities.Source>()
+                                          .HasMany(e => e.Metrics);
                    
 
 

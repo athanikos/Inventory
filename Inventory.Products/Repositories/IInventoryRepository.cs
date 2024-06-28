@@ -25,7 +25,7 @@ namespace Inventory.Products.Repositories
 
         Task AddOrEditInventoryMetric(InventoryMetricDto m);
 
-
+        bool CategoryFatherIdExists(Guid FatherId);
 
 
         Task<CategoryDto> AddCategoryAsync(CategoryDto dto);

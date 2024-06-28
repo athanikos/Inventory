@@ -34,28 +34,24 @@ Effective From will allways be min Value in this case since there wil be no chan
 
 ### Prices module 
     
-A hangfire hob that updates productMetric table. 
+A hangfire job that retrieves prices from an external endpoint and updates prices in productMetric table. 
 
 
 
 
 ### Expressions module
 
-#### product expression
+Uses Ncalc for evaluation. 
 
-Supports a simple formula like  METRICCODE(PRODUCTOCODE,UPPERBOUNDEFFECTIVEDATE) where upperbound Effective date.
-it parses metric code , product code and date time and finds the latest product metric row for that perticular date else the latest. 
-
-#### inventory expression 
-
-Todo support an aggregate formula 
-    i.e. sum all product prices per inventory 
-
-
+Evaluates three types of expressions:
+    Boolean Expressions ie RPICE([ADA]) > 1. Saves the result of the expression to Notification table in notifications table. 
+    Product Expressions ie these are expressions that compute some attribute for a product . example PRICE([ADA]) * VALUE([ADA]) 
+    Inventory Expressions. computes some attribute per inventory . Example SUM(VALUE([ALL])) 
 
 ### Tests Module 
 
-Runs end to end testing 
+Runs end to end testing . Currently tests the evaluator componenent. 
+
     
 ### Authorization rules 
     

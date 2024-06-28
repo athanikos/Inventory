@@ -1,9 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc.Formatters;
-
-namespace Inventory.Products.Entities
+﻿namespace Inventory.Transactions.Entities
 {
 
-        public sealed class Transaction 
+    public sealed class Transaction 
         {
             public Guid Id { get; set; }  = Guid.NewGuid();
 

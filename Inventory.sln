@@ -42,9 +42,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{A448CE67-00F
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{CC632FE4-A0E6-47AB-A2F4-EF8063743FAA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Common\Common.csproj", "{24E36E58-87C5-4235-B09A-612DCAAEF056}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Common", "Common\Common.csproj", "{24E36E58-87C5-4235-B09A-612DCAAEF056}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inventory.Expressions.Contracts", "Inventory.Expressions.Contracts\Inventory.Expressions.Contracts.csproj", "{004EF909-1F88-4660-9B23-13AF7C5B3F32}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Inventory.Expressions.Contracts", "Inventory.Expressions.Contracts\Inventory.Expressions.Contracts.csproj", "{004EF909-1F88-4660-9B23-13AF7C5B3F32}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Transactions", "Transactions", "{3148B307-D3E3-4049-835A-912CDA6DBFDE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inventory.Transactions", "Inventory.Transactions\Inventory.Transactions.csproj", "{9414B37A-4D36-48D3-B5DA-3EE14DE1CA08}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -96,6 +100,10 @@ Global
 		{004EF909-1F88-4660-9B23-13AF7C5B3F32}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{004EF909-1F88-4660-9B23-13AF7C5B3F32}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{004EF909-1F88-4660-9B23-13AF7C5B3F32}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9414B37A-4D36-48D3-B5DA-3EE14DE1CA08}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9414B37A-4D36-48D3-B5DA-3EE14DE1CA08}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9414B37A-4D36-48D3-B5DA-3EE14DE1CA08}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9414B37A-4D36-48D3-B5DA-3EE14DE1CA08}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -118,6 +126,8 @@ Global
 		{CC632FE4-A0E6-47AB-A2F4-EF8063743FAA} = {A448CE67-00F2-4249-9DE5-040476B1CB95}
 		{24E36E58-87C5-4235-B09A-612DCAAEF056} = {CC632FE4-A0E6-47AB-A2F4-EF8063743FAA}
 		{004EF909-1F88-4660-9B23-13AF7C5B3F32} = {BF59840D-EBEE-4E3A-8DB0-ACB79CD1D488}
+		{3148B307-D3E3-4049-835A-912CDA6DBFDE} = {A448CE67-00F2-4249-9DE5-040476B1CB95}
+		{9414B37A-4D36-48D3-B5DA-3EE14DE1CA08} = {3148B307-D3E3-4049-835A-912CDA6DBFDE}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {582FC159-BB6D-4F86-A864-9DCDBC25735B}

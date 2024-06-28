@@ -30,8 +30,7 @@ namespace Tests.Inventory.Expressions
             options.UseSqlServer(configuration.
             GetConnectionString("Products")));
 
-            services.AddScoped<ITransactionRepository, TransactionRepository>();
-            services.AddScoped<IInventoryRepository, InventoryRepository>();
+             services.AddScoped<IInventoryRepository, InventoryRepository>();
         }
 
         protected override ValueTask DisposeAsyncCore()

@@ -1,11 +1,10 @@
-﻿using Inventory.Products.Dto;
+﻿using Inventory.Transactions.Dto;
 
-namespace Inventory.Products.Repositories
+namespace Inventory.Transactions.Repositories
 {
     public interface ITransactionRepository
     {
         Task<TransactionDto> AddTransactionAsync(TransactionDto dto);
-        bool CategoryFatherIdExists(Guid FatherId);
         Task<TransactionDto> EditTransactionAsync(TransactionDto c);
         Task DeleteTransactionAsync(TransactionDto c);
 

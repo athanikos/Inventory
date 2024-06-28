@@ -1,13 +1,14 @@
 ﻿
-namespace Transaction.Products.Endpoints
+namespace Transaction.Transactions.Endpoints
 {
     using FastEndpoints;
+    using Inventory.Transactions.Dto;
+    using Inventory.Transactions.Repositories;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Http.HttpResults;
     using System.Threading;
     using System.Threading.Tasks;
-    using Inventory.Products.Dto;
-    using Inventory.Products.Repositories;
+
 
     public class EditTransaction :
         Endpoint<DeleteTransactionRequest>

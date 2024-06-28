@@ -1,16 +1,13 @@
 ﻿
-namespace Inventory.Products.Endpoints
+namespace Inventory.Transactions.Endpoints
 {
     using FastEndpoints;
-    using MediatR;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Http.HttpResults;
     using System.Threading;
     using System.Threading.Tasks;
-    using Inventory.Products.Dto;
-    using Azure.Core;
-    using Microsoft.EntityFrameworkCore.Storage;
-    using Inventory.Products.Repositories;
+    using Inventory.Transactions.Repositories;
+    using Inventory.Transactions.Dto;
 
     public class EditTransaction :
         Endpoint<EditTransactionRequest>

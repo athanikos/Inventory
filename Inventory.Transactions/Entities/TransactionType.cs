@@ -1,4 +1,4 @@
-﻿namespace Inventory.Products.Entities
+﻿namespace Inventory.Transactions.Entities
 {
     public class TransactionType
     {

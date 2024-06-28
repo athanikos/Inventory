@@ -1,62 +1,61 @@
 ﻿
-namespace Inventory.Products.Endpoints
+namespace TransactionItem.Transactions.Endpoints
 {
     using FastEndpoints;
-    using MediatR;
+    using Inventory.Transactions.Dto;
+    using Inventory.Transactions.Repositories;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Http.HttpResults;
     using System.Threading;
     using System.Threading.Tasks;
-    using Inventory.Products.Dto;
-    using Azure.Core;
-    using Inventory.Products.Repositories;
-
-    public class EditTransactionItem :
-        Endpoint<EditTransactionItemRequest>
+ 
+    public class AddTransactionItem :
+        Endpoint<AddTransactionItemRequest>
     {
         private readonly ITransactionRepository _repo;
 
-        public  EditTransactionItem(ITransactionRepository repo)
+        public  AddTransactionItem(ITransactionRepository repo)
         {
             _repo = repo;
         }
 
         public override void Configure()
         {
-            Post("/transactionitem");
+            Post("/transactionItem");
             // to do claims this is per TransactionItemId claim
             //  something like Admin_<TransactionItemId>
         }
 
         public override async Task<Results<Ok<TransactionItemDto>, NotFound, ProblemDetails>>
-            HandleAsync(EditTransactionItemRequest req,
+            HandleAsync(AddTransactionItemRequest req,
                         CancellationToken ct)
         {
-        
 
-            var dto =  await _repo.EditTransactionItemAsync(new TransactionItemDto(
-               req.TransactionId,
-            req.Id,
-               req.Description,
-               req.TransactionType,
-               req.UnitPrice,
-            req.Quantity,
-            req.Price,
-               req.VatPercentage,
-               req.PriceAfterVat,
-               req.Discount,
-               req.DiscountAmount,
-               req.TransactionFees,
-               req.DeliveryFees,
-               req.FinalPrice
-               ));
+            TransactionItemDto trns =
+               new TransactionItemDto(
+                 req.TransactionId,
+                 req.Id,
+                 req.Description,
+                 req.TransactionType,
+                 req.UnitPrice,
+                 req.Quantity,
+                 req.Price,
+                 req.VatPercentage,
+                 req.PriceAfterVat,
+                 req.Discount,
+                 req.DiscountAmount,
+                 req.TransactionFees,
+                 req.DeliveryFees,
+                 req.FinalPrice
+                 );
+            await _repo.EditTransactionItemAsync(trns);
 
-            return TypedResults.Ok<TransactionItemDto>(dto);
+            return TypedResults.Ok(trns);
         }
     }
 
 
-    public record EditTransactionItemRequest(Guid TransactionId,
+    public record AddTransactionItemRequest(Guid TransactionId,
                     Guid Id,
                     string Description,
                     string TransactionType,
@@ -70,8 +69,6 @@ namespace Inventory.Products.Endpoints
                     decimal TransactionFees,
                     decimal DeliveryFees,
                      decimal FinalPrice);
-
-   
 
   
 }

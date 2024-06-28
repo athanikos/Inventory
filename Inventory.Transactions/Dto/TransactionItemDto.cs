@@ -1,4 +1,4 @@
-﻿namespace Inventory.Products.Dto;
+﻿namespace Inventory.Transactions.Dto;
 
 public record TransactionItemDto(
                     Guid Id,
