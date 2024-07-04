@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Inventory.Notifications.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class iniial : Migration
+    public partial class PG : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -19,12 +19,13 @@ namespace Inventory.Notifications.Data.Migrations
                 schema: "Notifications",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    BooleanExpressionId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ExpressionValue = table.Column<bool>(type: "bit", nullable: false),
-                    NotifyEveryMinutes = table.Column<int>(type: "int", nullable: false),
-                    NotifyTimes = table.Column<int>(type: "int", nullable: false),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false)
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    BooleanExpressionId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ExpressionValue = table.Column<bool>(type: "boolean", nullable: false),
+                    NotifyEveryMinutes = table.Column<int>(type: "integer", nullable: false),
+                    NotifyTimes = table.Column<int>(type: "integer", nullable: false),
+                    IsActive = table.Column<bool>(type: "boolean", nullable: false),
+                    SystemDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {

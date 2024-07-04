@@ -14,8 +14,8 @@ namespace Inventory.Notifications
         {
               
 
-            services.AddDbContext<NotifierDbContext>(options =>
-            options.UseSqlServer(configuration.
+            services.AddEntityFrameworkNpgsql().AddDbContext<NotifierDbContext>(options =>
+            options.UseNpgsql(configuration.
             GetConnectionString("Notifications")));
 
 

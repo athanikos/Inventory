@@ -64,33 +64,34 @@ Client can order from inventory. For an inventory to be able to order
 ClaimType = CLIENTINVENTORY claimValue = <InventoryId>
    
 
-## migrations 
-    comment out //  builder.Services.AddSwaggerGen(); in startup for the migrations to work
-    
-    dotnet tool install --global dotnet-ef
-    
-    cd C:\projects\Inventory\Inventory\Inventory.WebApi
-    
-    dotnet add package Microsoft.EntityFrameworkCore
-    
-    dotnet ef migrations add Initial -c  UsersDbContext -p C:\projects\Inventory\Inventory\Inventory.Users\Inventory.Users.csproj -s C:\projects\Inventory\Inventory\Inventory.WebApi\Inventory.WebApi.csproj -o Data/Migrations
-    dotnet ef database update Initial
+## migrations (postgres sql )
+
+cd C:\projects\Inventory\Inventory\Inventory.WebApi
 
 
-    C:\projects\Inventory\Inventory\Inventory.WebApi>dotnet ef migrations add Initial -c  ProductsDbContext -p C:\projects\Inventory\Inventory\Inventory.Products\Inventory.Products.csproj -s C:\projects\Inventory\Inventory\Inventory.WebApi\Inventory.WebApi.csproj -o Data/Migrations
-    dotnet ef database update Initial
+dotnet ef migrations add PG -c  UsersDbContext -p C:\projects\Inventory\Inventory\Inventory.Users\Inventory.Users.csproj -s C:\projects\Inventory\Inventory\Inventory.WebApi\Inventory.WebApi.csproj -o Data/Migrations
+dotnet ef database update PG -c  UsersDbContext -p C:\projects\Inventory\Inventory\Inventory.Users\Inventory.Users.csproj 
 
-    dotnet ef migrations add pPricesv3 -c  PricesDbContext -p C:\projects\Inventory\Inventory\Prices\Inventory.Prices.csproj -s     C:\projects\Inventory\Inventory\Inventory.WebApi\Inventory.WebApi.csproj -o Data/Migrations
-    dotnet ef database update  pPricesv3 -c PricesDbContext
-
-
-      dotnet ef migrations add Exprv3 -c  ExpressionsDbContext -p C:\projects
-    \Inventory\Inventory\Expressions\Inventory.Expressions.csproj -s C:\projects\Inventory\Inventory\Inventory.WebApi\Invent
-    ory.WebApi.csproj -o Data/Migrations
+dotnet ef migrations add PG -c  ProductsDbContext -p C:\projects\Inventory\Inventory\Inventory.Products\Inventory.Products.csproj -s C:\projects\Inventory\Inventory\Inventory.WebApi\Inventory.WebApi.csproj -o Data/Migrations
+dotnet ef database update PG  -c  ProductsDbContext -p C:\projects\Inventory\Inventory\Inventory.Products\Inventory.Products.csproj 
 
 
-    dotnet ef migrations add iniial -c NotifierDbContext -p C:\projects\Inventory\Inventory\Inventory.Notifier\Inventory.Notifications.csproj -s  C:\projects\Inventory\Inventory\Inventory.WebApi\Inventory.WebApi.csproj -o Data/Migrations
-    
+
+dotnet ef migrations add PG  -c  PricesDbContext -p C:\projects\Inventory\Inventory\Prices\Inventory.Prices.csproj -s     C:\projects\Inventory\Inventory\Inventory.WebApi\Inventory.WebApi.csproj -o Data/Migrations
+
+dotnet ef database update  pPricesv3 -c PricesDbContext
+
+
+dotnet ef migrations add PG -c  ExpressionsDbContext -p C:\projects\Inventory\Inventory\Expressions\Inventory.Expressions.csproj -s C:\projects\Inventory\Inventory\Inventory.WebApi\Inventory.WebApi.csproj -o Data/Migrations
+
+
+dotnet ef database update   PG -c ExpressionsDbContext
+
+
+dotnet ef migrations add PG  -c NotifierDbContext -p C:\projects\Inventory\Inventory\Inventory.Notifier\Inventory.Notifications.csproj -s  C:\projects\Inventory\Inventory\Inventory.WebApi\Inventory.WebApi.csproj -o Data/Migrations
+
+dotnet ef database update   PG -c NotifierDbContext
+
         
 ### Metrics 
 

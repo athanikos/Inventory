@@ -14,8 +14,8 @@ namespace Inventory.Transactions
             mediatRAssemblies
             )
         {
-            services.AddDbContext<TransactionsDbContext>(options =>
-            options.UseSqlServer(configuration.
+            services.AddEntityFrameworkNpgsql().AddDbContext<TransactionsDbContext>(options =>
+            options.UseNpgsql(configuration.
             GetConnectionString("Transactions")));
 
             services.AddScoped<ITransactionRepository, TransactionRepository>();

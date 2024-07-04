@@ -14,8 +14,8 @@ namespace Inventory.Expressions
             List<System.Reflection.Assembly>  mediatRAssemblies
             )
         {
-             services.AddDbContext<ExpressionsDbContext>(options =>
-            options.UseSqlServer(configuration.
+             services.AddEntityFrameworkNpgsql().AddDbContext<ExpressionsDbContext>(options =>
+            options.UseNpgsql(configuration.
             GetConnectionString("Expressions")));
 
 

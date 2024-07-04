@@ -12,8 +12,8 @@ namespace Inventory.Users
             IConfiguration configuration)
         {          
 
-            services.AddDbContext<UsersDbContext>(options =>  
-            options.UseSqlServer(configuration.
+            services.AddEntityFrameworkNpgsql().AddDbContext<UsersDbContext>(options =>  
+            options.UseNpgsql(configuration.
             GetConnectionString("Users")));
 
             services.AddIdentityCore<IdentityUser>().

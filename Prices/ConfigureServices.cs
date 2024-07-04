@@ -5,6 +5,8 @@ using Prices.Inventory.Prices;
 using Hangfire;
 using Serilog;
 using MediatR;
+using Hangfire.PostgreSql;
+
 
 
 namespace Inventory.Prices
@@ -17,23 +19,16 @@ namespace Inventory.Prices
             List<System.Reflection.Assembly>  mediatRAssemblies
             )
         {
-            services.AddDbContext<PricesDbContext>(options =>
-            options.UseSqlServer(configuration.
+            services.AddEntityFrameworkNpgsql().AddDbContext<PricesDbContext>(options =>
+            options.UseNpgsql(configuration.
             GetConnectionString("Prices")));
 
             var str = configuration.GetConnectionString("Hangfire");
 
       
             services.AddHangfire(configuration => configuration
-                .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
-                .UseSimpleAssemblyNameTypeSerializer()
-                .UseRecommendedSerializerSettings()
-                .UseSqlServerStorage(str)
+                  .UsePostgreSqlStorage(str)
                 );
-
-            GlobalConfiguration.Configuration
-            .UseSqlServerStorage(str);
-
 
             mediatRAssemblies.Add(typeof(ConfigureServices).Assembly);
             mediatRAssemblies.Add(typeof(Products.Contracts.AddProductMetricCommand).Assembly);

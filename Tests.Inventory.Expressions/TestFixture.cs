@@ -22,12 +22,12 @@ namespace Tests.Inventory.Expressions
             services.AddMediatR(cfg =>
             cfg.RegisterServicesFromAssemblies(mediatRAssemblies.ToArray()));
 
-            services.AddDbContext<ExpressionsDbContext>(options =>
-            options.UseSqlServer(configuration.
+            services.AddEntityFrameworkNpgsql().AddDbContext<ExpressionsDbContext>(options =>
+            options.UseNpgsql(configuration.
             GetConnectionString("Expressions")));
 
-            services.AddDbContext<ProductsDbContext>(options =>
-            options.UseSqlServer(configuration.
+            services.AddEntityFrameworkNpgsql().AddDbContext<ProductsDbContext>(options =>
+            options.UseNpgsql(configuration.
             GetConnectionString("Products")));
 
              services.AddScoped<IInventoryRepository, InventoryRepository>();

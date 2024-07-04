@@ -14,8 +14,8 @@ namespace Inventory.Products
             mediatRAssemblies
             )
         {          
-            services.AddDbContext<ProductsDbContext>(options =>  
-            options.UseSqlServer(configuration.
+            services.AddEntityFrameworkNpgsql().AddDbContext<ProductsDbContext>(options =>  
+            options.UseNpgsql(configuration.
             GetConnectionString("Products")));
 
              services.AddScoped<IInventoryRepository, InventoryRepository>();
