@@ -14,6 +14,9 @@ namespace Inventory.Transactions
             mediatRAssemblies
             )
         {
+
+            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
             services.AddEntityFrameworkNpgsql().AddDbContext<TransactionsDbContext>(options =>
             options.UseNpgsql(configuration.
             GetConnectionString("Transactions")));

@@ -5,7 +5,8 @@ using Prices.Inventory.Prices;
 using Hangfire;
 using Serilog;
 using MediatR;
-using Hangfire.PostgreSql;
+using Hangfire.MemoryStorage;
+using Hangfire.SqlServer;
 
 
 
@@ -19,16 +20,17 @@ namespace Inventory.Prices
             List<System.Reflection.Assembly>  mediatRAssemblies
             )
         {
+
+            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
             services.AddEntityFrameworkNpgsql().AddDbContext<PricesDbContext>(options =>
             options.UseNpgsql(configuration.
             GetConnectionString("Prices")));
 
-            var str = configuration.GetConnectionString("Hangfire");
+        
+            services.AddHangfire(c=>c.UseMemoryStorage());
 
-      
-            services.AddHangfire(configuration => configuration
-                  .UsePostgreSqlStorage(str)
-                );
+            JobStorage.Current = new MemoryStorage();
 
             mediatRAssemblies.Add(typeof(ConfigureServices).Assembly);
             mediatRAssemblies.Add(typeof(Products.Contracts.AddProductMetricCommand).Assembly);

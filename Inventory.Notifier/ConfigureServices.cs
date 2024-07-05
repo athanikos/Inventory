@@ -12,7 +12,9 @@ namespace Inventory.Notifications
             List<System.Reflection.Assembly>  mediatRAssemblies
             )
         {
-              
+
+            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
 
             services.AddEntityFrameworkNpgsql().AddDbContext<NotifierDbContext>(options =>
             options.UseNpgsql(configuration.

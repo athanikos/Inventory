@@ -8,7 +8,6 @@ using MediatR;
 using Serilog;
 
 
-
 namespace Prices
 {
     namespace Inventory.Prices
@@ -33,7 +32,7 @@ namespace Prices
             {
                 if (string.IsNullOrEmpty(_parameterType))
                     throw new ArgumentNullException(nameof(_parameterType));
-                return [.. _context.Parameters.Where(p => p.ParameterType == _parameterType)];
+                return [.. _context.Parameters.Where(p => p.ParameterType == _parameterType).ToList()];
             }
 
             public void ScedhuleJobs(IServiceProvider serviceProvider)
@@ -75,7 +74,8 @@ namespace Prices
                     var response = client.Get(request);
                     JObject o = JObject.Parse(response.Content);
                     var value = decimal.Parse(o.SelectToken(p.TargetPathForProductCode).ToString());
-                    var command = new AddProductMetricCommand(p.ProductId, p.MetricId, value, DateTime.Now, p.TargetCurrency);
+                    var command = new AddProductMetricCommand(p.ProductId, p.MetricId,
+                        value, DateTime.Now, p.TargetCurrency);
 
                     Log.Information("AddProductMetricCommand  _mediator.Send " + p.ProductId + " " + p.MetricId);
 
@@ -96,10 +96,12 @@ namespace Prices
             }
 
 
-            public void DoScedhuledWork()
+            public async Task  DoScedhuledWork()
             {
-                foreach (var p in GetParameters())
-                    DoScheduledWork(p);
+
+                var items = GetParameters();
+                foreach (var p in items)
+                  await  DoScheduledWork(p);
             }
 
         }

@@ -17,7 +17,7 @@ public class ProductsDbContext : DbContext
         public   DbSet<Entities.ProductMetric> ProductMetrics { get; set; }
         public   DbSet<Entities.InventoryMetric> InventoryMetrics { get; set; }
     
-        protected override void OnModelCreating
+     protected override void OnModelCreating
             (ModelBuilder modelBuilder)
             {
                         base.OnModelCreating(modelBuilder);

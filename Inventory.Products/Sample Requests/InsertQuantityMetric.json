@@ -1,10 +1,20 @@
 {
-  "exclude": [
-    "**/bin",
-    "**/bower_components",
-    "**/jspm_packages",
-    "**/node_modules",
-    "**/obj",
-    "**/platforms"
-  ]
+  "Description": "VALUE",
+  "Code": "VALUE",
+  "sourceId": "70939371-dfdf-4bd8-af53-98752925f722"
 }
+
+
+{
+  "Description": "QUANTITY",
+  "Code": "QUANTITY",
+  "sourceId": "70939371-dfdf-4bd8-af53-98752925f722"
+}
+
+
+{
+  "Description": "PRICE",
+  "Code": "QUANTITY",
+  "sourceId": "70939371-dfdf-4bd8-af53-98752925f722"
+}
+

@@ -330,17 +330,18 @@ namespace Expressions
         {
             var productExpressions = GetProductExpressions();
             foreach (var p in productExpressions)
-                RecurringJob.AddOrUpdate(p.Id.ToString(), () => DoScheduledWork(p), Cron.Minutely);
+                RecurringJob.AddOrUpdate(p.Id.ToString(), 
+                    () => DoScheduledWork(p), Cron.Minutely);
 
             var inventoryExpressions = GetInventoryExpressions();
             foreach (var i in inventoryExpressions)
-                RecurringJob.AddOrUpdate(i.Id.ToString(), () => DoScheduledWork(i), Cron.Minutely);
+                RecurringJob.AddOrUpdate(i.Id.ToString(), 
+                    () => DoScheduledWork(i), Cron.Minutely);
 
             var booleanExpressions = GetBooleanExpressions();
             foreach (var i in booleanExpressions)
-                RecurringJob.AddOrUpdate(i.Id.ToString(), () => DoScheduledWork(i), Cron.Minutely);
-
-
+                RecurringJob.AddOrUpdate(i.Id.ToString(), 
+                    () => DoScheduledWork(i), Cron.Minutely);
         }
 
 
@@ -424,13 +425,11 @@ namespace Expressions
             if (_type == expressionType.productBased)
             {
                 Log.Information("AddProductMetricCommand");
-
-
-
                 var command = new AddProductMetricCommand(p.TargetProductId,
                                                           p.TargetMetricId,
                                                           decimal.Parse(result.Result),
-                                                          DateTime.Now, "EUR"); //todo get from product 
+                                                          DateTime.Now, 
+                                                          "EUR"); //todo get from product 
                 await _mediator.Send(command);
             }
         }

@@ -11,7 +11,8 @@ namespace Inventory.Products.Handlers
     {
         private IInventoryRepository _repository;
         
-        public AddProdcutMetricHandler(IInventoryRepository repository) 
+        public AddProdcutMetricHandler(IInventoryRepository
+            repository) 
         {
             _repository = repository;   
         }    
@@ -20,6 +21,7 @@ namespace Inventory.Products.Handlers
         public async Task<dto.ProductMetricDto> Handle(AddProductMetricCommand request, 
             CancellationToken cancellationToken)
         {
+
             var dto = new dto.ProductMetricDto(request.ProductId,
                                                    request.MetricId,
                                                    request.Value,
@@ -33,10 +35,7 @@ namespace Inventory.Products.Handlers
             try
             {
                 Log.Information(" _repository.AddOrEditProductMetric(dto); ");
-
-
                 Log.Information(" 2 _repository.AddOrEditProductMetric(dto); ");
-
                 await _repository.AddOrEditProductMetric(dto);
                 Log.Information(" after _repository.AddOrEditProductMetric(dto); ");
 

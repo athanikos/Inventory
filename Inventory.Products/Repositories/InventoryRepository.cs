@@ -140,8 +140,7 @@ namespace Inventory.Products.Repositories
 
         public async Task AddOrEditProductMetric(ProductMetricDto m)
         {
-                Log.Information("AddOrEditProductMetric" );
-                Log.Information(m.ToString());
+                Log.Information("AddOrEditProductMetric:" + m.ToString());
                 UpdateProductMetricCodes(m);
                 DecideNewOrEdit(m);
                 await _context.SaveChangesAsync();
@@ -165,12 +164,14 @@ namespace Inventory.Products.Repositories
 
         public  void DecideNewOrEdit(ProductMetricDto m)
         {
-            if (_context.ProductMetrics.Where
+            var exists = _context.ProductMetrics.Where
                 (
                     p => p.MetricId == m.MetricId
                          && p.ProductId == m.ProductId
                          && p.EffectiveDate == m.EffectiveDate
-                ).Count() > 0)
+                ).ToList().Count() > 0;
+
+            if (exists) // tolist https://stackoverflow.com/questions/61052687/a-command-is-already-in-progress
             {
                 ProductMetric pm = new();
                 pm.ProductId = m.ProductId;
@@ -257,23 +258,24 @@ namespace Inventory.Products.Repositories
             };
         }
 
-
-
-
-
-
-
         public async Task DeleteProductAsync(ProductDto c)
         {
-            List<Entities.ProductCategory> pcs = _context.ProductCategories.Where(p => p.ProductId == c.Id).ToList();
+            List<Entities.ProductCategory> pcs = _context.ProductCategories
+            .Where(p => p.ProductId == c.Id).ToList();
+            
             foreach (Entities.ProductCategory pc in pcs)
                 _context.Remove(pc);
 
-            List<Entities.ProductMetric> pms = _context.ProductMetrics.Where(p => p.ProductId == c.Id).ToList();
-            foreach (Entities.ProductMetric pm in pms)
+            List<ProductMetric> pms = _context.ProductMetrics.
+                Where(p => p.ProductId == c.Id).ToList();
+           
+            foreach (ProductMetric pm in pms)
                 _context.Remove(pm);
 
-            Entities.Product e = _context.Products.Where(p => p.Id == c.Id).Single();
+            Product e = _context.Products.
+                         Where(p => p.Id == c.Id).
+                         Single();
+
             _context.Remove(e);
 
             await _context.SaveChangesAsync();
@@ -282,9 +284,8 @@ namespace Inventory.Products.Repositories
         public  bool ProductDescriptionOrCategoryIsUsed(ProductDto c)
         {
             return  _context.Products.Where
-            (
-                        p => (p.Code == c.Code || p.Description == c.Description)
-                        && p.Id != c.Id  
+            (       p => (p.Code == c.Code || p.Description == c.Description)
+                         && p.Id != c.Id  
             ).Count() > 0;
         }
 

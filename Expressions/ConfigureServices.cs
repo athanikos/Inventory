@@ -14,7 +14,9 @@ namespace Inventory.Expressions
             List<System.Reflection.Assembly>  mediatRAssemblies
             )
         {
-             services.AddEntityFrameworkNpgsql().AddDbContext<ExpressionsDbContext>(options =>
+
+            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+            services.AddEntityFrameworkNpgsql().AddDbContext<ExpressionsDbContext>(options =>
             options.UseNpgsql(configuration.
             GetConnectionString("Expressions")));
 

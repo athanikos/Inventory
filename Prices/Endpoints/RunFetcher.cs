@@ -30,8 +30,7 @@ namespace Inventory.Products.Endpoints
             HandleAsync(RunFetcherRequest req,
                         CancellationToken ct)
         {
-            _fetcher.DoScedhuledWork();
-            await Task.CompletedTask;
+            await _fetcher.DoScedhuledWork();
             return TypedResults.Ok();
         }
 

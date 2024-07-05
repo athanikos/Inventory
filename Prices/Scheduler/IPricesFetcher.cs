@@ -4,7 +4,7 @@ namespace Prices.Inventory.Prices
 {
     public interface IPricesFetcher
     {
-        void DoScedhuledWork();
+         Task DoScedhuledWork();
         Task DoScheduledWork(PricesParameter p);
         void ScedhuleJobs(IServiceProvider serviceProvider);
     }

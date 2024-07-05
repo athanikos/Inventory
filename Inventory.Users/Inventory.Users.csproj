@@ -25,8 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Hangfire.PostgreSql" Version="1.20.9" />
-    <PackageReference Include="Hangfire.PostgreSql.NetCore" Version="1.4.3" />
+    <PackageReference Include="Hangfire.MemoryStorage" Version="1.8.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.6" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.6" />

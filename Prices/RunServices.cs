@@ -11,7 +11,10 @@ namespace Inventory.Prices
             )
         {
             var serviceProvider = services.BuildServiceProvider();
-            var service = serviceProvider.GetRequiredService<IPricesFetcher>();
+            var service = serviceProvider.
+                GetRequiredService<IPricesFetcher>();
+            
+            
             service.ScedhuleJobs(serviceProvider);
         }
 

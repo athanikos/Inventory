@@ -10,7 +10,9 @@ namespace Inventory.Users
     {
         public static IServiceCollection AddServices(this IServiceCollection services, 
             IConfiguration configuration)
-        {          
+        {
+
+            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
             services.AddEntityFrameworkNpgsql().AddDbContext<UsersDbContext>(options =>  
             options.UseNpgsql(configuration.

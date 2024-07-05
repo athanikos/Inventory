@@ -13,14 +13,17 @@ namespace Inventory.Products
             List<System.Reflection.Assembly>
             mediatRAssemblies
             )
-        {          
-            services.AddEntityFrameworkNpgsql().AddDbContext<ProductsDbContext>(options =>  
-            options.UseNpgsql(configuration.
-            GetConnectionString("Products")));
+        {
 
-             services.AddScoped<IInventoryRepository, InventoryRepository>();
-         
+            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
+            services.AddEntityFrameworkNpgsql().
+                     AddDbContext<ProductsDbContext>(options =>  
+                                               options.UseNpgsql(configuration.
+                                               GetConnectionString("Products")));
+
+
+            services.AddScoped<IInventoryRepository, InventoryRepository>();
             mediatRAssemblies.Add(typeof(ConfigureServices).Assembly);
             return services;
         }
