@@ -1,5 +1,5 @@
-﻿using Inventory.Products.Dto;
-using Inventory.Products.Contracts.Dto;
+﻿using Inventory.Products.Contracts.Dto;
+using Inventory.Products.Dto;
 using Inventory.Products.Entities;
 using Serilog;
 
@@ -9,20 +9,21 @@ namespace Inventory.Products.Repositories
     {
         private readonly ProductsDbContext _context;
 
-     
-
         public InventoryRepository(ProductsDbContext context)
         { _context = context; }
 
-
         public bool CategoryFatherIdExists(Guid FatherId)
         {
-            return _context.Categories.Where(p => p.FatherId == FatherId).Count() > 0;
+            return _context.Categories
+                   .Where(p => p.FatherId == FatherId)
+                   .Count() > 0;
         }
 
+        /// <summary>
+        /// for testing 
+        /// </summary>
         public void EmptyDB()
         {
-         
             _context.Sources.RemoveRange(_context.Sources);
             _context.Inventories.RemoveRange(_context.Inventories);
             _context.Metrics.RemoveRange(_context.Metrics);
@@ -30,9 +31,7 @@ namespace Inventory.Products.Repositories
             _context.ProductCategories.RemoveRange(_context.ProductCategories);
             _context.ProductMetrics.RemoveRange(_context.ProductMetrics);
             _context.Products.RemoveRange(_context.Products);
-
             _context.SaveChanges();
-
         }
 
 
@@ -63,8 +62,9 @@ namespace Inventory.Products.Repositories
 
         public async Task DeleteInventoryAsync(InventoryDto c)
         {
-            List<Entities.Product> products = _context.Products.Where(p=>p.InventoryId == c.Id).ToList();
-            foreach (Entities.Product pc in products)
+            List<Product> products = _context.Products.Where(p=>p.InventoryId == c.Id).ToList();
+
+            foreach (Product pc in products)
                 _context.Remove(pc);
             Entities.Inventory e = _context.Inventories.Where(p => p.Id == c.Id).Single();
             _context.Remove(e);
@@ -79,9 +79,8 @@ namespace Inventory.Products.Repositories
 
             if (c.Metrics!= null)   
             foreach (var m in c.Metrics)
-            {
                 DecideNewOrEdit(m);
-            }
+            
 
             await _context.SaveChangesAsync();
             return new ProductDto(c.Id, c.Description,c.Code, c.InventoryId, c.Metrics);
@@ -89,14 +88,13 @@ namespace Inventory.Products.Repositories
 
         public async Task<ProductDto> EditProductAsync(ProductDto c)
         {
-            Entities.Product e = new Entities.Product()
+            Product e = new Product()
             { Description = c.Description, Id = c.Id, Code = c.Code, InventoryId = c.InventoryId };
             _context.Update(e);
 
             foreach (var m in c.Metrics)
-            {
                 DecideNewOrEdit(m);
-            }
+            
             await _context.SaveChangesAsync();
             return new ProductDto(c.Id, c.Description,c.Code, c.InventoryId, c.Metrics);
         }
@@ -112,30 +110,31 @@ namespace Inventory.Products.Repositories
                                    );
         }
 
-
-
         public List<string> GetDistinctProductCodes(Guid InventoryId)
         {
-            if (!_context.Products.Any()) return new List<string>();
+            if (!_context.Products.Any())
+                return new List<string>();
       
             return _context.Products
                  .Where(p=>p.InventoryId==InventoryId)
                  .Select(i => i.Code.Trim().ToUpper())
-                .GroupBy(p => p)
-                .Select(o => o.FirstOrDefault())
-                .Where(i=>!string.IsNullOrEmpty(i))
-                .ToList();
+                 .GroupBy(p => p)
+                 .Select(o => o.FirstOrDefault())
+                 .Where(i=>!string.IsNullOrEmpty(i))
+                 .ToList();
         }
 
         public List<string> GetDistinctMetricCodes()
         {
-            if (!_context.Metrics.Any()) return new List<string>();
+            if (!_context.Metrics.Any()) 
+                return new List<string>();
         
-            return _context.Metrics.Select(i => i.Code.Trim().ToUpper())
-                .GroupBy(p => p)
-                .Select(o => o.FirstOrDefault())
-                .Where(i => !string.IsNullOrEmpty(i))
-                .ToList();
+            return _context.Metrics
+                  .Select(i => i.Code.Trim().ToUpper())
+                  .GroupBy(p => p)
+                  .Select(o => o.FirstOrDefault())
+                  .Where(i => !string.IsNullOrEmpty(i))
+                  .ToList();
         }
 
         public async Task AddOrEditProductMetric(ProductMetricDto m)
@@ -169,9 +168,9 @@ namespace Inventory.Products.Repositories
                     p => p.MetricId == m.MetricId
                          && p.ProductId == m.ProductId
                          && p.EffectiveDate == m.EffectiveDate
-                ).ToList().Count() > 0;
+                ).ToList().Count() > 0; // needed tolist ? https://stackoverflow.com/questions/61052687/a-command-is-already-in-progress
 
-            if (exists) // tolist https://stackoverflow.com/questions/61052687/a-command-is-already-in-progress
+            if (exists) 
             {
                 ProductMetric pm = new();
                 pm.ProductId = m.ProductId;
@@ -191,7 +190,7 @@ namespace Inventory.Products.Repositories
 
         private static ProductMetric CreateProductMetric(ProductMetricDto m)
         {
-            return new Entities.ProductMetric()
+            return new ProductMetric()
             {
                 MetricId = m.MetricId,
                 EffectiveDate = m.EffectiveDate,
@@ -200,12 +199,8 @@ namespace Inventory.Products.Repositories
                 Currency = m.Currency,
                 ProductCode = m.ProductCode,
                 MetricCode = m.MetricCode
-               
             };
         }
-
-
-
 
         public async Task AddOrEditInventoryMetric(InventoryMetricDto m)
         {
@@ -232,12 +227,13 @@ namespace Inventory.Products.Repositories
 
         public void DecideNewOrEdit(InventoryMetricDto m)
         {
-            if (_context.InventoryMetrics.Where
-                (
-                    p => p.MetricId == m.MetricId
-                         && p.InventoryId == m.InventoryId
-                         && p.EffectiveDate == m.EffectiveDate
-                ).Count() > 0)
+            var metricExists = _context.InventoryMetrics
+                               .Where(  p => p.MetricId == m.MetricId
+                                     && p.InventoryId == m.InventoryId
+                                     && p.EffectiveDate == m.EffectiveDate)
+                               .Any();
+
+            if (metricExists)
                 _context.Update(m);
             else
                 _context.InventoryMetrics.Add(CreateInventoryMetric(m));
@@ -245,7 +241,7 @@ namespace Inventory.Products.Repositories
 
         private static InventoryMetric CreateInventoryMetric(InventoryMetricDto m)
         {
-            return new Entities.InventoryMetric()
+            return new InventoryMetric()
             {
                 MetricId = m.MetricId,
                 EffectiveDate = m.EffectiveDate,
@@ -254,16 +250,15 @@ namespace Inventory.Products.Repositories
                 Currency = m.Currency,
                 InventoryCode = m.InventoryCode,
                 MetricCode = m.MetricCode
-
             };
         }
 
         public async Task DeleteProductAsync(ProductDto c)
         {
-            List<Entities.ProductCategory> pcs = _context.ProductCategories
+            List<ProductCategory> pcs = _context.ProductCategories
             .Where(p => p.ProductId == c.Id).ToList();
             
-            foreach (Entities.ProductCategory pc in pcs)
+            foreach (ProductCategory pc in pcs)
                 _context.Remove(pc);
 
             List<ProductMetric> pms = _context.ProductMetrics.
@@ -272,21 +267,20 @@ namespace Inventory.Products.Repositories
             foreach (ProductMetric pm in pms)
                 _context.Remove(pm);
 
-            Product e = _context.Products.
+            var p = _context.Products.
                          Where(p => p.Id == c.Id).
                          Single();
-
-            _context.Remove(e);
+            _context.Remove(p);
 
             await _context.SaveChangesAsync();
         }
 
         public  bool ProductDescriptionOrCategoryIsUsed(ProductDto c)
         {
-            return  _context.Products.Where
-            (       p => (p.Code == c.Code || p.Description == c.Description)
-                         && p.Id != c.Id  
-            ).Count() > 0;
+            return  _context.Products
+                    .Where(  p => (p.Code == c.Code || p.Description == c.Description)
+                                && p.Id != c.Id  )
+                    .Count() > 0;
         }
 
 
@@ -313,10 +307,16 @@ namespace Inventory.Products.Repositories
 
         public async Task DeleteCategoryAsync(CategoryDto c)
         {
-            List<Entities.ProductCategory> pcs = _context.ProductCategories.Where(p => p.CategoryId == c.Id).ToList();
-            foreach (Entities.ProductCategory pc in pcs)
+            List<ProductCategory> pcs = _context.ProductCategories
+                                 .Where(p => p.CategoryId == c.Id)
+                                 .ToList();
+           
+            foreach (ProductCategory pc in pcs)
                 _context.Remove(pc);
-            Entities.Category e = _context.Categories.Where(p => p.Id == c.Id).Single();
+            
+            var e = _context.Categories
+                                 .Where(p => p.Id == c.Id)
+                                 .Single();
             _context.Remove(e);
 
             await _context.SaveChangesAsync();
@@ -325,7 +325,7 @@ namespace Inventory.Products.Repositories
 
         public async Task<MetricDto> AddMetricAsync(MetricDto c)
         {
-            _context.Metrics.Add(new Entities.Metric()
+            _context.Metrics.Add(new Metric()
             {
                 Code = c.Code,
                 Id = c.Id,
@@ -338,7 +338,7 @@ namespace Inventory.Products.Repositories
 
         public async Task<MetricDto> EditMetricAsync(MetricDto c)
         {
-            Entities.Metric e = new Entities.Metric()
+            Metric e = new Metric()
             {
                 Code = c.Code,
                 Id = c.Id,
@@ -353,20 +353,28 @@ namespace Inventory.Products.Repositories
 
         public async Task DeleteMetricAsync(MetricDto c)
         {
-            List<Entities.ProductMetric> pcs = _context.ProductMetrics.Where(p => p.MetricId == c.Id).ToList();
-            foreach (Entities.ProductMetric pc in pcs)
+            List<ProductMetric> pcs = _context.ProductMetrics
+                                      .Where(p => p.MetricId == c.Id)
+                                      .ToList();
+            
+            foreach (ProductMetric pc in pcs)
                 _context.Remove(pc);
-            Entities.Metric e = _context.Metrics.Where(p => p.Id == c.Id).Single();
-            _context.Remove(e);
 
+            Metric e = _context.Metrics
+                       .Where(p => p.Id == c.Id)
+                       .Single();
+            
+            _context.Remove(e);
             await _context.SaveChangesAsync();
         }
 
 
         public MetricDto GetMetric(Guid metricId)
         {
-            var entity = _context.Metrics.Where(p =>
-                                 p.Id == metricId).Select(i => i).Single();
+            var entity = _context.Metrics
+                         .Where(p =>  p.Id == metricId)
+                         .Select(i => i)
+                         .Single();
 
             return new MetricDto(entity.Id, entity.Description, entity.Code, entity.SourceId);
         }
@@ -374,23 +382,24 @@ namespace Inventory.Products.Repositories
 
         public ProductMetricDto GetProductMetric(Guid productId, Guid metricId)
         {
-            var entity = _context.ProductMetrics.Where(p =>
-                                p.ProductId == productId && p.MetricId == metricId
-
-            ).Select(i => i).Single();
+            var entity = _context.ProductMetrics
+                         .Where(p => p.ProductId == productId && p.MetricId == metricId)
+                         .Select(i => i)
+                         .Single();
 
             return new ProductMetricDto(entity.ProductId,
-                                            entity.MetricId,
-                                             entity.Value,
-                                            entity.EffectiveDate,
-                                            entity.Currency ,
-                                            entity.ProductCode,
-                                            entity.MetricCode);
+                                        entity.MetricId,
+                                        entity.Value,
+                                        entity.EffectiveDate,
+                                        entity.Currency ,
+                                        entity.ProductCode,
+                                        entity.MetricCode);
         }
 
         public async  Task<SourceDto> AddSourceAsync(SourceDto dto )
         {
-            Entities.Source e = new Entities.Source() { Id = dto.Id, Description = dto.Description  };
+            Entities.Source e = new Entities.Source() 
+                                { Id = dto.Id, Description = dto.Description  };
             _context.Sources.Add(e);
             await _context.SaveChangesAsync();
             return new SourceDto(dto.Id, dto.Description);
@@ -405,25 +414,21 @@ namespace Inventory.Products.Repositories
         /// <returns></returns>
         public  ProductMetricDto GetProductMetric(string ProductCode, string MetricCode)
         {
-          
                 ProductCode = ProductCode.ToUpper().Trim();
                 MetricCode = MetricCode.ToUpper().Trim();
 
-
-                
-
-                return _context.ProductMetrics.
-                Where(i => i.ProductCode == ProductCode 
-                && i.MetricCode == MetricCode
-                ).
-                OrderByDescending(i => i.EffectiveDate).
-                Select(i => new ProductMetricDto(i.ProductId,
-                                            i.MetricId,
-                                            i.Value,
-                                            i.EffectiveDate,
-                                            i.Currency,
-                                            i.ProductCode,
-                                            i.MetricCode)).First();
+                return _context
+                       .ProductMetrics
+                       .Where(i => i.ProductCode == ProductCode  && i.MetricCode == MetricCode)
+                       .OrderByDescending(i => i.EffectiveDate)
+                       .Select(i => new ProductMetricDto(i.ProductId,
+                                                         i.MetricId,
+                                                         i.Value,
+                                                         i.EffectiveDate,
+                                                         i.Currency,
+                                                         i.ProductCode,
+                                                         i.MetricCode))
+                       .First();
 
          
 
