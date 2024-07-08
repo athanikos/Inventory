@@ -139,7 +139,7 @@ namespace Inventory.Products.Repositories
 
         public async Task AddOrEditProductMetric(ProductMetricDto m)
         {
-                Log.Information("AddOrEditProductMetric:" + m.ToString());
+                // Log.Information("AddOrEditProductMetric:" + m.ToString());
                 UpdateProductMetricCodes(m);
                 DecideNewOrEdit(m);
                 await _context.SaveChangesAsync();

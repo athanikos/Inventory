@@ -34,10 +34,10 @@ namespace Inventory.Products.Handlers
 
             try
             {
-                Log.Information(" _repository.AddOrEditProductMetric(dto); ");
-                Log.Information(" 2 _repository.AddOrEditProductMetric(dto); ");
+                // Log.Information(" _repository.AddOrEditProductMetric(dto); ");
+                // Log.Information(" 2 _repository.AddOrEditProductMetric(dto); ");
                 await _repository.AddOrEditProductMetric(dto);
-                Log.Information(" after _repository.AddOrEditProductMetric(dto); ");
+                // Log.Information(" after _repository.AddOrEditProductMetric(dto); ");
 
 
             }

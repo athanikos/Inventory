@@ -17,10 +17,10 @@ namespace Inventory.Products
 
             AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
-            services.AddEntityFrameworkNpgsql().
+            services.
                      AddDbContext<ProductsDbContext>(options =>  
-                                               options.UseNpgsql(configuration.
-                                               GetConnectionString("Products")));
+                                               options.UseNpgsql(configuration
+                                               .GetValue<String>("Products")));
 
 
             services.AddScoped<IInventoryRepository, InventoryRepository>();

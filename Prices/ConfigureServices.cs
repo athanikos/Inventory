@@ -23,9 +23,9 @@ namespace Inventory.Prices
 
             AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
-            services.AddEntityFrameworkNpgsql().AddDbContext<PricesDbContext>(options =>
-            options.UseNpgsql(configuration.
-            GetConnectionString("Prices")));
+            services.AddDbContext<PricesDbContext>(options =>
+            options.UseNpgsql(configuration
+            .GetValue<String>("Prices")));
 
         
             services.AddHangfire(c=>c.UseMemoryStorage());
@@ -39,10 +39,10 @@ namespace Inventory.Prices
 
            
 
-             Log.Logger  = new LoggerConfiguration()
-            .MinimumLevel.Debug()
-            .WriteTo.File("logs/Net6Tester.txt", rollingInterval: RollingInterval.Day)
-            .CreateLogger();
+            // Log.Logger  = new LoggerConfiguration()
+            //.MinimumLevel.Debug()
+            //.WriteTo.File("logs/Net6Tester.txt", rollingInterval: RollingInterval.Day)
+            //.CreateLogger();
 
             services.AddScoped<IPricesFetcher, PricesFetcher>(
             sp =>

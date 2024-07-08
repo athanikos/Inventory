@@ -78,7 +78,7 @@ namespace Expressions
             try
             {
 
-                Log.Information("NCalc.Evaluate:" + resultedExpression);
+                // Log.Information("NCalc.Evaluate:" + resultedExpression);
                 var value = new NCalc.Expression(resultedExpression).Evaluate().ToString();
                 return EvaluatorResult.NewEvaluatorResult(value.ToString());
 
@@ -396,14 +396,14 @@ namespace Expressions
             if (_type == expressionType.inventoryBased)
             {
 
-                Log.Information("AddInventoryMetricCommand");
+                // Log.Information("AddInventoryMetricCommand");
 
                 var command = new AddInventoryMetricCommand(p.TargetInventoryId,
                                                     p.TargetMetricId,
                                                    decimal.Parse(result.Result),
                                                     DateTime.Now, "EUR"); //todo get from product 
 
-                Log.Information("_mediator.Send(command)");
+                // Log.Information("_mediator.Send(command)");
 
                 await _mediator.Send(command);
 
@@ -424,7 +424,7 @@ namespace Expressions
 
             if (_type == expressionType.productBased)
             {
-                Log.Information("AddProductMetricCommand");
+                // Log.Information("AddProductMetricCommand");
                 var command = new AddProductMetricCommand(p.TargetProductId,
                                                           p.TargetMetricId,
                                                           decimal.Parse(result.Result),
@@ -437,7 +437,7 @@ namespace Expressions
         public async Task DoScheduledWorkAsync(Entities.BooleanExpression p)
         {
 
-            Log.Information("DoScheduledWorkAsync with BooleanExpression");
+            // Log.Information("DoScheduledWorkAsync with BooleanExpression");
             var result = await Execute(p.InventoryId, p.Expression);
 
             if (_type == expressionType.undefined)
@@ -448,13 +448,13 @@ namespace Expressions
 
             if (_type == expressionType.productBased)
             {
-                Log.Information("UpdateNotificationExpressionValueCommand");
+                // Log.Information("UpdateNotificationExpressionValueCommand");
                 var command = new UpdateNotificationExpressionValueCommand()
                 {
                     ExpressionValue = bool.Parse(result.Result),
                     BooleanExpressionId = p.Id
                 };
-                Log.Information(" _mediator.Send(command);");
+                // Log.Information(" _mediator.Send(command);");
 
                 await _mediator.Send(command);
             }

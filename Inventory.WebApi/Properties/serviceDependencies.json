@@ -1,0 +1,12 @@
+{
+  "dependencies": {
+    "mssql5": {
+      "ignored": "true",
+      "type": "mssql",
+      "connectionId": "ConnectionStrings:Prices"
+    },
+    "apis1": {
+      "type": "apis"
+    }
+  }
+}

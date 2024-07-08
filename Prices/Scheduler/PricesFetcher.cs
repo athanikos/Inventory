@@ -54,7 +54,7 @@ namespace Prices
 
                 try
                 {
-                    Log.Information("DoScheduledWork " + p.Id.ToString());
+                    // Log.Information("DoScheduledWork " + p.Id.ToString());
 
                     var options = new RestClientOptions(p.TargetURL + p.TargetProductCode);
                     var client = new RestClient(options);
@@ -64,7 +64,7 @@ namespace Prices
                     request.AddHeader("x-cg-demo-api-key", p.TargetKey);
 
 
-                    Log.Information(" client.Get(request) ");
+                    // Log.Information(" client.Get(request) ");
 
 
 
@@ -77,13 +77,13 @@ namespace Prices
                     var command = new AddProductMetricCommand(p.ProductId, p.MetricId,
                         value, DateTime.Now, p.TargetCurrency);
 
-                    Log.Information("AddProductMetricCommand  _mediator.Send " + p.ProductId + " " + p.MetricId);
+                    // Log.Information("AddProductMetricCommand  _mediator.Send " + p.ProductId + " " + p.MetricId);
 
 
 
                    await  _mediator.Send(command);
                     
-                    Log.Information("After mediator.send ");
+                    // Log.Information("After mediator.send ");
 
 
                 }

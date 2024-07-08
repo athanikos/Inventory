@@ -17,9 +17,9 @@ namespace Inventory.Transactions
 
             AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
-            services.AddEntityFrameworkNpgsql().AddDbContext<TransactionsDbContext>(options =>
-            options.UseNpgsql(configuration.
-            GetConnectionString("Transactions")));
+            services.AddDbContext<TransactionsDbContext>(options =>
+            options.UseNpgsql(configuration
+            .GetValue<String>("Transactions")));
 
             services.AddScoped<ITransactionRepository, TransactionRepository>();
        

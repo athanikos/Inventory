@@ -16,9 +16,9 @@ namespace Inventory.Notifications
             AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 
-            services.AddEntityFrameworkNpgsql().AddDbContext<NotifierDbContext>(options =>
-            options.UseNpgsql(configuration.
-            GetConnectionString("Notifications")));
+            services.AddDbContext<NotifierDbContext>(options =>
+            options.UseNpgsql(configuration
+            .GetValue<String>("Notifications")));
 
 
             
