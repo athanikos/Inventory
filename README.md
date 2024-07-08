@@ -65,32 +65,32 @@ ClaimType = CLIENTINVENTORY claimValue = <InventoryId>
    
 
 ## migrations (postgres sql )
-
-cd C:\projects\Inventory\Inventory\Inventory.WebApi
-
-
-dotnet ef migrations add PG -c  UsersDbContext -p C:\projects\Inventory\Inventory\Inventory.Users\Inventory.Users.csproj -s C:\projects\Inventory\Inventory\Inventory.WebApi\Inventory.WebApi.csproj -o Data/Migrations
-dotnet ef database update PG -c  UsersDbContext -p C:\projects\Inventory\Inventory\Inventory.Users\Inventory.Users.csproj 
-
-dotnet ef migrations add PG -c  ProductsDbContext -p C:\projects\Inventory\Inventory\Inventory.Products\Inventory.Products.csproj -s C:\projects\Inventory\Inventory\Inventory.WebApi\Inventory.WebApi.csproj -o Data/Migrations
-dotnet ef database update PG  -c  ProductsDbContext -p C:\projects\Inventory\Inventory\Inventory.Products\Inventory.Products.csproj 
-
-
-
-dotnet ef migrations add PG  -c  PricesDbContext -p C:\projects\Inventory\Inventory\Prices\Inventory.Prices.csproj -s     C:\projects\Inventory\Inventory\Inventory.WebApi\Inventory.WebApi.csproj -o Data/Migrations
-
-dotnet ef database update  pPricesv3 -c PricesDbContext
-
-
-dotnet ef migrations add PG -c  ExpressionsDbContext -p C:\projects\Inventory\Inventory\Expressions\Inventory.Expressions.csproj -s C:\projects\Inventory\Inventory\Inventory.WebApi\Inventory.WebApi.csproj -o Data/Migrations
-
-
-dotnet ef database update   PG -c ExpressionsDbContext
-
-
-dotnet ef migrations add PG  -c NotifierDbContext -p C:\projects\Inventory\Inventory\Inventory.Notifier\Inventory.Notifications.csproj -s  C:\projects\Inventory\Inventory\Inventory.WebApi\Inventory.WebApi.csproj -o Data/Migrations
-
-dotnet ef database update   PG -c NotifierDbContext
+    
+    cd C:\projects\Inventory\Inventory\Inventory.WebApi
+    
+    
+    dotnet ef migrations add PG -c  UsersDbContext -p C:\projects\Inventory\Inventory\Inventory.Users\Inventory.Users.csproj -s C:\projects\Inventory\Inventory\Inventory.WebApi\Inventory.WebApi.csproj -o Data/Migrations
+    dotnet ef database update PG -c  UsersDbContext -p C:\projects\Inventory\Inventory\Inventory.Users\Inventory.Users.csproj 
+    
+    dotnet ef migrations add PG -c  ProductsDbContext -p C:\projects\Inventory\Inventory\Inventory.Products\Inventory.Products.csproj -s C:\projects\Inventory\Inventory\Inventory.WebApi\Inventory.WebApi.csproj -o Data/Migrations
+    dotnet ef database update PG  -c  ProductsDbContext -p C:\projects\Inventory\Inventory\Inventory.Products\Inventory.Products.csproj 
+    
+    
+    
+    dotnet ef migrations add PG  -c  PricesDbContext -p C:\projects\Inventory\Inventory\Prices\Inventory.Prices.csproj -s     C:\projects\Inventory\Inventory\Inventory.WebApi\Inventory.WebApi.csproj -o Data/Migrations
+    
+    dotnet ef database update  pPricesv3 -c PricesDbContext
+    
+    
+    dotnet ef migrations add PG -c  ExpressionsDbContext -p C:\projects\Inventory\Inventory\Expressions\Inventory.Expressions.csproj -s C:\projects\Inventory\Inventory\Inventory.WebApi\Inventory.WebApi.csproj -o Data/Migrations
+    
+    
+    dotnet ef database update   PG -c ExpressionsDbContext
+    
+    
+    dotnet ef migrations add PG  -c NotifierDbContext -p C:\projects\Inventory\Inventory\Inventory.Notifier\Inventory.Notifications.csproj -s  C:\projects\Inventory\Inventory\Inventory.WebApi\Inventory.WebApi.csproj -o Data/Migrations
+    
+    dotnet ef database update   PG -c NotifierDbContext
 
         
 ### Metrics 
