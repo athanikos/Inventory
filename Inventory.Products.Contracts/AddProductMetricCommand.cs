@@ -4,8 +4,8 @@ using MediatR;
 
 namespace Inventory.Products.Contracts
 {
-    public  class
-        AddProductMetricCommand : IRequest<ProductMetricDto>
+    public  class  AddProductMetricCommand 
+        : IRequest<ProductMetricDto>
     {
         public Guid ProductId { get; set; }
 
@@ -17,8 +17,8 @@ namespace Inventory.Products.Contracts
 
         public string Currency { get; set; } = string.Empty;
 
-
-        public AddProductMetricCommand(Guid ProductId, Guid MetricId, decimal Value, DateTime EffectiveDate, string Curtrency)
+        public AddProductMetricCommand(Guid ProductId, Guid MetricId, decimal Value,
+                                       DateTime EffectiveDate, string Curtrency)
         {
             this.ProductId = ProductId;
             this.MetricId = MetricId;
