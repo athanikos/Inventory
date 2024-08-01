@@ -22,6 +22,7 @@ namespace Inventory.Products.Endpoints
         public override void Configure()
         {
             Post("/inventory");
+            AllowAnonymous();
             // to do claims this is per InventoryId claim
             //  something like Admin_<inventoryId>
         }

@@ -1,5 +1,8 @@
 ﻿
 
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.Identity.Web.Resource;
+
 namespace Category.Products.Endpoints
 {
     using FastEndpoints;
@@ -11,6 +14,8 @@ namespace Category.Products.Endpoints
     using Inventory.Products.Dto;
     using System;
     using Inventory.Products.Repositories;
+
+    [RequiredScope("products.read")]
 
     public class AddCategory :
         Endpoint<AddCategoryRequest>
@@ -26,6 +31,7 @@ namespace Category.Products.Endpoints
 
         public override void Configure()
         {
+            
             Post("/Category");
             // to do claims this is per CategoryId claim
             //  something like Admin_<CategoryId>
