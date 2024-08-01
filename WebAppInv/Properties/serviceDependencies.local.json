@@ -1,8 +1,0 @@
-{
-  "dependencies": {
-    "identityapp1": {
-      "connectionInfo": "App registration: Invnetory, Tenant: Invnetory (inventoryorg.onmicrosoft.com - AAD B2C)",
-      "type": "identityapp.default"
-    }
-  }
-}
