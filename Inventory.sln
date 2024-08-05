@@ -50,8 +50,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Transactions", "Transaction
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Inventory.Transactions", "Inventory.Transactions\Inventory.Transactions.csproj", "{9414B37A-4D36-48D3-B5DA-3EE14DE1CA08}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Invnetory.Web", "WebAppInv\Invnetory.Web.csproj", "{56EA64B6-096A-4C73-ADA1-F9E3EE5CE45C}"
-EndProject
+
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
