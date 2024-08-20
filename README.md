@@ -1,5 +1,8 @@
 # Inventory
 
+a generix inventory implementation with dynamic metrics and dynamic invoice fields. supports buy / sell / loan .
+
+use cases may b
 
 ### Products module 
 Manage products. Manage Categories and metrics. Products Categories are just labels. Categories support tree like structure where its node keeps track of its father. Each product may have any kind of  metric via the product metric table.  
