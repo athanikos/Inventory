@@ -125,5 +125,37 @@ ClaimType = CLIENTINVENTORY claimValue = <InventoryId>
 
 #### Betting portofolio support 
 
+### Rooms to let 
+
+eaxh room is a product 
+a price per day can be done via prosuct metric 
+a let action can happen via transaction 
+let is similar to sell having an end date inclusive - need to check schema 
+let subtracts from quantity - can i do unlet with some effective date ?
+
+### Transactions 
+
+#### actions 
+buy adds to quantity 
+sell subtracts from quantity
+let subtracts from quantity
+unlet adds to quantity 
+
+let and unlet come in pairs 
+
+#### invoice items 
+
+dynamic fields 
+for rooms it has line items :
+
+
+quantity - entered and validated (days)
+price per day - computed by product metrics 
+discount value - enterwd 
+datefrom inclusive 
+dateto inclusive 
+
+
+
 
     
