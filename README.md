@@ -8,7 +8,7 @@ inventory with products bought keeping track of values in rime
 
 cryptos / stocks 
 
-rooms for rent 
+rooms to let 
 
 ### Products module 
 Manage products. Manage Categories and metrics. Products Categories are just labels. Categories support tree like structure where its node keeps track of its father. Each product may have any kind of  metric via the product metric table.  
