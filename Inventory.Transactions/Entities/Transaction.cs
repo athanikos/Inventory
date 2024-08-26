@@ -9,7 +9,7 @@
 
             public DateTime Created { get; set; }   
 
-            public ICollection<TransactionItem> TransactionItems  { get; set; } = new List<TransactionItem>();
+            public ICollection<Value> Values  { get; set; } = new List<Value>();
                
         }
 }

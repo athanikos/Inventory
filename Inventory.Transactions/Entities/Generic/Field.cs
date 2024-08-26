@@ -6,9 +6,12 @@
     /// configuration item
     /// describes the field for an transaction template
     /// </summary>
-    public  class TransactionItemTemplateField
+    public  class Field
     {
+
         public  Guid Id { get; set; }
+
+        public Guid TemplateId { get; set; }
         /// <summary>
         /// total price 
         /// </summary>
@@ -18,12 +21,9 @@
         /// </summary>
         public string Expression { get; set; } = string.Empty;
 
-        public TemplateFieldType Type { get; set; }
+        public FieldType Type { get; set; }
 
-        public ICollection<TransactionItemFieldValue> FieldValues { get; set; } = new List<TransactionItemFieldValue>();
-
-
-
+        public ICollection<Value> FieldValues { get; set; } = new List<Value>();
 
         //todo: do i need this here? since it is visual ? some other 
         // entity?

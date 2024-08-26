@@ -1,7 +1,6 @@
 ﻿using Inventory.Products.Contracts.Dto;
 using Inventory.Products.Dto;
 using Inventory.Products.Entities;
-using Serilog;
 
 namespace Inventory.Products.Repositories
 {

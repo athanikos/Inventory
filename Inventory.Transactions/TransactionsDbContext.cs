@@ -3,18 +3,15 @@ namespace Inventory.Transactions;
 
 public class TransactionsDbContext : DbContext
 {
-
     public TransactionsDbContext(DbContextOptions
         <TransactionsDbContext> options) :
-        base(options)
-    { }
+        base(options) { }
 
     public DbSet<Entities.Transaction> Transactions { get; set; }
-    public DbSet<Entities.TransactionItem> TransactionItems { get; set; }
-    public DbSet<Entities.TransactionItemTemplate> Templates { get; set; }
-    public DbSet<Entities.TransactionItemFieldValue> Values { get; set; }
-
-
+    public DbSet<Entities.Entity> Entities  { get; set; }
+    public DbSet<Entities.Template> Templates { get; set; }
+    public DbSet<Entities.Field> Fields { get; set; }
+    public DbSet<Entities.Value> Values { get; set; }
 
     protected override void OnModelCreating
         (ModelBuilder modelBuilder)
@@ -22,25 +19,24 @@ public class TransactionsDbContext : DbContext
         base.OnModelCreating(modelBuilder);
         modelBuilder.HasDefaultSchema("Transactions");
 
-        modelBuilder.Entity<Entities.TransactionItemTemplate>().ToTable("TransactionItemTemplate");
+        modelBuilder.Entity<Entities.Transaction>().ToTable("Transaction");
+        modelBuilder.Entity<Entities.Entity>().ToTable("Entity");
+        modelBuilder.Entity<Entities.Template>().ToTable("Template");
+        modelBuilder.Entity<Entities.Field>().ToTable("Field");
+        modelBuilder.Entity<Entities.Value>().ToTable("Value");
 
-        modelBuilder.Entity<Entities.TransactionItemTemplate>()
-        .HasMany(e => e.TemplateFields);
+        modelBuilder.Entity<Entities.Template>()
+        .HasMany(e => e.Fields);
 
+        modelBuilder.Entity<Entities.Template>().HasKey(e => e.Id);  
 
-        modelBuilder.Entity<Entities.TransactionItemTemplate>().HasKey(e => e.Id);  
-
-        modelBuilder.Entity<Entities.TransactionItemTemplateField>()
+        modelBuilder.Entity<Entities.Field>()
                                                .HasMany(e => e.FieldValues)
                                                .WithOne(e => e.Field);
 
-        modelBuilder.Entity<Entities.TransactionItemTemplateField>().HasKey(e => e.Id);
+        modelBuilder.Entity<Entities.Field>().HasKey(e => e.Id);
 
-
-        modelBuilder.Entity < Entities.TransactionItemFieldValue>().HasKey(e => e.Id);
-
-
-
+        modelBuilder.Entity < Entities.Value>().HasKey(e => e.Id);
     }
 
     protected override void ConfigureConventions(
@@ -49,8 +45,5 @@ public class TransactionsDbContext : DbContext
         configurationBuilder.Properties<decimal>()
           .HavePrecision(18, 6);
     }
-
-
-
 }
 
