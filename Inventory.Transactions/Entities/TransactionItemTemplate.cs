@@ -1,7 +1,9 @@
 ﻿namespace Inventory.Transactions.Entities
 {
     /// <summary>
-    /// configuration holder 
+    /// configuration holder for transacationItems depedning on 
+    /// the type of transaction 
+    /// examples can be Let, Retail , Cryptos 
     /// </summary>
     public  class TransactionItemTemplate
     {
@@ -9,6 +11,8 @@
 
         public string Name { get; set; }    = string.Empty;
 
-        public List<TransactionItemTemplateField> Fields { get; set; } = new();
+        public List<TransactionItemTemplateField> TemplateFields { get; set; } = new();
     }
+
+
 }

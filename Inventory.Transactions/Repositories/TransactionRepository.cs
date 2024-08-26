@@ -42,126 +42,130 @@ namespace Inventory.Transactions.Repositories
 
         public async Task<TransactionItemDto> AddTransactionItemAsync(TransactionItemDto ti)
         {
-            Entities.TransactionItem trans =
-          new Entities.TransactionItem()
-          {
-              //Description = ti.Description
-             // ,
-              Id = ti.Id
-              ,
-              TransactionId = ti.TransactionId
-              ,
-              //TransactionType = ti.TransactionType
-              //,
-              //UnitPrice = ti.UnitPrice
-              //,
-              //Quantity = ti.Quantity
-              //,
-              //Price = ti.Price
-              //,
-              //VatPercentage = ti.VatPercentage
-              //,
-              //PriceAfterVat = ti.PriceAfterVat
-              //,
-              //Discount = ti.Discount
-              //,
-              //DiscountAmount = ti.DiscountAmount
-              //,
-              //TransactionFees = ti.TransactionFees
-              //,
-              //DeliveryFees = ti.DeliveryFees
-              //,
-              //FinalPrice = ti.FinalPrice
-          };
+            throw new NotImplementedException();
+          //  Entities.TransactionItem trans =
+          //new Entities.TransactionItem()
+          //{
+          //    //Description = ti.Description
+          //   // ,
+          //    Id = ti.Id
+          //    ,
+          //    TransactionId = ti.TransactionId
+          //    ,
+          //    //TransactionType = ti.TransactionType
+          //    //,
+          //    //UnitPrice = ti.UnitPrice
+          //    //,
+          //    //Quantity = ti.Quantity
+          //    //,
+          //    //Price = ti.Price
+          //    //,
+          //    //VatPercentage = ti.VatPercentage
+          //    //,
+          //    //PriceAfterVat = ti.PriceAfterVat
+          //    //,
+          //    //Discount = ti.Discount
+          //    //,
+          //    //DiscountAmount = ti.DiscountAmount
+          //    //,
+          //    //TransactionFees = ti.TransactionFees
+          //    //,
+          //    //DeliveryFees = ti.DeliveryFees
+          //    //,
+          //    //FinalPrice = ti.FinalPrice
+          //};
 
-            _context.TransactionItems.Add(trans);
+            //_context.TransactionItems.Add(trans);
             await _context.SaveChangesAsync();
 
-            return new TransactionItemDto(
-                       trans.TransactionId,
-                       trans.Id
-                       //trans.Description,
-                       //trans.TransactionType,
-                       //trans.UnitPrice,
-                       //trans.Quantity,
-                       //trans.Price,
-                       //trans.VatPercentage,
-                       //trans.PriceAfterVat,
-                       //trans.Discount,
-                       //trans.DiscountAmount,
-                       //trans.TransactionFees,
-                       //trans.DeliveryFees,
-                       //trans.FinalPrice
-                       );
+            //return new TransactionItemDto(
+            //           trans.TransactionId,
+            //           trans.Id
+            //           //trans.Description,
+            //           //trans.TransactionType,
+            //           //trans.UnitPrice,
+            //           //trans.Quantity,
+            //           //trans.Price,
+            //           //trans.VatPercentage,
+            //           //trans.PriceAfterVat,
+            //           //trans.Discount,
+            //           //trans.DiscountAmount,
+            //           //trans.TransactionFees,
+            //           //trans.DeliveryFees,
+            //           //trans.FinalPrice
+            //           );
         }
 
 
         public async Task<TransactionItemDto> 
             EditTransactionItemAsync(TransactionItemDto ti)
         {
-         Entities.TransactionItem trns =
-         new Entities.TransactionItem()
-         {
-             //Description = ti.Description
-             //,
-             Id = ti.Id
-             ,
-             TransactionId = ti.TransactionId
+
+            throw new NotImplementedException();
+         //Entities.TransactionItem trns =
+         //new Entities.TransactionItem()
+         //{
+         //    //Description = ti.Description
+         //    //,
+         //    Id = ti.Id
+         //    ,
+         //    TransactionId = ti.TransactionId
              
-             //TransactionType = ti.TransactionType
-             //,
-             //UnitPrice = ti.UnitPrice
-             //,
-             //Quantity = ti.Quantity
-             //,
-             //Price = ti.Price
-             //,
-             //VatPercentage = ti.VatPercentage
-             //,
-             //PriceAfterVat = ti.PriceAfterVat
-             //,
-             //Discount = ti.Discount
-             //,
-             //DiscountAmount = ti.DiscountAmount
-             //,
-             //TransactionFees = ti.TransactionFees
-             //,
-             //DeliveryFees = ti.DeliveryFees
-             //,
-             //FinalPrice = ti.FinalPrice
-         };
+         //    //TransactionType = ti.TransactionType
+         //    //,
+         //    //UnitPrice = ti.UnitPrice
+         //    //,
+         //    //Quantity = ti.Quantity
+         //    //,
+         //    //Price = ti.Price
+         //    //,
+         //    //VatPercentage = ti.VatPercentage
+         //    //,
+         //    //PriceAfterVat = ti.PriceAfterVat
+         //    //,
+         //    //Discount = ti.Discount
+         //    //,
+         //    //DiscountAmount = ti.DiscountAmount
+         //    //,
+         //    //TransactionFees = ti.TransactionFees
+         //    //,
+         //    //DeliveryFees = ti.DeliveryFees
+         //    //,
+         //    //FinalPrice = ti.FinalPrice
+         //};
 
-         _context.TransactionItems.Add(trns);
-         await _context.SaveChangesAsync();
+         //_context.TransactionItems.Add(trns);
+         //await _context.SaveChangesAsync();
 
-            return new TransactionItemDto(
-                       trns.TransactionId,
-                       trns.Id
-                       //trns.Description,
-                       //trns.TransactionType,
-                       //trns.UnitPrice,
-                       //trns.Quantity,
-                       //trns.Price,
+         //   return new TransactionItemDto(
+         //              trns.TransactionId,
+         //              trns.Id
+         //              //trns.Description,
+         //              //trns.TransactionType,
+         //              //trns.UnitPrice,
+         //              //trns.Quantity,
+         //              //trns.Price,
          
-                       //trns.VatPercentage,
-                       //trns.PriceAfterVat,
-                       //trns.Discount,
-                       //trns.DiscountAmount,
-                       //trns.TransactionFees,
-                       //trns.DeliveryFees,
-                       //trns.FinalPrice
-                       );
+         //              //trns.VatPercentage,
+         //              //trns.PriceAfterVat,
+         //              //trns.Discount,
+         //              //trns.DiscountAmount,
+         //              //trns.TransactionFees,
+         //              //trns.DeliveryFees,
+         //              //trns.FinalPrice
+         //              );
         }
 
         public async Task DeleteTransactionItemAsync(TransactionItemDto ti)
         {
-            var itemToRemove = _context.TransactionItems.
-                SingleOrDefault(x => x.Id == ti.Id);
-            if (itemToRemove != null)
-            {
-                _context.TransactionItems.Remove(itemToRemove);
-                await _context.SaveChangesAsync();
-            }
+            throw new NotImplementedException();
+            //var itemToRemove = _context.TransactionItems.
+            //    SingleOrDefault(x => x.Id == ti.Id);
+            //if (itemToRemove != null)
+            //{
+            //    _context.TransactionItems.Remove(itemToRemove);
+            //    await _context.SaveChangesAsync();
+            //}
         }
 
 

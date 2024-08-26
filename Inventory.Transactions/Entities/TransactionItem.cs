@@ -5,44 +5,28 @@ namespace Inventory.Transactions.Entities
     {
         public Guid Id { get; set; }
 
+        /// <summary>
+        /// the header entity 
+        /// </summary>
         public Guid TransactionId { get; set; }
 
+        /// <summary>
+        /// the product id for which this item applies 
+        /// </summary>
         public Guid ProductId { get; set; }
 
-        //represents all line items 
-        // price vat quantgity etc  
-        public List<TransactionItemTemplateField> Fields { get; set; } = new();
-
+        /// <summary>
+        ///  the template to which this item refers to 
+        /// </summary>
+        public Guid TemplateId { get; set; }    
+        
         /// <summary>
         /// the actual values of fields 
         /// </summary>
-        public List<TransactionItemFieldValue> FieldValues { get; set; } = new();
+        public required ICollection<TransactionItemFieldValue> FieldValues { get; set; } 
+           
 
 
-        //todo dynamic generate 
-
-        //public string Description { get; set; } = string.Empty; 
-
-        //public string TransactionType { get; set; } = string.Empty;
-
-        //public decimal UnitPrice { get; set; }
-
-        //public decimal Quantity { get; set; }
-
-        //public decimal Price { get; set; }
-
-        //public decimal VatPercentage { get; set; } =0;
-
-        //public decimal PriceAfterVat { get; set; } 
-
-        //public decimal Discount { get; set; } =0;
-
-        //public decimal DiscountAmount { get; set; } = 0;
-
-        //public decimal TransactionFees { get; set; } = 0;
-
-        //public decimal DeliveryFees { get; set; } = 0;
-
-        //public decimal FinalPrice { get; set; } 
+      
     }
 }

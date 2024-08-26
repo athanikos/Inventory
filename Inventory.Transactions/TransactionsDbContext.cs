@@ -1,6 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Reflection.Emit;
 namespace Inventory.Transactions;
 
 public class TransactionsDbContext : DbContext
@@ -13,6 +11,10 @@ public class TransactionsDbContext : DbContext
 
     public DbSet<Entities.Transaction> Transactions { get; set; }
     public DbSet<Entities.TransactionItem> TransactionItems { get; set; }
+    public DbSet<Entities.TransactionItemTemplate> Templates { get; set; }
+    public DbSet<Entities.TransactionItemFieldValue> Values { get; set; }
+
+
 
     protected override void OnModelCreating
         (ModelBuilder modelBuilder)
@@ -20,8 +22,22 @@ public class TransactionsDbContext : DbContext
         base.OnModelCreating(modelBuilder);
         modelBuilder.HasDefaultSchema("Transactions");
 
+        modelBuilder.Entity<Entities.TransactionItemTemplate>().ToTable("TransactionItemTemplate");
+
+        modelBuilder.Entity<Entities.TransactionItemTemplate>()
+        .HasMany(e => e.TemplateFields);
 
 
+        modelBuilder.Entity<Entities.TransactionItemTemplate>().HasKey(e => e.Id);  
+
+        modelBuilder.Entity<Entities.TransactionItemTemplateField>()
+                                               .HasMany(e => e.FieldValues)
+                                               .WithOne(e => e.Field);
+
+        modelBuilder.Entity<Entities.TransactionItemTemplateField>().HasKey(e => e.Id);
+
+
+        modelBuilder.Entity < Entities.TransactionItemFieldValue>().HasKey(e => e.Id);
 
 
 

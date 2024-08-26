@@ -30,27 +30,27 @@ namespace TransactionItem.Transactions.Endpoints
             HandleAsync(AddTransactionItemRequest req,
                         CancellationToken ct)
         {
+            throw new NotImplementedException();    
+            //TransactionItemDto trns =
+            //   new TransactionItemDto(
+            //     req.TransactionId,
+            //     req.Id,
+            //     req.Description,
+            //     req.TransactionType,
+            //     req.UnitPrice,
+            //     req.Quantity,
+            //     req.Price,
+            //     req.VatPercentage,
+            //     req.PriceAfterVat,
+            //     req.Discount,
+            //     req.DiscountAmount,
+            //     req.TransactionFees,
+            //     req.DeliveryFees,
+            //     req.FinalPrice
+            ////     );
+            //await _repo.EditTransactionItemAsync(trns);
 
-            TransactionItemDto trns =
-               new TransactionItemDto(
-                 req.TransactionId,
-                 req.Id,
-                 req.Description,
-                 req.TransactionType,
-                 req.UnitPrice,
-                 req.Quantity,
-                 req.Price,
-                 req.VatPercentage,
-                 req.PriceAfterVat,
-                 req.Discount,
-                 req.DiscountAmount,
-                 req.TransactionFees,
-                 req.DeliveryFees,
-                 req.FinalPrice
-                 );
-            await _repo.EditTransactionItemAsync(trns);
-
-            return TypedResults.Ok(trns);
+            //return TypedResults.Ok(trns);
         }
     }
 

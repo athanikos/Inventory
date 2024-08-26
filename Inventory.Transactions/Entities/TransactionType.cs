@@ -1,9 +1,10 @@
 ﻿namespace Inventory.Transactions.Entities
 {
-    public class TransactionType
+    public enum TransactionType
     {
-        public Guid Id { get; set; }
-
-        public string Name { get; set; } = String.Empty; 
+        BUY = 0,
+        SELL =1,
+        LET =2, 
+        UNLET  = 3, 
     }
 }

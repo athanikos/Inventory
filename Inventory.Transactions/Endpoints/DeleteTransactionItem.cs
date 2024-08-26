@@ -27,9 +27,11 @@ namespace TransactionItem.Transactions.Endpoints
             HandleAsync(DeleteTransactionItemRequest req,
                         CancellationToken ct)
         {
-            await _repo.DeleteTransactionItemAsync(new TransactionItemDto(req.Id, Guid.Empty));
 
-            return TypedResults.Ok();
+            throw new NotImplementedException();
+            //await _repo.DeleteTransactionItemAsync(new TransactionItemDto(req.Id, Guid.Empty));
+
+            //return TypedResults.Ok();
         }
     }
 
