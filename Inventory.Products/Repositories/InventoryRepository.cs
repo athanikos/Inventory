@@ -162,16 +162,15 @@ namespace Inventory.Products.Repositories
 
         public  void DecideNewOrEdit(ProductMetricDto m)
         {
-            var exists = _context.ProductMetrics.Where
+            var pm = _context.ProductMetrics.Where
                 (
                     p => p.MetricId == m.MetricId
                          && p.ProductId == m.ProductId
                          && p.EffectiveDate == m.EffectiveDate
-                ).ToList().Count() > 0; // needed tolist ? https://stackoverflow.com/questions/61052687/a-command-is-already-in-progress
+                ).FirstOrDefault(); // needed tolist ? https://stackoverflow.com/questions/61052687/a-command-is-already-in-progress
 
-            if (exists) 
+            if (pm!=null) 
             {
-                ProductMetric pm = new();
                 pm.ProductId = m.ProductId;
                 pm.Value = m.Value; 
                 pm.Currency = m.Currency;
@@ -180,7 +179,6 @@ namespace Inventory.Products.Repositories
                 pm.EffectiveDate = m.EffectiveDate; 
                 pm.MetricCode = m.MetricCode;   
                 pm.MetricId = m.MetricId;   
-                _context.Attach(pm);
                 _context.Update(pm);
             }
             else

@@ -1,12 +1,17 @@
 ﻿{
-  "Id": "FE6D49E4-A5CF-4540-B2A3-08DC854DBFD8",
-  "InventoryId": "FE96F515-0A6D-4AB5-42FD-08DC853A6EC8",
-  "Code": "10269",
-  "Description": "Harley Danidson Fat Boy",
-  "Metrics": {
-    "MetricId": "538B8F13-BBD1-44B1-78D0-08DC857109B2",
-    "ProductId": "FE6D49E4-A5CF-4540-B2A3-08DC854DBFD8",
-    "Value": "1",
-    "EffectiveDate": "2024-06-05"
-  }
+  "Id": "50b8d963-a06a-4a54-bdd7-b0514cc759ff",
+  "InventoryId": "8ae3369f-6c4a-4024-aff3-09dee71a1895",
+  "Code": "ROOM1",
+  "Description": "ROOM1",
+  "Metrics": [
+    {
+      "MetricId": "f6699504-a3bd-47e9-bf9c-a8d679f4ee56",
+      "ProductId": "50b8d963-a06a-4a54-bdd7-b0514cc759ff",
+      "Value": "100",
+      "EffectiveDate": "2024-07-01",
+      "ProductCode": "ROOM1",
+      "MetricCode": "LETPRICEPERDAY",
+      "CURRENCY": "EUR"
+    }
+  ]
 }

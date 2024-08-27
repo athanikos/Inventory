@@ -24,6 +24,7 @@ namespace Source.Products.Endpoints
         public override void Configure()
         {
             Post("/Source");
+            AllowAnonymous();
             // to do claims this is per SourceId claim
             //  something like Admin_<SourceId>
         }

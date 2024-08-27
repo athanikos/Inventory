@@ -7,6 +7,7 @@ namespace Transaction.Transactions.Endpoints
     using System.Threading.Tasks;
     using Inventory.Transactions.Dto;
     using Inventory.Transactions.Repositories;
+    using Microsoft.AspNetCore.Http;
 
     public class AddTransaction :
         Endpoint<AddTransactionRequest>
@@ -30,16 +31,17 @@ namespace Transaction.Transactions.Endpoints
                         CancellationToken ct)
         {
 
-            throw new NotImplementedException();
-            //var dto =  await _repo.AddTransactionAsync(
-            //    new TransactionDto(req.TransactionId, 
-            //                       req.Description, 
-            //                       req.Created));
-        
-            //return TypedResults.Ok<TransactionDto>(dto);
+
+            var dto = await _repo.AddTransactionAsync(
+                new TransactionDto(req.TransactionId,
+                                   req.Description,
+                                   req.Created,
+                                   req.Values));
+
+            return TypedResults.Ok<TransactionDto>(dto);
         }
     }
-    public record AddTransactionRequest(Guid TransactionId, string Description, DateTime Created);
+    public record AddTransactionRequest(Guid TransactionId, string Description, DateTime Created, ICollection<ValueDto> Values);
 
   
 }
