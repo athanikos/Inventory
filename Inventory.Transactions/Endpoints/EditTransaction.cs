@@ -30,7 +30,7 @@ namespace Inventory.Transactions.Endpoints
             HandleAsync(EditTransactionRequest req,
                         CancellationToken ct)
         {
-            var dto =  await _repo.AddTransactionAsync(new TransactionDto(req.Id, req.Description, req.Created, req.Values));
+            var dto =  await _repo.EditTransactionAsync(new TransactionDto(req.Id, req.Description, req.Created, req.Values));
             return TypedResults.Ok(dto);
         }
     }

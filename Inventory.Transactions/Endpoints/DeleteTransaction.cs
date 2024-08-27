@@ -31,6 +31,7 @@ namespace Transaction.Transactions.Endpoints
             HandleAsync(DeleteTransactionRequest req,
                         CancellationToken ct)
         {
+            //todo fix optional parameters , just id contructor?
             await _repo.DeleteTransactionAsync(new TransactionDto(req.Id, string.Empty, DateTime.MinValue,null));
             return TypedResults.Ok();
         }
