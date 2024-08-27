@@ -24,6 +24,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj" />
+    <ProjectReference Include="..\Inventory.Transactions.Contracts\Inventory.Transactions.Contracts.csproj" />
   </ItemGroup>
 
 </Project>

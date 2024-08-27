@@ -1,4 +1,4 @@
-﻿public enum TransactionItemType
+﻿public enum TransactionType
 {
     BUY = 0,
     SELL = 1,

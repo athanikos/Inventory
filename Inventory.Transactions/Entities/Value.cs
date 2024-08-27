@@ -31,5 +31,10 @@
         /// </summary>
         public Guid? EntityId { get; set; }
 
+        /// <summary>
+        /// the line in which this value appears in section 
+        /// </summary>
+        public int SectionLineNumber { get; set; } = 0;
+
     }
 }

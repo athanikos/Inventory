@@ -23,6 +23,7 @@ namespace Transaction.Transactions.Endpoints
         public override void Configure()
         {
             Delete("/template");
+            AllowAnonymous();
             // to do claims this is per TransactionId claim
             //  something like Admin_<TransactionId>
         }
@@ -31,7 +32,7 @@ namespace Transaction.Transactions.Endpoints
             HandleAsync(DeleteTemplateRequest req,
                         CancellationToken ct)
         {
-            await _repo.DeleteTemplateAsync(new TemplateDto(req.Id,string.Empty,TemplateType.Transaction, DateTime.MinValue, new List<FieldDto>() ));
+            await _repo.DeleteTemplateAsync(new TemplateDto(req.Id));
             return TypedResults.Ok();
         }
     }

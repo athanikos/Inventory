@@ -14,10 +14,10 @@ namespace Inventory.Transactions.Repositories
 
         public async Task<TemplateDto> GetTemplateAsync(Guid Id)
         {
-            var fields = await  GetFieldsAsync(Id);
+            var sections = await  GetSectionsAsync(Id);
           
             return   await _context.Templates.Where(o => o.Id == Id)
-                                           .Select(i => new TemplateDto(i.Id, i.Name, i.Type, i.Created, fields))
+                                           .Select(i => new TemplateDto(i.Id, i.Name, i.Type, i.Created, sections))
                                            .SingleAsync();
  
         }
@@ -28,10 +28,11 @@ namespace Inventory.Transactions.Repositories
         {
             var t = new Template() { Id = dto.Id, Created = dto.Created, Name = dto.Name, Type = dto.Type };
             _context.Templates.Add(t);
-         
-            foreach (var field in dto.Fields)
-                AddField(field);
 
+            if (dto.Sections != null)
+                foreach (var s in dto.Sections)
+                    AddSection(s);
+       
             await _context.SaveChangesAsync();
 
             return await GetTemplateAsync(t.Id);
@@ -41,23 +42,21 @@ namespace Inventory.Transactions.Repositories
         {
             var inStoreTemplate = await GetTemplateAsync(inboundTemplate.Id);
 
-            foreach (var field in inboundTemplate.Fields)
+            foreach (var sec in inboundTemplate.Sections)
             {
-                if (inStoreTemplate.Fields.Where(t => field.TemplateId == t.Id).Any())
-                    EditField(field);
+                if (inStoreTemplate.Sections.Where(t => sec.TemplateId == t.Id).Any())
+                    EditSection(sec);
                 else
-                    AddField(field);
+                    AddSection(sec);
             }
 
-            foreach (var storedTemplate in inStoreTemplate.Fields)
+            foreach (var storedSection in inStoreTemplate.Sections)
             {
-                if (inboundTemplate.Fields.Where(t => storedTemplate.TemplateId == t.Id).Any() == false )
-                    DeleteField(storedTemplate); 
+                if (inboundTemplate.Sections.Where(t => storedSection.TemplateId == t.Id).Any() == false)
+                    DeleteSection(storedSection);
             }
-
 
             await _context.SaveChangesAsync();  
-
             return await GetTemplateAsync(inStoreTemplate.Id);
         }
 
@@ -72,6 +71,81 @@ namespace Inventory.Transactions.Repositories
             await _context.SaveChangesAsync();
         }
 
+        #region Sections 
+        public async Task<ICollection<SectionDto>> GetSectionsAsync(Guid TemplateId)
+        {
+            return await _context.Sections.Where(o => o.TemplateId == TemplateId)
+                           .Select(i => new SectionDto()
+                           {
+                               Id = i.Id,
+                               Name = i.Name,
+                               TemplateId = i.TemplateId,
+                           }).ToListAsync();
+        }
+
+        public void AddSection(SectionDto c)
+        {
+            List<Field> fields = new List<Field>();
+            foreach (var f in c.Fields)
+                fields.Add(new Field()
+                {
+                    Name = f.Name,
+                    Expression = f.Expression,
+                    Id = f.Id,  
+                    SectionId = f.SectionId,
+                    TemplateId= f.TemplateId,   
+                    Type    = f.Type,   
+                });   
+                    
+            _context.Sections.Add(new Section()
+            {
+                Id = c.Id,
+                Name = c.Name,
+                TemplateId = c.TemplateId,
+                Fields = fields,
+                TransactionType = c.TransactionType
+            });
+        }
+
+        public void  EditSection(SectionDto inboundSection)
+        {
+
+            var inStoreSection = _context.Sections.Where(i => i.Id == inboundSection.Id).Single();
+
+            Section f = new Section()
+            { Id = inboundSection.Id, Name = inboundSection.Name, TemplateId = inboundSection.TemplateId, TransactionType = inboundSection.TransactionType };
+
+
+            foreach (var field in inboundSection.Fields)
+            {
+                if (inStoreSection.Fields.Where(t => field.TemplateId == t.Id).Any())
+                    EditField(field);
+                else
+                    AddField(field);
+            }
+
+            foreach (var storedField in inStoreSection.Fields)
+            {
+                if (inboundSection.Fields.Where(t => storedField.TemplateId == t.Id).Any() == false)
+                    DeleteField(new FieldDto(storedField.Id));
+            }
+
+
+
+            _context.Update(f);
+
+
+        }
+
+        public void DeleteSection(SectionDto dto)
+        {
+            Section f = _context.Sections.Where(p => p.Id == dto.Id).Single();
+            _context.Remove(f);
+        }
+
+        #endregion 
+
+
 
         #region Fields 
         public async Task<ICollection<FieldDto>> GetFieldsAsync(Guid TemplateId)
@@ -81,7 +155,8 @@ namespace Inventory.Transactions.Repositories
                                                           Expression =i.Expression, 
                                                           Name = i.Name,
                                                           Type = i.Type,
-                                                          TemplateId = i.TemplateId 
+                                                          TemplateId = i.TemplateId ,
+                                                          SectionId = i.SectionId,  
                             }).ToListAsync();
         }
 
@@ -92,14 +167,17 @@ namespace Inventory.Transactions.Repositories
                 Id = c.Id,
                 Expression = c.Expression,
                 Name = c.Name,
-                Type = c.Type
+                Type = c.Type,
+                SectionId = c.SectionId,    
+                TemplateId= c.TemplateId,   
             });
         }
 
         public void EditField(FieldDto dto)
         {
             Field f = new Field()
-            { Id = dto.Id, Name = dto.Name, Expression = dto.Expression, TemplateId = dto.TemplateId, Type = dto.Type};
+            { Id = dto.Id, Name = dto.Name, Expression = dto.Expression, 
+              TemplateId = dto.TemplateId, Type = dto.Type, SectionId = dto.SectionId};
             _context.Update(f);
         }
 
@@ -109,7 +187,6 @@ namespace Inventory.Transactions.Repositories
             _context.Remove(f);
         }
         #endregion Fields 
-
 
         #region Values
 

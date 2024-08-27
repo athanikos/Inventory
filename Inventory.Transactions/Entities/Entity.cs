@@ -12,5 +12,8 @@
         public DateTime Created { get; set; }
 
         public ICollection<Value> Values { get; set; } = new List<Value>();
+
+        public Contracts.EntityType EntityType { get; set; }  
+        
     }
 }

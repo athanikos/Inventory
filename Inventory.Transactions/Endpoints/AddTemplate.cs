@@ -8,6 +8,7 @@ namespace Transaction.Transactions.Endpoints
     using Inventory.Transactions.Dto;
     using Inventory.Transactions.Repositories;
     using Microsoft.AspNetCore.Http;
+    using System.Text.Json.Serialization;
 
     public class AddTemplate :
         Endpoint<AddTemplateRequest>
@@ -21,7 +22,8 @@ namespace Transaction.Transactions.Endpoints
 
         public override void Configure()
         {
-            Post("/transactionItemTemplate");
+            Post("/template");
+            AllowAnonymous();
             // to do claims this is per TransactionId claim
             //  something like Admin_<TransactionId>
         }
@@ -31,7 +33,7 @@ namespace Transaction.Transactions.Endpoints
                         CancellationToken ct)
         {
             var dto = await _repo.AddTemplateAsync(
-                new TemplateDto(Guid.Empty, req.Name, req.Type, DateTime.UtcNow, req.Fields));
+                new TemplateDto(Guid.Empty, req.Name, req.Type, DateTime.UtcNow, req.Sections));
                 
             return TypedResults.Ok
                 <TemplateDto>(dto);
@@ -39,13 +41,32 @@ namespace Transaction.Transactions.Endpoints
     }
 
 
-   public record AddTemplateRequest(               string Name,
-                                                   DateTime Created,
-                                                   TemplateType Type,
-                                                    ICollection<FieldDto> Fields
 
 
-       ) ;
+    public class AddTemplateRequest
+    {
+        public AddTemplateRequest(Guid Id, string Name, TemplateType Type, DateTime Created, ICollection<SectionDto> Sections)
+        {
+            this.Id = Id;
+            this.Name = Name;
+            this.Type = Type;
+            this.Created = Created;
+            this.Sections = Sections;
+        }
 
-  
+
+        public Guid Id { get; set; }
+        public string Name { get; set; }
+
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        public TemplateType Type { get; set; }
+
+        public DateTime Created { get; set; }
+
+        public ICollection<SectionDto> Sections { get; set; }
+
+    }
+
+
+
 }

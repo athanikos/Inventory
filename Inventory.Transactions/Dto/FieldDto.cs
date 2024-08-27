@@ -1,10 +1,19 @@
 ﻿using Inventory.Transactions.Entities;
+using System.Text.Json.Serialization;
 
 namespace Inventory.Transactions.Dto
 {
     public  class FieldDto
     {
+        public FieldDto(Guid Id)
+        {
+            this.Id = Id;   
+        }
+        public FieldDto() { }
+
         public Guid Id { get; set; }
+
+        public Guid SectionId { get; set; }
 
         public Guid TemplateId { get; set; }
         /// <summary>
@@ -16,6 +25,8 @@ namespace Inventory.Transactions.Dto
         /// </summary>
         public string Expression { get; set; } = string.Empty;
 
+
+        [JsonConverter(typeof(JsonStringEnumConverter))]
         public FieldType Type { get; set; }
     }
 
