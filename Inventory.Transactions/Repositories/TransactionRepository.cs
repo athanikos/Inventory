@@ -7,54 +7,70 @@ namespace Inventory.Transactions.Repositories
     public class TransactionRepository :
         ITransactionRepository
     {
-        private readonly Transactions.TransactionsDbContext _context;
+        private readonly TransactionsDbContext _context;
         
         public TransactionRepository(TransactionsDbContext context)
         { _context = context; }
 
-
-
         public async Task<TemplateDto> GetTemplateAsync(Guid Id)
-
         {
-         
-            throw new NotImplementedException();      
+            var fields = await  GetFieldsAsync(Id);
+          
+            return   await _context.Templates.Where(o => o.Id == Id)
+                                           .Select(i => new TemplateDto(i.Id, i.Name, i.Type, i.Created, fields))
+                                           .SingleAsync();
+ 
         }
 
-        
+       
+
         public async Task<TemplateDto> AddTemplateAsync(TemplateDto dto)
         {
-            _context.Templates.Add(new Entities.Template() { Id = dto.Id, Created = dto.Created, Name = dto.Name, Type = dto.Type });
-            await _context.SaveChangesAsync();
-
-            foreach (var field in dto.fields)
+            var t = new Template() { Id = dto.Id, Created = dto.Created, Name = dto.Name, Type = dto.Type };
+            _context.Templates.Add(t);
+         
+            foreach (var field in dto.Fields)
                 AddField(field);
-            
 
             await _context.SaveChangesAsync();
 
-            //todo fetch template 
-            return new TemplateDto(dto.Id, dto.Name, dto.Type, dto.Created,dto.fields);
+            return await GetTemplateAsync(t.Id);
         }
 
-        Task<TemplateDto> ITransactionRepository.EditTemplateAsync(TemplateDto c)
+        async Task<TemplateDto> ITransactionRepository.EditTemplateAsync(TemplateDto inboundTemplate)
         {
-            throw new NotImplementedException();
+            var inStoreTemplate = await GetTemplateAsync(inboundTemplate.Id);
+
+            foreach (var field in inboundTemplate.Fields)
+            {
+                if (inStoreTemplate.Fields.Where(t => field.TemplateId == t.Id).Any())
+                    EditField(field);
+                else
+                    AddField(field);
+            }
+
+            foreach (var storedTemplate in inStoreTemplate.Fields)
+            {
+                if (inboundTemplate.Fields.Where(t => storedTemplate.TemplateId == t.Id).Any() == false )
+                    DeleteField(storedTemplate); 
+            }
+
+
+            await _context.SaveChangesAsync();  
+
+            return await GetTemplateAsync(inStoreTemplate.Id);
         }
 
         public async Task DeleteTemplateAsync(TemplateDto c)
         {
-            Entities.Template t = _context.Templates.Where(p => p.Id == c.Id).Single();
+            Template t = _context.Templates.Where(p => p.Id == c.Id).Single();
             _context.Remove(t);
 
-            List<Entities.Field> fs = _context.Fields.Where(p => p.TemplateId == c.Id).ToList();
-            foreach (Entities.Field f in fs)
+            List<Field> fs = _context.Fields.Where(p => p.TemplateId == c.Id).ToList();
+            foreach (Field f in fs)
                 _context.Remove(f);
             await _context.SaveChangesAsync();
         }
-
-
-
 
 
         #region Fields 
@@ -93,69 +109,228 @@ namespace Inventory.Transactions.Repositories
             _context.Remove(f);
         }
         #endregion Fields 
-        
-        public async Task<TransactionDto> AddTransactionAsync(TransactionDto c)
+
+
+        #region Values
+
+        public async Task<ICollection<ValueDto>> GetEntityValuesAsync(Guid EntityId)
         {
-            _context.Transactions.Add(new Entities.Transaction() { Id = c.Id, Created = c.Created, Description = c.Description });
+            return await _context.Values.Where(o => o.EntityId == EntityId)
+
+
+                           //todo use mapper
+                           .Select(i => new ValueDto()
+                           {
+                               Id = i.Id,
+                               Field = new FieldDto()
+                               {
+                                   Expression = i.Field.Expression,
+                                   Name = i.Field.Name,
+                                   Type = i.Field.Type,
+                                   Id = i.Id,
+                                   TemplateId = i.Field.TemplateId,
+                               },
+                               Text = i.Text
+
+
+                           })
+                          .ToListAsync();
+        }
+
+        public async Task<ICollection<ValueDto>> GetTransactionValuesAsync(Guid TransactionId)
+        {
+            return await _context.Values.Where(o => o.TransactionId == TransactionId)
+
+
+                //todo use mapper
+                           .Select(i => new ValueDto()
+                           {
+                               Id = i.Id,
+                               Field    = new FieldDto() { 
+                                                               Expression = i.Field.Expression ,
+                                                               Name = i.Field.Name, 
+                                                               Type = i.Field.Type,
+                                                               Id = i.Id,
+                                                               TemplateId = i.Field.TemplateId, 
+                                                         },
+                               Text = i.Text 
+
+
+                           })                   
+                          .ToListAsync();
+        }
+
+        public void AddValue(ValueDto dto)
+        { //todo use mapper
+            _context.Values.Add(new Value()
+            {
+                Field = new Field
+                {
+                    Expression = dto.Field.Expression,
+                    Name = dto.Field.Name,
+                    Type = dto.Field.Type,
+                    Id = dto.Id,
+                    TemplateId =dto.Field.TemplateId,
+                },
+                Text = dto.Text   
+            });
+        }
+
+        public void EditValue(ValueDto dto)
+        {
+            //todo use mapper
+            Field field = new Field
+            {
+                Expression = dto.Field.Expression,
+                Name = dto.Field.Name,
+                Type = dto.Field.Type,
+                Id = dto.Id,
+                TemplateId = dto.Field.TemplateId,
+            };
+
+            Value f = new Value() { Id = dto.Id, Field = field, FieldId = dto.Id };
+            _context.Update(f);
+        }
+
+        public void DeleteValue(ValueDto dto)
+        {
+            Value f = _context.Values.Where(p => p.Id == dto.Id).Single();
+            _context.Remove(f);
+        }
+
+        #endregion Values 
+
+
+        #region Transaction 
+
+        public async Task<TransactionDto> AddTransactionAsync(TransactionDto dto)
+        {
+            //todo use mapper
+            var t = new Entities.Transaction() { Id = dto.Id, Created = dto.Created, Description = dto.Description };
+            _context.Transactions.Add(t);
+
+            foreach (var v in dto.Values)
+                AddValue(v);
+
             await _context.SaveChangesAsync();
-            return new TransactionDto(c.Id, c.Description,c.Created);
-            
-         }
+            return await GetTransactionAsync(t.Id);
 
-        public async Task<TransactionDto> EditTransactionAsync(TransactionDto c)
-        {
-            Entities.Transaction e = new Entities.Transaction() { Id = c.Id, Created = c.Created, Description = c.Description };
-            _context.Update(e);
-             await _context.SaveChangesAsync();
-            return new TransactionDto(c.Id, c.Description, c.Created);
         }
 
-
-        public async Task DeleteTransactionAsync(TransactionDto c)
+        public async Task<TransactionDto> GetTransactionAsync(Guid Id)
         {
-            //List<Entities.TransactionItem> tis = _context.TransactionItems.Where(p=>p.TransactionId == c.Id).ToList();
-            //foreach (Entities.TransactionItem ti in tis)
-            //    _context.Remove(ti);
-            //todo for values 
+            var values = await GetTransactionValuesAsync(Id);
 
-            Entities.Transaction t = _context.Transactions.Where(p => p.Id == c.Id).Single();
+            return await _context.Transactions.Where(o => o.Id == Id)
+                                           .Select(i => new TransactionDto(i.Id, i.Description, i.Created, values))
+                                           .SingleAsync();
+
+        }
+
+        public async Task<TransactionDto> EditTransactionAsync(TransactionDto inboundTransaction)
+        {
+            var inStoreTransaction = await GetTransactionAsync(inboundTransaction.Id);
+
+            foreach (var value in inboundTransaction.Values)
+            {
+                if (inStoreTransaction.Values.Where(v => value.Id == v.Id).Any())
+                    EditValue(value);
+                else
+                    AddValue(value);
+            }
+
+            foreach (var storedTransaction in inStoreTransaction.Values)
+            {
+                if (inboundTransaction.Values.Where(v => storedTransaction.Id == v.Id).Any() == false)
+                    DeleteValue(storedTransaction);
+            }
+
+
+            await _context.SaveChangesAsync();
+
+            return await GetTransactionAsync(inStoreTransaction.Id);
+        }
+
+        public async Task DeleteTransactionAsync(TransactionDto dto)
+        {
+            Entities.Transaction t = _context.Transactions.Where(p => p.Id == dto.Id).Single();   
             _context.Remove(t);
-             await _context.SaveChangesAsync();           
+
+            List<Value> vs = _context.Values.Where(p => p.TransactionId == dto.Id).ToList();
+            foreach (Value v in vs)
+                _context.Remove(v);
+            await _context.SaveChangesAsync();
         }
 
-        public Task<TransactionItemTemplateDto> AddTransactionItemTemplateAsync(TransactionItemTemplateDto dto)
+        #endregion Transaction 
+
+        #region Entity 
+
+        public async Task<EntityDto> AddEntityAsync(EntityDto dto)
         {
-            throw new NotImplementedException();
+            //todo use mapper
+            var e = new Entities.Entity() { Id = dto.Id, Created = dto.Created, Description = dto.Description };
+            _context.Entities.Add(e);
+
+            foreach (var v in dto.Values)
+                AddValue(v);
+
+            await _context.SaveChangesAsync();
+            return await GetEntityAsync(e.Id);
         }
 
-        public Task<TransactionItemDto> AddTransactionItemAsync(TransactionItemDto ti)
+        public async Task<EntityDto> GetEntityAsync(Guid Id)
         {
-            throw new NotImplementedException();
+            var values = await GetEntityValuesAsync(Id);
+
+            return await _context.Entities.Where(o => o.Id == Id)
+                                           .Select(i => new EntityDto()
+                                           {
+                                               Id = i.Id,
+                                               Created = i.Created,
+                                               Description = i.Description,
+                                               Values = values
+                                           }
+                                           )
+                                           .SingleAsync();
         }
 
-        public Task<TransactionItemDto> EditTransactionItemAsync(TransactionItemDto ti)
+        public async Task<EntityDto> EditEntityAsync(EntityDto inboundEntity)
         {
-            throw new NotImplementedException();
+            var inStoreEntity = await GetEntityAsync(inboundEntity.Id);
+
+            foreach (var value in inboundEntity.Values)
+            {
+                if (inStoreEntity.Values.Where(v => value.Id == v.Id).Any())
+                    EditValue(value);
+                else
+                    AddValue(value);
+            }
+
+            foreach (var storedTransaction in inStoreEntity.Values)
+            {
+                if (inboundEntity.Values.Where(v => storedTransaction.Id == v.Id).Any() == false)
+                    DeleteValue(storedTransaction);
+            }
+
+            await _context.SaveChangesAsync();
+            return await GetEntityAsync(inStoreEntity.Id);
         }
 
-        public Task DeleteTransactionItemAsync(TransactionItemDto ti)
+        public async Task DeleteEntityAsync(EntityDto dto)
         {
-            throw new NotImplementedException();
+            Entities.Entity e = _context.Entities.Where(p => p.Id == dto.Id).Single();
+            _context.Remove(e);
+
+            List<Value> vs = _context.Values.Where(p => p.EntityId == dto.Id).ToList();
+            foreach (Value v in vs)
+                _context.Remove(v);
+            await _context.SaveChangesAsync();
         }
 
-        public Task<TransactionDto> AddEntityAsync(EntityDto dto)
-        {
-            throw new NotImplementedException();
-        }
+      
 
-        public Task<TransactionDto> EditEntityAsync(EntityDto c)
-        {
-            throw new NotImplementedException();
-        }
+        #endregion
 
-        public Task DeleteEntityAsync(EntityDto c)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

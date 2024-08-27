@@ -4,6 +4,6 @@ public record TemplateDto(   Guid Id,
                              string Name ,
                              TemplateType Type,
                              DateTime Created, 
-                             ICollection<FieldDto> fields
+                             ICollection<FieldDto> Fields
                              );
 

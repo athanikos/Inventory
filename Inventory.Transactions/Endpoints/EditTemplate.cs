@@ -9,33 +9,35 @@ namespace Inventory.Transactions.Endpoints
     using Inventory.Transactions.Repositories;
     using Inventory.Transactions.Dto;
 
-    public class EditTransaction :
-        Endpoint<EditTransactionRequest>
+    public class EditTemplate :
+        Endpoint<EditTemplateRequest>
     {
         private readonly ITransactionRepository _repo;
 
-        public EditTransaction(ITransactionRepository repo)
+        public EditTemplate(ITransactionRepository repo)
         {
             _repo = repo;
         }
 
         public override void Configure()
         {
-            Put("/transaction");
+            Put("/template");
             // to do claims this is per TransactionId claim
             //  something like Admin_<TransactionId>
         }
 
-        public override async Task<Results<Ok<TransactionDto>, NotFound, ProblemDetails>>
-            HandleAsync(EditTransactionRequest req,
+        public override async Task<Results<Ok<TemplateDto>, NotFound, ProblemDetails>>
+            HandleAsync(EditTemplateRequest req,
                         CancellationToken ct)
         {
-            var dto =  await _repo.AddTransactionAsync(new TransactionDto(req.Id, req.Description, req.Created, req.Values));
-            return TypedResults.Ok(dto);
+            return TypedResults.Ok(
+                   await _repo.EditTemplateAsync(new TemplateDto(req.Id, req.Name,req.Type,req.Created,req.Fields)));
+            
         }
     }
 
-    public record EditTransactionRequest(Guid Id,string Description, DateTime Created, ICollection<ValueDto> Values);
+    public record EditTemplateRequest(Guid Id,string Name, DateTime Created, TemplateType Type,
+                             ICollection<FieldDto> Fields);
 
   
 }

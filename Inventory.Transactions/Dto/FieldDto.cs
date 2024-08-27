@@ -17,7 +17,8 @@ namespace Inventory.Transactions.Dto
         public string Expression { get; set; } = string.Empty;
 
         public FieldType Type { get; set; }
-
     }
+
+
 
 }

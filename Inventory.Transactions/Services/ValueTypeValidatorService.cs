@@ -1,9 +1,9 @@
 ﻿namespace Inventory.Transactions.Services
 {
-    public  class TransactionItemTypeValidatorService
+    public  class ValueTypeValidatorService
     {
 
-        public TransactionItemTypeValidatorService() { }    
+        public ValueTypeValidatorService() { }    
         public bool Validate()
         {
             throw new NotImplementedException();

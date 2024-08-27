@@ -37,6 +37,17 @@ public class TransactionsDbContext : DbContext
         modelBuilder.Entity<Entities.Field>().HasKey(e => e.Id);
 
         modelBuilder.Entity < Entities.Value>().HasKey(e => e.Id);
+
+        modelBuilder.Entity<Entities.Transaction>()
+                                           .HasMany(e => e.Values)
+                                            .WithOne(a => a.Transaction)
+                                            .HasForeignKey(e => e.TransactionId);
+      
+        modelBuilder.Entity<Entities.Entity>()
+                                   .HasMany(e => e.Values)
+                                   .WithOne(a => a.Entity)
+                                   .HasForeignKey(e => e.EntityId);
+
     }
 
     protected override void ConfigureConventions(

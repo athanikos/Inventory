@@ -31,7 +31,7 @@ namespace Transaction.Transactions.Endpoints
             HandleAsync(DeleteTransactionRequest req,
                         CancellationToken ct)
         {
-            await _repo.DeleteTransactionAsync(new TransactionDto(req.Id, string.Empty, DateTime.MinValue));
+            await _repo.DeleteTransactionAsync(new TransactionDto(req.Id, string.Empty, DateTime.MinValue,null));
             return TypedResults.Ok();
         }
     }

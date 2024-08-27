@@ -3,6 +3,7 @@ using System;
 using Inventory.Transactions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Inventory.Transactions.Data.Migrations
 {
     [DbContext(typeof(TransactionsDbContext))]
-    partial class TransactionsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240826171041_PG3")]
+    partial class PG3
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -148,7 +151,7 @@ namespace Inventory.Transactions.Data.Migrations
 
             modelBuilder.Entity("Inventory.Transactions.Entities.Value", b =>
                 {
-                    b.HasOne("Inventory.Transactions.Entities.Entity", "Entity")
+                    b.HasOne("Inventory.Transactions.Entities.Entity", null)
                         .WithMany("Values")
                         .HasForeignKey("EntityId");
 
@@ -158,15 +161,11 @@ namespace Inventory.Transactions.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Inventory.Transactions.Entities.Transaction", "Transaction")
+                    b.HasOne("Inventory.Transactions.Entities.Transaction", null)
                         .WithMany("Values")
                         .HasForeignKey("TransactionId");
 
-                    b.Navigation("Entity");
-
                     b.Navigation("Field");
-
-                    b.Navigation("Transaction");
                 });
 
             modelBuilder.Entity("Inventory.Transactions.Entities.Entity", b =>

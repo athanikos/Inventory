@@ -22,8 +22,8 @@ namespace Expressions
         private string _expression = string.Empty;
         private readonly IMediator _mediator;
         private readonly ExpressionsDbContext _context;
-        private List<string> _allProductCodes;
-        private List<string> _allMetricCodes;
+        private List<string> _allProductCodes= new List<string>();
+        private List<string> _allMetricCodes= new List<string>();
         private Guid _inventoryId;
 
         public Evaluator(IMediator mediator, ExpressionsDbContext context)
@@ -37,17 +37,7 @@ namespace Expressions
             _expression = expression;
             _inventoryId = inventoryId;
             GetCodes();
-            return await ComputeTokens(ParseTokens());
-        }
-
-        private async void GetCodes()
-        {
-            var response = await _mediator.Send(new CodesQuery(_inventoryId));
-            if (response == null)
-                throw new ArgumentNullException();
-
-            _allProductCodes = response.ProductCodes;
-            _allMetricCodes = response.MetricCodes;
+            return await ComputeTokens(BreakExpressionIntoListOfStrings());
         }
 
         private async Task<EvaluatorResult> ComputeTokens(List<string> tokens)
@@ -55,7 +45,7 @@ namespace Expressions
             var resultedExpression = string.Empty;
             foreach (var token in tokens)
             {
-                if (IsNumeric(token) || IsOperator(token) )
+                if (IsNumeric(token) || IsOperator(token))
                     resultedExpression += token.ToString().Trim();
                 else if (IsInventoryBasedFormula(token))
                 {
@@ -85,17 +75,24 @@ namespace Expressions
             }
             catch (Exception ex)
             {
-                
+
                 Log.Error(ex.ToString());
                 return EvaluatorResult.NewUndefinedResult();
             }
 
         }
-        /// <summary>
-        /// breaks expression into list of strings 
-        /// </summary>
-        /// <returns></returns>
-        private List<string> ParseTokens()
+
+        private async void GetCodes()
+        {
+            var response = await _mediator.Send(new CodesQuery(_inventoryId));
+            if (response == null)
+                throw new ArgumentNullException();
+
+            _allProductCodes = response.ProductCodes;
+            _allMetricCodes = response.MetricCodes;
+        }
+
+        private List<string> BreakExpressionIntoListOfStrings()
         {
             List<string> resultedList = new List<string>();
             string currentToken = string.Empty;
@@ -106,8 +103,8 @@ namespace Expressions
                 {
                     if (currentToken != string.Empty)
                         resultedList.Add(currentToken);
+            
                     currentToken = string.Empty;
-
                     resultedList.Add(_expression[i].ToString());
                 }
                 else
@@ -120,8 +117,6 @@ namespace Expressions
             return resultedList;
         }
 
-
-
         private string ExtractAggregateFunction(string token)
         {
             int indexOfParenthesis = token.IndexOf(OpenParenthesis);
@@ -129,7 +124,6 @@ namespace Expressions
         }
 
         // todo: per inventoryId 
-
         /// <summary>
         ///     Parses a formula  of the following  
         ///     SUM( VALUE(FUNC(ALL),Latest))
@@ -142,7 +136,7 @@ namespace Expressions
             string aggregateFunction)
         {
             DateTime upperboundDate = DateTime.MaxValue;
-            List<string> productCodes = null;
+            List<string> productCodes = new List<string>();
             string metricCode = string.Empty;
           
             try
@@ -164,8 +158,14 @@ namespace Expressions
                     try
                     {
                         var dto = (await _mediator.Send(
-                                   new GetProductMetricQuery(_inventoryId, productCode, metricCode, upperboundDate)));
-                        result += result != string.Empty ? "+" + dto.Value : string.Empty + dto.Value;
+                                                   new GetProductMetricQuery(_inventoryId, 
+                                                                              productCode,
+                                                                              metricCode,
+                                                                              upperboundDate)));
+                    
+                        result += result != string.Empty  ? 
+                                          "+" + dto.Value : 
+                                          string.Empty + dto.Value;
                     }
                     catch (Exception e)
                     {
@@ -254,6 +254,7 @@ namespace Expressions
             inventoryBased = 1
         }
 
+        #region token identify  
         private bool IsProductBasedFormula(string token)
         {
 
@@ -271,7 +272,6 @@ namespace Expressions
             return expressionType.productBased == _type;
         }
 
-
         private bool IsOperator(string token)
         {
             return token.Length == 1 && _operators.Contains(token[0]);
@@ -281,11 +281,7 @@ namespace Expressions
         {
             return decimal.TryParse(token, out var result);
         }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="token"></param>
-        /// <returns></returns>
+         
         private bool IsInventoryBasedFormula(string token)
         {
             foreach (var item in aggregateFunctions)
@@ -310,6 +306,10 @@ namespace Expressions
 
             return expressionType.inventoryBased == _type;
         }
+        #endregion
+
+
+
 
         public List<Entities.ProductExpression> GetProductExpressions()
         {
@@ -325,6 +325,8 @@ namespace Expressions
         {
             return [.. _context.BooleanExpressions];
         }
+
+        #region Scheduler
 
         public void ScheduleJobs(IServiceProvider serviceProvider)
         {
@@ -343,8 +345,6 @@ namespace Expressions
                 RecurringJob.AddOrUpdate(i.Id.ToString(), 
                     () => DoScheduledWork(i), Cron.Minutely);
         }
-
-
 
         public  void  DoScheduledWork(Entities.InventoryExpression ie)
         {
@@ -460,7 +460,6 @@ namespace Expressions
             }
         }
 
-
         public void DoScheduledWork()
         {
             try
@@ -482,7 +481,7 @@ namespace Expressions
             }
         }
 
-
+        #endregion Scheduler
     }
-    
+
 }
