@@ -101,6 +101,9 @@ ClaimType = CLIENTINVENTORY claimValue = <InventoryId>
     
     dotnet ef database update   PG -c NotifierDbContext
 
+dotnet ef migrations add PG4  -c TransactionsDbContext -p C:\projects\Inventory\Inventory\Inventory.Transactions\Inventory.Transactions.csproj  -s  C:\projects\Inventory\Inventory\Inventory.WebApi\Inventory.WebApi.csproj -o Data/Migrations
+dotnet ef database update   PG4 -c TransactionsDbContext
+
         
 ### Metrics 
 
