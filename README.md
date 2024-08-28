@@ -1,6 +1,6 @@
 # Inventory
 
-a generic inventory implementation with dynamic metrics and dynamic invoice fields. supports buy / sell / let
+a generic inventory implementation with dynamic metrics and transaction fields. supports buy / sell / let
 
 use cases 
 
