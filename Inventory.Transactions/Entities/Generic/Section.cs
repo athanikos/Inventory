@@ -1,4 +1,6 @@
-﻿namespace Inventory.Transactions.Entities
+﻿using Inventory.Transactions.Contracts;
+
+namespace Inventory.Transactions.Entities
 {
     public  class Section
     {
@@ -10,7 +12,7 @@
 
         public List<Field> Fields { get; set; } = new();
 
-        public TransactionType TransactionType { get; set; }    
+        public SectionType SectionType { get; set; }    
         
     }
 }

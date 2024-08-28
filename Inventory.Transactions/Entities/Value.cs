@@ -17,19 +17,7 @@
 
         public required Field Field { get; set; }
 
-        public Transaction? Transaction { get; set; }
-
-        public Entity? Entity { get; set; }
-
-        /// <summary>
-        /// either this or entityId is null 
-        /// </summary>
         public Guid? TransactionId { get; set; }
-
-        /// <summary>
-        /// either this or TransactionId is null 
-        /// </summary>
-        public Guid? EntityId { get; set; }
 
         /// <summary>
         /// the line in which this value appears in section 

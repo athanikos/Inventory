@@ -26,8 +26,8 @@ public class TemplateDto
     public TemplateType Type { get; set; }
 
     public DateTime Created { get; set; }
-    
-    public ICollection<SectionDto> Sections { get; set; }
+
+    public ICollection<SectionDto> Sections { get; set; } = new List<SectionDto>();
 
 }
 

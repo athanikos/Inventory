@@ -22,7 +22,8 @@ namespace Inventory.Notifications.Endpoints
 
         public override void Configure()
         {
-            Get("/Notifications");
+            Get("/Notification"); 
+
             // to do claims this is per CategoryId claim
             //  something like Admin_<CategoryId>
         }

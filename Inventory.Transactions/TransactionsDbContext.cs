@@ -8,7 +8,6 @@ public class TransactionsDbContext : DbContext
         base(options) { }
 
     public DbSet<Entities.Transaction> Transactions { get; set; }
-    public DbSet<Entities.Entity> Entities  { get; set; }
     public DbSet<Entities.Template> Templates { get; set; }
     public DbSet<Entities.Section> Sections { get; set; }
     public DbSet<Entities.Field> Fields { get; set; }
@@ -19,14 +18,17 @@ public class TransactionsDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
         modelBuilder.HasDefaultSchema("Transactions");
-
+  
         modelBuilder.Entity<Entities.Transaction>().ToTable("Transaction");
-        modelBuilder.Entity<Entities.Entity>().ToTable("Entity");
+        modelBuilder.Entity<Entities.TransactionSection>().ToTable("TransactionSection");
+        modelBuilder.Entity<Entities.TransactionSectionGroup>().ToTable("TransactionSectionGroup");
+        modelBuilder.Entity<Entities.Value>().ToTable("Value");
+
+
         modelBuilder.Entity<Entities.Template>().ToTable("Template");
         modelBuilder.Entity<Entities.Section>().ToTable("Section");
         modelBuilder.Entity<Entities.Field>().ToTable("Field");
-        modelBuilder.Entity<Entities.Value>().ToTable("Value");
-
+        
         modelBuilder.Entity<Entities.Template>()
         .HasMany(e => e.Sections);
 
@@ -38,7 +40,7 @@ public class TransactionsDbContext : DbContext
         modelBuilder.Entity<Entities.Template>().HasKey(e => e.Id);  
 
         modelBuilder.Entity<Entities.Field>()
-                                               .HasMany(e => e.FieldValues)
+                                               .HasMany(e => e.Values)
                                                .WithOne(e => e.Field);
 
         modelBuilder.Entity<Entities.Field>().HasKey(e => e.Id);
@@ -47,14 +49,15 @@ public class TransactionsDbContext : DbContext
 
 
         modelBuilder.Entity<Entities.Transaction>()
-                                           .HasMany(e => e.Values)
+                                           .HasMany(e => e.TransactionSections)
                                             .WithOne(a => a.Transaction)
                                             .HasForeignKey(e => e.TransactionId);
-      
-        modelBuilder.Entity<Entities.Entity>()
-                                   .HasMany(e => e.Values)
-                                   .WithOne(a => a.Entity)
-                                   .HasForeignKey(e => e.EntityId);
+
+        modelBuilder.Entity<Entities.TransactionSection>()
+                                          .HasMany(e => e.SectionGroups)
+                                           .WithOne(a => a.TransactionSection)
+                                           .HasForeignKey(e => e.TransactionSectionId);
+
 
     }
 

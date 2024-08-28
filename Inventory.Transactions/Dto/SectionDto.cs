@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using Inventory.Transactions.Contracts;
+using System.Text.Json.Serialization;
 
 namespace Inventory.Transactions.Dto
 {
@@ -13,6 +14,6 @@ namespace Inventory.Transactions.Dto
         public List<FieldDto> Fields { get; set; } = new();
 
         [JsonConverter(typeof(JsonStringEnumConverter))]
-        public TransactionType TransactionType { get; set; }
+        public SectionType SectionType { get; set; }
     }
 }

@@ -12,6 +12,16 @@ namespace Inventory.Transactions.Repositories
         public TransactionRepository(TransactionsDbContext context)
         { _context = context; }
 
+        public async Task EmptyDB()
+        {
+            _context.Values.RemoveRange(_context.Values);
+            _context.Transactions.RemoveRange(_context.Transactions);
+            _context.Fields.RemoveRange(_context.Fields);
+            _context.Sections.RemoveRange(_context.Sections);
+            _context.Templates.RemoveRange(_context.Templates);
+            await _context.SaveChangesAsync();
+        }
+
         public async Task<TemplateDto> GetTemplateAsync(Guid Id)
         {
             var sections = await  GetSectionsAsync(Id);
@@ -28,12 +38,17 @@ namespace Inventory.Transactions.Repositories
         {
             var t = new Template() { Id = dto.Id, Created = dto.Created, Name = dto.Name, Type = dto.Type };
             _context.Templates.Add(t);
+            await _context.SaveChangesAsync();
+
+
 
             if (dto.Sections != null)
                 foreach (var s in dto.Sections)
-                    AddSection(s);
-       
-            await _context.SaveChangesAsync();
+                {
+                    s.TemplateId = t.Id;
+                   await AddSection(s);
+                }
+
 
             return await GetTemplateAsync(t.Id);
         }
@@ -47,7 +62,7 @@ namespace Inventory.Transactions.Repositories
                 if (inStoreTemplate.Sections.Where(t => sec.TemplateId == t.Id).Any())
                     EditSection(sec);
                 else
-                    AddSection(sec);
+                     await   AddSection(sec);
             }
 
             foreach (var storedSection in inStoreTemplate.Sections)
@@ -83,28 +98,33 @@ namespace Inventory.Transactions.Repositories
                            }).ToListAsync();
         }
 
-        public void AddSection(SectionDto c)
+        public async Task AddSection(SectionDto c)
         {
             List<Field> fields = new List<Field>();
-            foreach (var f in c.Fields)
-                fields.Add(new Field()
-                {
-                    Name = f.Name,
-                    Expression = f.Expression,
-                    Id = f.Id,  
-                    SectionId = f.SectionId,
-                    TemplateId= f.TemplateId,   
-                    Type    = f.Type,   
-                });   
-                    
-            _context.Sections.Add(new Section()
+            Section s = new Section()
             {
                 Id = c.Id,
                 Name = c.Name,
                 TemplateId = c.TemplateId,
                 Fields = fields,
-                TransactionType = c.TransactionType
-            });
+                SectionType = c.SectionType
+            };
+            _context.Sections.Add(s);
+            await _context.SaveChangesAsync();
+
+              foreach (var f in c.Fields)
+                fields.Add(new Field()
+                {
+                    Name = f.Name,
+                    Expression = f.Expression,
+                    Id = f.Id,  
+                    SectionId = s.Id,
+                    TemplateId= c.TemplateId,   
+                    Type    = f.Type,   
+                });
+
+            await _context.SaveChangesAsync();
+
         }
 
         public void  EditSection(SectionDto inboundSection)
@@ -113,7 +133,7 @@ namespace Inventory.Transactions.Repositories
             var inStoreSection = _context.Sections.Where(i => i.Id == inboundSection.Id).Single();
 
             Section f = new Section()
-            { Id = inboundSection.Id, Name = inboundSection.Name, TemplateId = inboundSection.TemplateId, TransactionType = inboundSection.TransactionType };
+            { Id = inboundSection.Id, Name = inboundSection.Name, TemplateId = inboundSection.TemplateId, SectionType = inboundSection.SectionType };
 
 
             foreach (var field in inboundSection.Fields)
@@ -189,30 +209,6 @@ namespace Inventory.Transactions.Repositories
         #endregion Fields 
 
         #region Values
-
-        public async Task<ICollection<ValueDto>> GetEntityValuesAsync(Guid EntityId)
-        {
-            return await _context.Values.Where(o => o.EntityId == EntityId)
-
-
-                           //todo use mapper
-                           .Select(i => new ValueDto()
-                           {
-                               Id = i.Id,
-                               Field = new FieldDto()
-                               {
-                                   Expression = i.Field.Expression,
-                                   Name = i.Field.Name,
-                                   Type = i.Field.Type,
-                                   Id = i.Id,
-                                   TemplateId = i.Field.TemplateId,
-                               },
-                               Text = i.Text
-
-
-                           })
-                          .ToListAsync();
-        }
 
         public async Task<ICollection<ValueDto>> GetTransactionValuesAsync(Guid TransactionId)
         {
@@ -341,73 +337,6 @@ namespace Inventory.Transactions.Repositories
 
         #endregion Transaction 
 
-        #region Entity 
-
-        public async Task<EntityDto> AddEntityAsync(EntityDto dto)
-        {
-            //todo use mapper
-            var e = new Entities.Entity() { Id = dto.Id, Created = dto.Created, Description = dto.Description };
-            _context.Entities.Add(e);
-
-            foreach (var v in dto.Values)
-                AddValue(v);
-
-            await _context.SaveChangesAsync();
-            return await GetEntityAsync(e.Id);
-        }
-
-        public async Task<EntityDto> GetEntityAsync(Guid Id)
-        {
-            var values = await GetEntityValuesAsync(Id);
-
-            return await _context.Entities.Where(o => o.Id == Id)
-                                           .Select(i => new EntityDto()
-                                           {
-                                               Id = i.Id,
-                                               Created = i.Created,
-                                               Description = i.Description,
-                                               Values = values
-                                           }
-                                           )
-                                           .SingleAsync();
-        }
-
-        public async Task<EntityDto> EditEntityAsync(EntityDto inboundEntity)
-        {
-            var inStoreEntity = await GetEntityAsync(inboundEntity.Id);
-
-            foreach (var value in inboundEntity.Values)
-            {
-                if (inStoreEntity.Values.Where(v => value.Id == v.Id).Any())
-                    EditValue(value);
-                else
-                    AddValue(value);
-            }
-
-            foreach (var storedTransaction in inStoreEntity.Values)
-            {
-                if (inboundEntity.Values.Where(v => storedTransaction.Id == v.Id).Any() == false)
-                    DeleteValue(storedTransaction);
-            }
-
-            await _context.SaveChangesAsync();
-            return await GetEntityAsync(inStoreEntity.Id);
-        }
-
-        public async Task DeleteEntityAsync(EntityDto dto)
-        {
-            Entities.Entity e = _context.Entities.Where(p => p.Id == dto.Id).Single();
-            _context.Remove(e);
-
-            List<Value> vs = _context.Values.Where(p => p.EntityId == dto.Id).ToList();
-            foreach (Value v in vs)
-                _context.Remove(v);
-            await _context.SaveChangesAsync();
-        }
-
-      
-
-        #endregion
-
+  
     }
 }
