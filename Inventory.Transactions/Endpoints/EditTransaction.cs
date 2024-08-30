@@ -22,6 +22,7 @@ namespace Inventory.Transactions.Endpoints
         public override void Configure()
         {
             Put("/transaction");
+            AllowAnonymous();
             // to do claims this is per TransactionId claim
             //  something like Admin_<TransactionId>
         }

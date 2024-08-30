@@ -1,7 +1,6 @@
 ﻿using Inventory.Transactions.Dto;
 using Inventory.Transactions.Entities;
 using Microsoft.EntityFrameworkCore;
-using System.Timers;
 
 namespace Inventory.Transactions.Repositories.Postgres
 {
@@ -331,7 +330,7 @@ namespace Inventory.Transactions.Repositories.Postgres
 
             foreach (var sec in inboundTransaction.Sections)
             {
-                if (inStoreTransaction.Sections.Where(v => sec.Id == v.Id).Any())
+                if (inStoreTransaction.Sections.Where(s => sec.Id == s.Id).Any())
                     await EditTransactionSectionAsync(sec);
                 else
                     await AddTransactionSectionAsync(sec);
@@ -339,7 +338,7 @@ namespace Inventory.Transactions.Repositories.Postgres
 
             foreach (var storedSection in inStoreTransaction.Sections)
             {
-                if (inboundTransaction.Sections.Where(s => storedSection.Id == s.TransactionId).Any() == false)
+                if (inboundTransaction.Sections.Where(s => storedSection.TransactionId == s.TransactionId).Any() == false)
                     await DeleteTransactionSectionAsync(storedSection);
             }
 
