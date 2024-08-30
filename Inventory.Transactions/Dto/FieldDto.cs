@@ -11,7 +11,7 @@ namespace Inventory.Transactions.Dto
         }
         public FieldDto() { }
 
-        public Guid Id { get; set; }
+        public Guid Id { get; set; } = Guid.Empty;
 
         public Guid SectionId { get; set; }
 

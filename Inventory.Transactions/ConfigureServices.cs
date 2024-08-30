@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Inventory.Transactions.Repositories;
+using Inventory.Transactions.Repositories.Postgres;
 
 namespace Inventory.Transactions
 {
@@ -21,7 +22,7 @@ namespace Inventory.Transactions
             options.UseNpgsql(configuration
             .GetValue<String>("Transactions")));
 
-            services.AddScoped<ITransactionRepository, TransactionRepository>();
+            services.AddScoped<ITransactionRepository, PostgresTransactionRepository>();
        
 
             mediatRAssemblies.Add(typeof(ConfigureServices).Assembly);

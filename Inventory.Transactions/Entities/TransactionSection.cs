@@ -4,11 +4,14 @@ namespace Inventory.Transactions.Entities
 {
     public class TransactionSection
     {
-        Guid Id { get; set; }
+        public  Guid Id { get; set; }
         public Guid TransactionId { get; set; } = Guid.Empty;
-        public SectionType TransactionSectionType {get; set;}
 
-        public required Transaction Transaction { get; set; }
+        public string Name { get; set; }    = string.Empty; 
+
+        public SectionType TransactionSectionType { get; set;}
+
+        public Transaction Transaction { get; set; } = null;
 
         public ICollection<TransactionSectionGroup> SectionGroups { get; set; } 
         = new List<TransactionSectionGroup>();

@@ -6,7 +6,11 @@
             public Guid Id { get; set; }  = Guid.NewGuid();
             public string Description { get; set; }             = string.Empty;
             public DateTime Created { get; set; }   
-            public ICollection<TransactionSection> TransactionSections   { get; set; } = new List<TransactionSection>();  
+            public ICollection<TransactionSection> TransactionSections   { get; set; } = new List<TransactionSection>();
+
+            public Template Template { get; set; } = null;
+
+            public Guid TemplateId { get; set; }        
     }
 }
 

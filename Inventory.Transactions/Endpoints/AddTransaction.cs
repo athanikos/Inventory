@@ -22,6 +22,7 @@ namespace Transaction.Transactions.Endpoints
         public override void Configure()
         {
             Post("/transaction");
+            AllowAnonymous();
             // to do claims this is per TransactionId claim
             //  something like Admin_<TransactionId>
         }
@@ -35,13 +36,15 @@ namespace Transaction.Transactions.Endpoints
             var dto = await _repo.AddTransactionAsync(
                 new TransactionDto(req.TransactionId,
                                    req.Description,
-                                   req.Created,
-                                   req.Values));
+                                   DateTime.Now,
+                                   req.TemplateId,
+                                   req.Sections));
 
             return TypedResults.Ok<TransactionDto>(dto);
         }
     }
-    public record AddTransactionRequest(Guid TransactionId, string Description, DateTime Created, ICollection<ValueDto> Values);
+    public record AddTransactionRequest(Guid TransactionId, 
+        string Description,Guid TemplateId, ICollection<TransactionSectionDto> Sections );
 
   
 }

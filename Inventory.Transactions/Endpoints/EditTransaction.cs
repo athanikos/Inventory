@@ -30,12 +30,14 @@ namespace Inventory.Transactions.Endpoints
             HandleAsync(EditTransactionRequest req,
                         CancellationToken ct)
         {
-            var dto =  await _repo.EditTransactionAsync(new TransactionDto(req.Id, req.Description, req.Created, req.Values));
+            var dto =  await _repo.EditTransactionAsync(new TransactionDto(req.Id, req.Description,
+                req.Created,req.TemplateId, req.Sections));
             return TypedResults.Ok(dto);
         }
     }
 
-    public record EditTransactionRequest(Guid Id,string Description, DateTime Created, ICollection<ValueDto> Values);
+    public record EditTransactionRequest(Guid Id,string Description, DateTime Created, Guid TemplateId,
+        ICollection<TransactionSectionDto> Sections );
 
   
 }

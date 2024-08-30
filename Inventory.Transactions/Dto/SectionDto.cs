@@ -5,7 +5,7 @@ namespace Inventory.Transactions.Dto
 {
     public  class SectionDto
     {
-        public Guid Id { get; set; }
+        public Guid Id { get; set; } = Guid.Empty;
 
         public Guid TemplateId { get; set; }
 

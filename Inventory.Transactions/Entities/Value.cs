@@ -15,14 +15,14 @@
 
         public Guid FieldId { get; set; }
 
-        public required Field Field { get; set; }
+      //  public Field Field { get; set; } = null; 
 
         public Guid? TransactionId { get; set; }
 
-        /// <summary>
-        /// the line in which this value appears in section 
-        /// </summary>
-        public int SectionLineNumber { get; set; } = 0;
+        public TransactionSectionGroup TransactionSectionGroup { get; set; } = null;
+
+        public Guid   TransactionSectionGroupId {  get; set; }       
+
 
     }
 }

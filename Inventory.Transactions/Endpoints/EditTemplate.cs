@@ -31,12 +31,12 @@ namespace Inventory.Transactions.Endpoints
                         CancellationToken ct)
         {
             return TypedResults.Ok(
-                   await _repo.EditTemplateAsync(new TemplateDto(req.Id, req.Name,req.Type,req.Created,req.Sections)));
+                   await _repo.EditTemplateAsync(new TemplateDto(req.Id, req.Name,req.Type,DateTime.UtcNow,req.Sections)));
             
         }
     }
 
-    public record EditTemplateRequest(Guid Id,string Name, DateTime Created, TemplateType Type,
+    public record EditTemplateRequest(Guid Id,string Name, TemplateType Type,
                              ICollection<SectionDto> Sections);
 
   

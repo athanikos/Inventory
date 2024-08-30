@@ -3,6 +3,7 @@ using System;
 using Inventory.Transactions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Inventory.Transactions.Data.Migrations
 {
     [DbContext(typeof(TransactionsDbContext))]
-    partial class TransactionsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240829132514_PG9")]
+    partial class PG9
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -110,12 +113,7 @@ namespace Inventory.Transactions.Data.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid>("TemplateId")
-                        .HasColumnType("uuid");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("TemplateId");
 
                     b.ToTable("Transaction", "Transactions");
                 });
@@ -125,10 +123,6 @@ namespace Inventory.Transactions.Data.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.Property<Guid>("TransactionId")
                         .HasColumnType("uuid");
@@ -206,17 +200,6 @@ namespace Inventory.Transactions.Data.Migrations
                         .HasForeignKey("TemplateId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("Inventory.Transactions.Entities.Transaction", b =>
-                {
-                    b.HasOne("Inventory.Transactions.Entities.Template", "Template")
-                        .WithMany()
-                        .HasForeignKey("TemplateId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Template");
                 });
 
             modelBuilder.Entity("Inventory.Transactions.Entities.TransactionSection", b =>

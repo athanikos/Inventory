@@ -8,11 +8,11 @@
     /// </summary>
     public enum SectionType
     {
-        ProductBuy,        
-        ProductSell,
-        ProductLet,
-        IndividualEntity,
-        CorporateEntity,
-        Aggregate  
+        ProductBuy=0,        
+        ProductSell=1,
+        ProductLet=2,
+        IndividualEntity=3,
+        CorporateEntity=4,
+        Aggregate=5   
     }
 }

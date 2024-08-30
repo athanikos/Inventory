@@ -32,7 +32,7 @@ namespace Transaction.Transactions.Endpoints
                         CancellationToken ct)
         {
             //todo fix optional parameters , just id contructor?
-            await _repo.DeleteTransactionAsync(new TransactionDto(req.Id, string.Empty, DateTime.MinValue,null));
+            await _repo.DeleteTransactionAsync(new TransactionDto(req.Id));
             return TypedResults.Ok();
         }
     }
