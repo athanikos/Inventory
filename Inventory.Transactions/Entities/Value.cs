@@ -5,7 +5,7 @@
     /// </summary>
     public  class Value
     {
-        public Guid  Id { get; set; }
+        public Guid  Id { get; set; } = Guid.Empty;
         /// <summary>
         /// depending on type in TransactionItemTemplateField 
         /// this can be any value of 
@@ -16,8 +16,7 @@
         public Guid FieldId { get; set; }
 
       //  public Field Field { get; set; } = null; 
-
-        public Guid? TransactionId { get; set; }
+        public Guid TransactionId { get; set; }
 
         public TransactionSectionGroup TransactionSectionGroup { get; set; } = null;
 

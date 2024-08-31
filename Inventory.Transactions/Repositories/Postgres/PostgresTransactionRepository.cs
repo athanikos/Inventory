@@ -1,6 +1,8 @@
 ﻿using Inventory.Transactions.Dto;
 using Inventory.Transactions.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using System.Runtime.Intrinsics.Arm;
 
 namespace Inventory.Transactions.Repositories.Postgres
 {
@@ -48,6 +50,28 @@ namespace Inventory.Transactions.Repositories.Postgres
 
 
             return await GetTemplateAsync(t.Id);
+        }
+
+        public async Task<TemplateDto> EditTemplateAsync(TemplateDto inboundTemplate)
+        {
+            var inStoreTemplate = await GetTemplateAsync(inboundTemplate.Id);
+
+            foreach (var sec in inboundTemplate.Sections)
+            {
+                if (inStoreTemplate.Sections.Where(t => sec.TemplateId == t.Id).Any())
+                    EditSection(sec);
+                else
+                    await AddSection(sec);
+            }
+
+            foreach (var storedSection in inStoreTemplate.Sections)
+            {
+                if (inboundTemplate.Sections.Where(t => storedSection.TemplateId == t.Id).Any() == false)
+                    DeleteSection(storedSection);
+            }
+
+            await _context.SaveChangesAsync();
+            return await GetTemplateAsync(inStoreTemplate.Id);
         }
 
         public async Task DeleteTemplateAsync(TemplateDto c)
@@ -222,27 +246,36 @@ namespace Inventory.Transactions.Repositories.Postgres
 
         }
 
-        public void AddValue(ValueDto dto)
+        public void AddValue(ValueDto dto, TransactionSectionGroup tsg)
         { //todo use mapper
-            _context.Values.Add(new Value()
-            {
-                FieldId = dto.FieldId,
-                Text = dto.Text,
-                TransactionId = dto.TransactionId,
-                TransactionSectionGroupId = dto.TransactionSectionGroupId,
+            tsg.Values.Add(
 
-            });
+                new Value()
+                {
+                    FieldId = dto.FieldId,
+                    Text = dto.Text,
+                    TransactionId = dto.TransactionId,
+                    TransactionSectionGroupId = dto.TransactionSectionGroupId,
+                }
+
+
+                );
+
         }
 
-        public void EditValue(ValueDto dto)
+        public void EditValue(ValueDto dto, TransactionSectionGroup tsg)
         {
-            _context.Update(new Value()
+            var v = new Value()
             {
+                Id = dto.Id,
                 FieldId = dto.FieldId,
                 Text = dto.Text,
                 TransactionId = dto.TransactionId,
-                TransactionSectionGroupId = dto.TransactionSectionGroupId,
-            });
+                TransactionSectionGroupId = tsg.Id
+            };
+
+            tsg.Values.Add(v);
+            _context.Entry(v).State = EntityState.Modified;
         }
 
         public void DeleteValue(ValueDto dto)
@@ -267,20 +300,20 @@ namespace Inventory.Transactions.Repositories.Postgres
 
             };
             _context.Transactions.Add(t);
-            await _context.SaveChangesAsync(); // to save id 
-
             foreach (var ts in dto.Sections)
-                await AddTransactionSectionAsync(
-                                    new TransactionSectionDto()
-                                    {
-                                        Id = ts.Id,
-                                        TransactionId = t.Id,
-                                        TransactionSectionType = ts.TransactionSectionType,
-                                        SectionGroups = ts.SectionGroups,
-                                    }
-                    );
+                AddTransactionSection(
+                                   t
+                                   , new TransactionSectionDto()
+                                   {
+                                       Id = ts.Id,
+                                       TransactionId = t.Id,
+                                       TransactionSectionType = ts.TransactionSectionType,
+                                       SectionGroups = ts.SectionGroups,
+                                   }
+                   );
 
             await _context.SaveChangesAsync();
+
             return await GetTransactionAsync(t.Id);
 
         }
@@ -302,64 +335,38 @@ namespace Inventory.Transactions.Repositories.Postgres
 
         }
 
-        public async Task<TemplateDto> EditTemplateAsync(TemplateDto inboundTemplate)
-        {
-            var inStoreTemplate = await GetTemplateAsync(inboundTemplate.Id);
-
-            foreach (var sec in inboundTemplate.Sections)
-            {
-                if (inStoreTemplate.Sections.Where(t => sec.TemplateId == t.Id).Any())
-                    EditSection(sec);
-                else
-                    await AddSection(sec);
-            }
-
-            foreach (var storedSection in inStoreTemplate.Sections)
-            {
-                if (inboundTemplate.Sections.Where(t => storedSection.TemplateId == t.Id).Any() == false)
-                    DeleteSection(storedSection);
-            }
-
-            await _context.SaveChangesAsync();
-            return await GetTemplateAsync(inStoreTemplate.Id);
-        }
-
         public async Task<TransactionDto> EditTransactionAsync(TransactionDto inboundTransaction)
         {
-            var inStoreTransaction = await GetTransactionAsync(inboundTransaction.Id);
+            Entities.Transaction inStoreTransaction = await _context.Transactions.Where(p => p.Id == inboundTransaction.Id).SingleAsync();
 
             foreach (var sec in inboundTransaction.Sections)
             {
-                if (inStoreTransaction.Sections.Where(s => sec.Id == s.Id).Any())
-                    await EditTransactionSectionAsync(sec);
+                if (sec.Id == Guid.Empty)
+                    AddTransactionSection(inStoreTransaction, sec);
                 else
-                    await AddTransactionSectionAsync(sec);
+                    EditTransactionSection(sec, inStoreTransaction);
+
             }
 
-            foreach (var storedSection in inStoreTransaction.Sections)
+            foreach (var storedSection in inStoreTransaction.TransactionSections)
             {
-                if (inboundTransaction.Sections.Where(s => storedSection.TransactionId == s.TransactionId).Any() == false)
-                    await DeleteTransactionSectionAsync(storedSection);
+                if (inboundTransaction.Sections
+                                      .Where(s => storedSection.TransactionId == s.TransactionId)
+                                      .Any() == false)
+                    DeleteTransactionSection(storedSection);
             }
 
             await _context.SaveChangesAsync();
             return await GetTransactionAsync(inStoreTransaction.Id);
         }
 
-        //public async Task DeleteTransactionAsync(TransactionDto dto)
-        //{
-        //    Entities.Transaction t = _context.Transactions.Where(p => p.Id == dto.Id).Single();   
-        //    _context.Remove(t);
-
-        //    List<Value> vs = _context.Values.Where(p => p.TransactionId == dto.Id).ToList();
-        //    foreach (Value v in vs)
-        //        _context.Remove(v);
-        //    await _context.SaveChangesAsync();
-        //}
-
+        public async Task  DeleteTransactionAsync(TransactionDto c)
+        {
+             throw new NotImplementedException();
+             await Task.CompletedTask;
+        }
 
         #endregion Transaction 
-
 
         #region TransactionSection 
         public async Task<ICollection<TransactionSectionDto>> GetTransactionSectionsAsync(Guid TransactionId)
@@ -371,75 +378,73 @@ namespace Inventory.Transactions.Repositories.Postgres
                             Id = ts.Id,
                             TransactionId = TransactionId,
                             TransactionSectionType = ts.TransactionSectionType,
-                            // Transaction = null
+                            //Transaction = null
                         };
-
-
-            return await query.ToListAsync();
+           return await query.ToListAsync();
 
         }
 
-        public async Task<TransactionSectionDto> AddTransactionSectionAsync(TransactionSectionDto dto)
+        private void  AddTransactionSection(Entities.Transaction t, TransactionSectionDto tsdto)
         {
-            TransactionSection ts = new TransactionSection()
+            var ts = new TransactionSection()
             {
-                Id = dto.Id,
-                TransactionId = dto.TransactionId,
-                TransactionSectionType = dto.TransactionSectionType,
+                Id = Guid.Empty,
+                Name = tsdto.Name,
+                TransactionId = tsdto.TransactionId,
+                TransactionSectionType = tsdto.TransactionSectionType,
             };
-            _context.Add(ts);
-            await _context.SaveChangesAsync();
 
-            foreach (var sg in dto.SectionGroups)
+            foreach (var sg in tsdto.SectionGroups)
             {
-                sg.TransactionSectionId = ts.Id;
-                await AddTransactionSectionGroupAsync(sg);
-            }
-            return dto;
-        }
-
-        public async Task<TransactionSectionDto> EditTransactionSectionAsync(TransactionSectionDto dto)
-        {
-            TransactionSection ts = new TransactionSection()
-            {
-                Id = dto.Id,
-                TransactionId = dto.TransactionId,
-                TransactionSectionType = dto.TransactionSectionType,
-            };
-            _context.Update(ts);
-
-            foreach (var sg in dto.SectionGroups)
-            {
-                if (sg.Id == Guid.Empty)                
-                    await AddTransactionSectionGroupAsync(sg);
+                var tsg = new TransactionSectionGroupDto()
+                {
+                    GroupValue = sg.GroupValue,
+                    Id = sg.Id,
+                    Values = sg.Values,
+                    TransactionSectionId = sg.TransactionSectionId
+                };
+                if (sg.Id == Guid.Empty)
+                    AddTransactionSectionGroup(tsg, ts);
                 else
-                    await EditTransactionSectionGroupAsync(sg);
-
+                    EditTransactionSectionGroup(tsg, ts);
             }
-
-            return dto;
-
-
+            t.TransactionSections.Add(ts);
         }
 
-
-        public async Task DeleteTransactionSectionAsync(TransactionSectionDto dto)
+        private void EditTransactionSection(TransactionSectionDto dto, 
+                                           Transactions.Entities.Transaction t )
         {
-            throw new NotImplementedException();    
-            //List<Value> vs = _context.Values.Where(p => p.TransactionId == dto.Id).ToList();
-            //foreach (Value v in vs)
-            //    _context.Remove(v);
-            //await _context.SaveChangesAsync();
+            TransactionSection ts = new TransactionSection()
+            {
+                Id = dto.Id,
+                TransactionId = dto.TransactionId,
+                TransactionSectionType = dto.TransactionSectionType,
+            };
+
+            _context.Attach(ts); //test 
+     
+            
+            foreach (var sg in dto.SectionGroups)
+                if (sg.Id == Guid.Empty)
+                   AddTransactionSectionGroup(sg,ts);
+                else
+                   EditTransactionSectionGroup(sg,ts);
         }
+
+        private void  DeleteTransactionSection(Entities.TransactionSection ts  )
+        {
+            foreach (var sg in ts.SectionGroups)
+               _context.Remove(sg);
+            _context.Remove(ts);
+         }
 
         #endregion
 
-
-
         #region TransactionSectionGroup 
+
         public async Task AddTransactionSectionGroupAsync(TransactionSectionGroupDto dto)
         {
-            var e = new TransactionSectionGroup()
+            var tsg = new TransactionSectionGroup()
             {
                 GroupValue = dto.GroupValue,
                 Id = dto.Id,
@@ -447,45 +452,66 @@ namespace Inventory.Transactions.Repositories.Postgres
                 TransactionSection = null
             };
 
-            _context.Add(e);
+            _context.Add(tsg);
             await _context.SaveChangesAsync();
 
             foreach (var v in dto.Values)
             {
-                v.TransactionSectionGroupId = e.Id;
+                v.TransactionSectionGroupId = tsg.Id;
                 if (v.Id == Guid.Empty)
-                    AddValue(v);
+                    AddValue(v,tsg);
                 else
-                    EditValue(v);
+                    EditValue(v,tsg);
             }
+
             await _context.SaveChangesAsync();
         }
 
-        public async Task EditTransactionSectionGroupAsync(TransactionSectionGroupDto dto)
+        private void AddTransactionSectionGroup(TransactionSectionGroupDto dto, 
+            Entities.TransactionSection ts )
         {
-            var e = new TransactionSectionGroup()
+            var tsg = new TransactionSectionGroup()
+            {
+                GroupValue = dto.GroupValue,
+                Id = dto.Id,
+                TransactionSectionId = ts.Id,
+                TransactionSection = null
+            };
+            ts.SectionGroups.Add(tsg);
+                        
+            foreach (var v in dto.Values)
+            {
+                v.TransactionSectionGroupId = tsg.Id;
+                if (v.Id == Guid.Empty)
+                    AddValue(v,tsg);
+                else
+                    EditValue(v, tsg);
+            }
+        }
+
+        private void EditTransactionSectionGroup(TransactionSectionGroupDto dto, 
+            Entities.TransactionSection ts)
+        {
+            var tsg = new TransactionSectionGroup()
             {
                 GroupValue = dto.GroupValue,
                 Id = dto.Id,
                 TransactionSectionId = dto.TransactionSectionId,
-                TransactionSection = null
+                TransactionSection  = ts 
             };
-
-            _context.Update(e);
-            await _context.SaveChangesAsync();
-
+            _context.Update(tsg);
             foreach (var v in dto.Values)
             {
-                v.TransactionSectionGroupId = e.Id;
-                AddValue(v);
+                v.TransactionSectionGroupId = tsg.Id;
+                if (v.Id == Guid.Empty)
+                    AddValue(v,tsg);
+                else
+                    EditValue(v, tsg    );
             }
-            await _context.SaveChangesAsync();
         }
 
-        public Task DeleteTransactionAsync(TransactionDto c)
-        {
-            throw new NotImplementedException();
-        }
+        
+
 
         #endregion
 

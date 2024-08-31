@@ -9,6 +9,11 @@ namespace Inventory.Transactions.Dto
         public Guid Id { get; set; } = Guid.Empty;
         public Guid TransactionId { get; set; } = Guid.Empty;
 
+
+        public string Name { get; set; } = string.Empty;
+
+
+
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public SectionType TransactionSectionType { get; set; }
 
