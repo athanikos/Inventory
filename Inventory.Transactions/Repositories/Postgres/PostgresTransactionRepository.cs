@@ -1,8 +1,6 @@
 ﻿using Inventory.Transactions.Dto;
 using Inventory.Transactions.Entities;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
-using System.Runtime.Intrinsics.Arm;
 
 namespace Inventory.Transactions.Repositories.Postgres
 {
