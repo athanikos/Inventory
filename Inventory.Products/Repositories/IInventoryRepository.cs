@@ -18,6 +18,7 @@ namespace Inventory.Products.Repositories
         List<string> GetDistinctProductCodes(Guid InventoryId);
         List<string> GetDistinctMetricCodes();
 
+        Task AddOrEditProductQuantityMetric(QuantityMetricDto m);
         Task AddOrEditProductMetric(ProductMetricDto m);
         Task<MetricDto> AddMetricAsync(MetricDto dto);
         Task<MetricDto> EditMetricAsync(MetricDto c);

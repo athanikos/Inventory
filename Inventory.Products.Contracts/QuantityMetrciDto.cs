@@ -1,15 +1,14 @@
 ﻿namespace Inventory.Products.Contracts.Dto
 {
 
-    public class ProductMetricDto
+    public class QuantityMetricDto
     {
-        public ProductMetricDto(
+        public QuantityMetricDto(
             Guid productId, 
             Guid metricId,
             decimal value, 
             DateTime effectiveDate, 
-            string currency,
-            string productCode,
+             string productCode,
             string metricCode
             )
         {
@@ -17,7 +16,6 @@
             MetricId = metricId;    
             Value = value;
             EffectiveDate = effectiveDate;
-            Currency = currency;
             ProductCode = productCode;
             MetricCode = metricCode;    
         }
@@ -35,17 +33,18 @@
         public DateTime EffectiveDate { get; set; }
         = DateTime.MinValue;
 
-        public string Currency { get; set; } = string.Empty;
-
         public Guid SourceId { get; set; }
 
 
         public override string ToString()
         {
-            return "ProductId" +
+            return 
+            
+              "ProductId" +
             ProductId.ToString() + " "+
-           "MetricId" + MetricId.ToString() + " "+
-            Value + " " +  EffectiveDate;
+              "MetricId" + MetricId.ToString() + " "+
+            Value + " " +
+            EffectiveDate;
         }
     }
 

@@ -3,41 +3,37 @@ using dto = Inventory.Products.Contracts.Dto;
 using Inventory.Products.Repositories;
 using MediatR;
 using Serilog;
+using Inventory.Products.Contracts.Dto;
 
 namespace Inventory.Products.Handlers
 {
-    public class AddProdcutMetricHandler : 
-        IRequestHandler<AddProductMetricCommand,dto.ProductMetricDto>
+    public class AddQuantityMetricHandler : 
+        IRequestHandler<AddQuantityMetricCommand,dto.QuantityMetricDto>
     {
         private IInventoryRepository _repository;
         
-        public AddProdcutMetricHandler(IInventoryRepository
+        public AddQuantityMetricHandler(IInventoryRepository
             repository) 
         {
             _repository = repository;   
         }    
 
 
-        public async Task<dto.ProductMetricDto> Handle(AddProductMetricCommand request, 
-            CancellationToken cancellationToken)
+     
+        public Task<QuantityMetricDto> Handle(AddQuantityMetricCommand request, CancellationToken cancellationToken)
         {
-
-            var dto = new dto.ProductMetricDto(request.ProductId,
-                                                   request.MetricId,
-                                                   request.Value,
-                                                   request.EffectiveDate,
-                                                   request.Currency,
-                                                   string.Empty,
-                                                   string.Empty
-                             );
+            var dto = new dto.QuantityMetricDto(request.ProductId,
+                                                     request.MetricId,
+                                                     request.Value,
+                                                     request.EffectiveDate,
+                                                     string.Empty,
+                                                     string.Empty
+                               );
 
 
             try
             {
-                // Log.Information(" _repository.AddOrEditProductMetric(dto); ");
-                // Log.Information(" 2 _repository.AddOrEditProductMetric(dto); ");
-                await _repository.AddOrEditProductMetric(dto);
-                // Log.Information(" after _repository.AddOrEditProductMetric(dto); ");
+                await _repository.AddOrEditQuantityMetric(dto);
 
 
             }
@@ -45,10 +41,8 @@ namespace Inventory.Products.Handlers
             {
                 Log.Error(ex.ToString());
             }
-       
+
             return dto;
         }
-
-        
     }
 }

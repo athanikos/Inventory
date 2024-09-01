@@ -34,9 +34,14 @@ namespace Inventory.Transactions.Repositories.Postgres
 
         public async Task<TemplateDto> AddTemplateAsync(TemplateDto dto)
         {
-            var t = new Template() { Id = dto.Id, Created = dto.Created, Name = dto.Name, Type = dto.Type };
+            var t = new Template() {
+                                        Id = dto.Id, 
+                                        Created = dto.Created, 
+                                        Name = dto.Name,
+                                         Type = dto.Type 
+                                    };
             _context.Templates.Add(t);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(); //todo do work in context avoid saving per level 
 
 
             if (dto.Sections != null)
@@ -111,10 +116,6 @@ namespace Inventory.Transactions.Repositories.Postgres
             _context.Sections.Add(s);
             await _context.SaveChangesAsync();
 
-
-
-
-
             foreach (var f in c.Fields)
                 fields.Add(new Field()
                 {
@@ -140,24 +141,17 @@ namespace Inventory.Transactions.Repositories.Postgres
 
 
             foreach (var field in inboundSection.Fields)
-            {
-                if (inStoreSection.Fields.Where(t => field.TemplateId == t.Id).Any())
-                    EditField(field);
-                else
+                if (field.Id == Guid.Empty)
                     AddField(field);
-            }
-
+                else
+                    EditField(field);
+            
             foreach (var storedField in inStoreSection.Fields)
             {
                 if (inboundSection.Fields.Where(t => storedField.TemplateId == t.Id).Any() == false)
                     DeleteField(new FieldDto(storedField.Id));
             }
-
-
-
             _context.Update(f);
-
-
         }
 
         public void DeleteSection(SectionDto dto)

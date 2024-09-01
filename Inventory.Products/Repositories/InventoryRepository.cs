@@ -136,6 +136,16 @@ namespace Inventory.Products.Repositories
                   .ToList();
         }
 
+
+        public async Task AddOrEditProductQuantityMetric(QuantityMetricDto qm)
+        {
+            // Log.Information("AddOrEditProductMetric:" + m.ToString());
+            UpdateProductMetricCodes(qm);
+            DecideNewOrEdit(qm);
+            await _context.SaveChangesAsync();
+        }
+
+
         public async Task AddOrEditProductMetric(ProductMetricDto m)
         {
                 // Log.Information("AddOrEditProductMetric:" + m.ToString());
@@ -146,21 +156,35 @@ namespace Inventory.Products.Repositories
 
         public void UpdateProductMetricCodes(ProductMetricDto m)
         {
-            string productCode = _context.Products.
-                                 Where(p => p.Id == m.ProductId).
-                                 Select(i => i.Code).Single();
-
-            string metricCode = _context.Metrics.
-                          Where(p => p.Id == m.MetricId).
-                          Select(i => i.Code).Single();
+            string productCode, metricCode;
+            UpdateMetricCodes(m.ProductId, m.MetricId, out productCode, out metricCode);
 
             m.ProductCode = productCode;
             m.MetricCode = metricCode;
 
         }
 
+        public void UpdateQuantityMetricCodes(QuantityMetricDto m)
+        {
+            string productCode, metricCode;
+            UpdateMetricCodes(m.ProductId, m.MetricId, out productCode, out metricCode);
 
-        public  void DecideNewOrEdit(ProductMetricDto m)
+            m.ProductCode = productCode;
+            m.MetricCode = metricCode;
+
+        }
+
+        private void UpdateMetricCodes(Guid ProductId, Guid MetricId, out string productCode, out string metricCode)
+        {
+            productCode = _context.Products.
+                                 Where(p => p.Id == ProductId).
+                                 Select(i => i.Code).Single();
+            metricCode = _context.Metrics.
+                          Where(p => p.Id == MetricId).
+                          Select(i => i.Code).Single();
+        }
+
+        public void DecideNewOrEdit(ProductMetricDto m)
         {
             var pm = _context.ProductMetrics.Where
                 (
@@ -169,17 +193,42 @@ namespace Inventory.Products.Repositories
                          && p.EffectiveDate == m.EffectiveDate
                 ).FirstOrDefault(); // needed tolist ? https://stackoverflow.com/questions/61052687/a-command-is-already-in-progress
 
-            if (pm!=null) 
+            if (pm != null)
             {
                 pm.ProductId = m.ProductId;
-                pm.Value = m.Value; 
+                pm.Value = m.Value;
                 pm.Currency = m.Currency;
                 pm.ProductCode = m.ProductCode;
                 pm.Currency = m.Currency;
-                pm.EffectiveDate = m.EffectiveDate; 
-                pm.MetricCode = m.MetricCode;   
-                pm.MetricId = m.MetricId;   
+                pm.EffectiveDate = m.EffectiveDate;
+                pm.MetricCode = m.MetricCode;
+                pm.MetricId = m.MetricId;
                 _context.Update(pm);
+            }
+            else
+                _context.ProductMetrics.Add(CreateProductMetric(m));
+        }
+
+
+
+        public void DecideNewOrEdit(QuantityMetricDto m)
+        {
+            var qm = _context.ProductMetrics.Where
+                (
+                    p => p.MetricId == m.MetricId
+                         && p.ProductId == m.ProductId
+                         && p.EffectiveDate == m.EffectiveDate
+                ).FirstOrDefault(); // needed tolist ? https://stackoverflow.com/questions/61052687/a-command-is-already-in-progress
+
+            if (qm!=null) 
+            {
+                qm.ProductId = m.ProductId;
+                qm.Value = m.Value; 
+                qm.ProductCode = m.ProductCode;
+                qm.EffectiveDate = m.EffectiveDate; 
+                qm.MetricCode = m.MetricCode;   
+                qm.MetricId = m.MetricId;   
+                _context.Update(qm);
             }
             else
                 _context.ProductMetrics.Add(CreateProductMetric(m));
