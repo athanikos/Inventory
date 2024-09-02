@@ -1,7 +1,9 @@
-﻿using Inventory.Products.Contracts.Dto;
+﻿using Inventory.Products.Contracts;
+using Inventory.Products.Contracts.Dto;
 using Inventory.Products.Dto;
 using Inventory.Products.Entities;
 using Inventory.Products.Handlers;
+using Microsoft.EntityFrameworkCore;
 using System.Data.SqlClient;
 
 namespace Inventory.Products.Repositories
@@ -487,23 +489,9 @@ namespace Inventory.Products.Repositories
         {
             throw new NotImplementedException();
         }
+                        
 
-
-        async Task<QuantityMetricDto> AddQuantityMetricAsync(QuantityMetricDto dto)
-        {
-                QuantityMetric qm = new QuantityMetric();
-                qm.ProductId = dto.ProductId;
-                qm.Value = dto.Value;
-                qm.ProductCode = dto.ProductCode;
-                qm.EffectiveDate = dto.EffectiveDate;
-                qm.MetricCode = dto.MetricCode;
-                _context.Update(qm);
-                await _context.SaveChangesAsync();
-
-                return              GetQuantityMetric(qm.ProductCode, qm.MetricCode);
-        }
-
-        public QuantityMetricDto GetQuantityMetric(string ProductCode, string MetricCode)
+        public Task<QuantityMetricDto> GetQuantityMetric(string ProductCode, string MetricCode)
         {
             ProductCode = ProductCode.ToUpper().Trim();
             MetricCode = MetricCode.ToUpper().Trim();
@@ -516,15 +504,20 @@ namespace Inventory.Products.Repositories
                                                      i.Value,
                                                      i.EffectiveDate,
                                                      i.ProductCode))
-                   .First();
-
-
-
+                   .FirstAsync();
         }
 
-        Task<QuantityMetricDto> IInventoryRepository.AddQuantityMetricAsync(QuantityMetricDto inventoryDto)
+        async Task<QuantityMetricDto> IInventoryRepository.AddQuantityMetricAsync(QuantityMetricDto dto)
         {
-            throw new NotImplementedException();
+            QuantityMetric qm = new QuantityMetric();
+            qm.ProductId = dto.ProductId;
+            qm.Value = dto.Value;
+            qm.ProductCode = dto.ProductCode;
+            qm.EffectiveDate = dto.EffectiveDate;
+            qm.MetricCode = dto.MetricCode;
+            _context.Add(qm);
+            await _context.SaveChangesAsync();
+            return await  GetQuantityMetric(dto.ProductCode, Constants.QUANTITYCODE);
         }
 
         public Task<QuantityMetricDto> GetQuantityMetricAsync(QuantityMetricDto inventoryDto)

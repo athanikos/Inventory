@@ -2,13 +2,10 @@
 namespace Inventory.Products.Endpoints
 {
     using FastEndpoints;
-    using Hangfire.Annotations;
     using Inventory.Products.Contracts.Dto;
-    using Inventory.Products.Dto;
     using Inventory.Products.Repositories;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Http.HttpResults;
-    using System.Globalization;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -24,7 +21,7 @@ namespace Inventory.Products.Endpoints
 
         public override void Configure()
         {
-            Post("/inventory");
+            Post("/quantitymetric");
             AllowAnonymous();//todo remove 
             // to do claims this is per InventoryId claim
             //  something like Admin_<inventoryId>
@@ -42,7 +39,8 @@ namespace Inventory.Products.Endpoints
     }
 
 
-    public record AddQuantityMetricRequest(Guid ProductId, string ProductCode, string MetricCode, decimal Value, DateTime EffectiveDate);
+    public record AddQuantityMetricRequest(Guid ProductId, 
+         decimal Value, DateTime EffectiveDate, string ProductCode);
 
 
 
