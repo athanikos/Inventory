@@ -1,5 +1,6 @@
 ﻿using Inventory.Products.Dto;
 using Inventory.Products.Contracts.Dto;
+using Inventory.Products.Handlers;
 
 namespace Inventory.Products.Repositories
 {
@@ -25,9 +26,7 @@ namespace Inventory.Products.Repositories
         Task DeleteMetricAsync(MetricDto c);
 
         Task AddOrEditInventoryMetric(InventoryMetricDto m);
-
         bool CategoryFatherIdExists(Guid FatherId);
-
 
         Task<CategoryDto> AddCategoryAsync(CategoryDto dto);
         bool CategoryIdExists(Guid Id);
@@ -35,10 +34,14 @@ namespace Inventory.Products.Repositories
         Task DeleteCategoryAsync(CategoryDto c);
         Task<SourceDto> AddSourceAsync(SourceDto sourceDto);
 
-
+        Task<QuantityMetricDto> LetProduct(LetProductDto dto);    
         ProductMetricDto GetProductMetric(string ProductCode, string MetricCode);
 
-        void EmptyDB();
+        Task<QuantityMetricDto> AddQuantityMetricAsync(QuantityMetricDto inventoryDto);
 
+        Task<QuantityMetricDto> GetQuantityMetricAsync(QuantityMetricDto inventoryDto);
+
+
+        void EmptyDB();
     }
 }

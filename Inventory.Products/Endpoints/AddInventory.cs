@@ -1,4 +1,5 @@
 ﻿
+
 namespace Inventory.Products.Endpoints
 {
     using FastEndpoints;

@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System;
 namespace Inventory.Products;
 
 public class ProductsDbContext : DbContext
@@ -15,17 +16,14 @@ public class ProductsDbContext : DbContext
         public   DbSet<Entities.Source> Sources { get; set; }
         public   DbSet<Entities.ProductCategory> ProductCategories { get; set; }
         public   DbSet<Entities.ProductMetric> ProductMetrics { get; set; }
-        public DbSet<Entities.QuantityMetric> QuamtityMetrics { get; set; }
+        public   DbSet<Entities.QuantityMetric> QuantityMetrics { get; set; }
+        public   DbSet<Entities.InventoryMetric> InventoryMetrics { get; set; }
     
-
-    public   DbSet<Entities.InventoryMetric> InventoryMetrics { get; set; }
-    
-     protected override void OnModelCreating
-            (ModelBuilder modelBuilder)
-            {
+        protected override void OnModelCreating
+        (ModelBuilder modelBuilder)
+        {
                         base.OnModelCreating(modelBuilder);
                         modelBuilder.HasDefaultSchema("Products");
-
                         modelBuilder.Entity<Entities.Product>().ToTable("Product");
 
                         modelBuilder.Entity<Entities.Inventory>()
@@ -34,6 +32,11 @@ public class ProductsDbContext : DbContext
                         modelBuilder.Entity<Entities.Inventory>().ToTable("Inventory");
                         modelBuilder.Entity<Entities.Source>().ToTable("Source");
                         modelBuilder.Entity<Entities.Category>().ToTable("Category");
+
+                        modelBuilder.Entity<Entities.Category>().HasKey(e => e.Id); 
+
+                        modelBuilder.Entity<Entities.QuantityMetric>()
+                       .HasKey(p => new { p.MetricId, p.ProductId, p.EffectiveDate });
 
                         modelBuilder.Entity<Entities.Product>()
                                                 .HasMany(e => e.Categories)
@@ -52,15 +55,8 @@ public class ProductsDbContext : DbContext
                         .UsingEntity<Entities.InventoryMetric>()
                         .HasKey(p => new { p.MetricId, p.InventoryId, p.EffectiveDate });
 
-
-
-
                         modelBuilder.Entity<Entities.Source>()
                                           .HasMany(e => e.Metrics);
-                   
-
-
-
         }
 
      protected override void ConfigureConventions(

@@ -1,6 +1,8 @@
 ﻿using Inventory.Products.Contracts.Dto;
 using Inventory.Products.Dto;
 using Inventory.Products.Entities;
+using Inventory.Products.Handlers;
+using System.Data.SqlClient;
 
 namespace Inventory.Products.Repositories
 {
@@ -139,8 +141,10 @@ namespace Inventory.Products.Repositories
 
         public async Task AddOrEditProductQuantityMetric(QuantityMetricDto qm)
         {
-            // Log.Information("AddOrEditProductMetric:" + m.ToString());
-            UpdateProductMetricCodes(qm);
+            qm.ProductCode = _context.Products.
+                             Where(p => p.Id == qm.ProductId).
+                             Select(i => i.Code).Single();
+           
             DecideNewOrEdit(qm);
             await _context.SaveChangesAsync();
         }
@@ -164,16 +168,7 @@ namespace Inventory.Products.Repositories
 
         }
 
-        public void UpdateQuantityMetricCodes(QuantityMetricDto m)
-        {
-            string productCode, metricCode;
-            UpdateMetricCodes(m.ProductId, m.MetricId, out productCode, out metricCode);
-
-            m.ProductCode = productCode;
-            m.MetricCode = metricCode;
-
-        }
-
+        
         private void UpdateMetricCodes(Guid ProductId, Guid MetricId, out string productCode, out string metricCode)
         {
             productCode = _context.Products.
@@ -213,10 +208,9 @@ namespace Inventory.Products.Repositories
 
         public void DecideNewOrEdit(QuantityMetricDto m)
         {
-            var qm = _context.ProductMetrics.Where
+            var qm = _context.QuantityMetrics.Where
                 (
-                    p => p.MetricId == m.MetricId
-                         && p.ProductId == m.ProductId
+                    p => p.ProductId == m.ProductId
                          && p.EffectiveDate == m.EffectiveDate
                 ).FirstOrDefault(); // needed tolist ? https://stackoverflow.com/questions/61052687/a-command-is-already-in-progress
 
@@ -224,14 +218,14 @@ namespace Inventory.Products.Repositories
             {
                 qm.ProductId = m.ProductId;
                 qm.Value = m.Value; 
+               
                 qm.ProductCode = m.ProductCode;
                 qm.EffectiveDate = m.EffectiveDate; 
                 qm.MetricCode = m.MetricCode;   
-                qm.MetricId = m.MetricId;   
                 _context.Update(qm);
             }
             else
-                _context.ProductMetrics.Add(CreateProductMetric(m));
+                _context.QuantityMetrics.Add(CreateQuantityMetric(m));
         }
 
         private static ProductMetric CreateProductMetric(ProductMetricDto m)
@@ -243,6 +237,18 @@ namespace Inventory.Products.Repositories
                 ProductId = m.ProductId,
                 Value = m.Value,
                 Currency = m.Currency,
+                ProductCode = m.ProductCode,
+                MetricCode = m.MetricCode
+            };
+        }
+
+        private static QuantityMetric CreateQuantityMetric(QuantityMetricDto m)
+        {
+            return new QuantityMetric()
+            {
+                EffectiveDate = m.EffectiveDate,
+                ProductId = m.ProductId,
+                Value = m.Value,
                 ProductCode = m.ProductCode,
                 MetricCode = m.MetricCode
             };
@@ -424,24 +430,7 @@ namespace Inventory.Products.Repositories
 
             return new MetricDto(entity.Id, entity.Description, entity.Code, entity.SourceId);
         }
-
-
-        public ProductMetricDto GetProductMetric(Guid productId, Guid metricId)
-        {
-            var entity = _context.ProductMetrics
-                         .Where(p => p.ProductId == productId && p.MetricId == metricId)
-                         .Select(i => i)
-                         .Single();
-
-            return new ProductMetricDto(entity.ProductId,
-                                        entity.MetricId,
-                                        entity.Value,
-                                        entity.EffectiveDate,
-                                        entity.Currency ,
-                                        entity.ProductCode,
-                                        entity.MetricCode);
-        }
-
+           
         public async  Task<SourceDto> AddSourceAsync(SourceDto dto )
         {
             Entities.Source e = new Entities.Source() 
@@ -451,14 +440,28 @@ namespace Inventory.Products.Repositories
             return new SourceDto(dto.Id, dto.Description);
         }
 
+        public async Task<bool> LetProduct(LetProductDto dto)  
+        {
+            var ProductId = new SqlParameter("@ProductId", dto.ProductId);
+            var IncreaseBy = new SqlParameter("@IncreaseBy", dto.IncreaseBy);
 
-        /// <summary>
-        /// returns the latest by effective date product metric row 
-        /// </summary>
-        /// <param name="ProductCode"></param>
-        /// <param name="MetricCode"></param>
-        /// <returns></returns>
-        public  ProductMetricDto GetProductMetric(string ProductCode, string MetricCode)
+            ////to get this to work, you will need to change your select inside dbo.insert_department to include name in the resultset
+            //var department = _context.Database.SqlQuery<QuantityMetric>(
+            //    "dbo.insert_department @ProductId,@IncreaseBy ", ProductId  
+            //     ).SingleOrDefault();
+
+            await _context.SaveChangesAsync();
+            return true;    
+        }
+
+
+            /// <summary>
+            /// returns the latest by effective date product metric row 
+            /// </summary>
+            /// <param name="ProductCode"></param>
+            /// <param name="MetricCode"></param>
+            /// <returns></returns>
+        public ProductMetricDto GetProductMetric(string ProductCode, string MetricCode)
         {
                 ProductCode = ProductCode.ToUpper().Trim();
                 MetricCode = MetricCode.ToUpper().Trim();
@@ -480,6 +483,53 @@ namespace Inventory.Products.Repositories
 
         }
 
-        
+        Task<QuantityMetricDto> IInventoryRepository.LetProduct(LetProductDto dto)
+        {
+            throw new NotImplementedException();
+        }
+
+
+        async Task<QuantityMetricDto> AddQuantityMetricAsync(QuantityMetricDto dto)
+        {
+                QuantityMetric qm = new QuantityMetric();
+                qm.ProductId = dto.ProductId;
+                qm.Value = dto.Value;
+                qm.ProductCode = dto.ProductCode;
+                qm.EffectiveDate = dto.EffectiveDate;
+                qm.MetricCode = dto.MetricCode;
+                _context.Update(qm);
+                await _context.SaveChangesAsync();
+
+                return              GetQuantityMetric(qm.ProductCode, qm.MetricCode);
+        }
+
+        public QuantityMetricDto GetQuantityMetric(string ProductCode, string MetricCode)
+        {
+            ProductCode = ProductCode.ToUpper().Trim();
+            MetricCode = MetricCode.ToUpper().Trim();
+
+            return _context
+                   .QuantityMetrics
+                   .Where(i => i.ProductCode == ProductCode && i.MetricCode == MetricCode)
+                   .OrderByDescending(i => i.EffectiveDate)
+                   .Select(i => new QuantityMetricDto(i.ProductId,
+                                                     i.Value,
+                                                     i.EffectiveDate,
+                                                     i.ProductCode))
+                   .First();
+
+
+
+        }
+
+        Task<QuantityMetricDto> IInventoryRepository.AddQuantityMetricAsync(QuantityMetricDto inventoryDto)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<QuantityMetricDto> GetQuantityMetricAsync(QuantityMetricDto inventoryDto)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

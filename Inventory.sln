@@ -54,6 +54,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Inventory.Transactions.Cont
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Utilities", "Utilities", "{095722A7-8D45-4AC1-9427-6FED013EB486}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SQL", "SQL", "{0844F098-CD39-4904-8C5B-E019D592C9B0}"
+	ProjectSection(SolutionItems) = preProject
+		DailyLetProduct.sql = DailyLetProduct.sql
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -138,6 +143,7 @@ Global
 		{9414B37A-4D36-48D3-B5DA-3EE14DE1CA08} = {3148B307-D3E3-4049-835A-912CDA6DBFDE}
 		{533EADA9-36BE-46E8-BE50-CB671FD898B9} = {3148B307-D3E3-4049-835A-912CDA6DBFDE}
 		{095722A7-8D45-4AC1-9427-6FED013EB486} = {A448CE67-00F2-4249-9DE5-040476B1CB95}
+		{0844F098-CD39-4904-8C5B-E019D592C9B0} = {FC7F9F24-A6CD-4F29-9A04-866E01A39B73}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {582FC159-BB6D-4F86-A864-9DCDBC25735B}
