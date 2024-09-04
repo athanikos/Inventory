@@ -1,5 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Inventory.Products.Entities;
+using Microsoft.EntityFrameworkCore;
 using System;
+using System.Diagnostics.Metrics;
 namespace Inventory.Products;
 
 public class ProductsDbContext : DbContext
@@ -33,12 +35,15 @@ public class ProductsDbContext : DbContext
                         modelBuilder.Entity<Entities.Source>().ToTable("Source");
                         modelBuilder.Entity<Entities.Category>().ToTable("Category");
 
-                        modelBuilder.Entity<Entities.Category>().HasKey(e => e.Id); 
+                        modelBuilder.Entity<Entities.Category>().HasKey(e => e.Id);
 
-                        modelBuilder.Entity<Entities.QuantityMetric>()
-                       .HasKey(p => new { p.MetricId, p.ProductId, p.EffectiveDate });
+                       modelBuilder.Entity<Entities.QuantityMetric>().ToTable("QuantityMetric");
 
-                        modelBuilder.Entity<Entities.Product>()
+
+                       modelBuilder.Entity<Entities.QuantityMetric>()
+                       .HasKey(p => new {  p.ProductId, p.EffectiveDate });
+        
+                       modelBuilder.Entity<Entities.Product>()
                                                 .HasMany(e => e.Categories)
                                                 .WithMany(e => e.Products)
                                                 .UsingEntity<Entities.ProductCategory>();
@@ -55,8 +60,8 @@ public class ProductsDbContext : DbContext
                         .UsingEntity<Entities.InventoryMetric>()
                         .HasKey(p => new { p.MetricId, p.InventoryId, p.EffectiveDate });
 
-                        modelBuilder.Entity<Entities.Source>()
-                                          .HasMany(e => e.Metrics);
+                          modelBuilder.Entity<Entities.Source>()
+                                                                              .HasMany(e => e.Metrics);
         }
 
      protected override void ConfigureConventions(

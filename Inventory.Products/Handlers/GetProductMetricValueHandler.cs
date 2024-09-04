@@ -19,8 +19,7 @@ namespace Inventory.Products.Handlers
         public async  Task<ProductMetricDto> Handle(GetProductMetricQuery request, 
             CancellationToken cancellationToken)
         {
-            await Task.CompletedTask;
-            return _repo.GetProductMetric(request.ProductCode, request.MetricCode);
+            return await  _repo.GetProductMetricAsync(request.ProductCode,request.MetricCode);
         }
 
        

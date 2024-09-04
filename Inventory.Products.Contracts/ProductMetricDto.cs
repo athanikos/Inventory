@@ -3,6 +3,13 @@
 
     public class ProductMetricDto
     {
+        public ProductMetricDto(Guid productId)
+        {
+            ProductId = productId;
+        }
+
+
+
         public ProductMetricDto(
             Guid productId, 
             Guid metricId,
@@ -21,6 +28,13 @@
             ProductCode = productCode;
             MetricCode = metricCode;    
         }
+
+        public  static ProductMetricDto NewProductMetricDto(Guid metricId, Guid productId,
+         int quantity, string currency, string productCode, string metricCode)
+        {
+            return new ProductMetricDto(productId, metricId, quantity, DateTime.MinValue, currency, productCode, metricCode);
+        }
+
 
         public Guid ProductId { get; set; }
 

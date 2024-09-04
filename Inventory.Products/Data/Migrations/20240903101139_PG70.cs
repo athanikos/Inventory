@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Inventory.Products.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class PG : Migration
+    public partial class PG70 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -40,6 +40,21 @@ namespace Inventory.Products.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Inventory", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "QuantityMetric",
+                schema: "Products",
+                columns: table => new
+                {
+                    ProductId = table.Column<Guid>(type: "uuid", nullable: false),
+                    EffectiveDate = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    ProductCode = table.Column<string>(type: "text", nullable: false),
+                    Value = table.Column<decimal>(type: "numeric(18,6)", precision: 18, scale: 6, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_QuantityMetric", x => new { x.ProductId, x.EffectiveDate });
                 });
 
             migrationBuilder.CreateTable(
@@ -234,6 +249,10 @@ namespace Inventory.Products.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "ProductMetrics",
+                schema: "Products");
+
+            migrationBuilder.DropTable(
+                name: "QuantityMetric",
                 schema: "Products");
 
             migrationBuilder.DropTable(

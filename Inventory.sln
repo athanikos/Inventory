@@ -56,7 +56,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Utilities", "Utilities", "{
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SQL", "SQL", "{0844F098-CD39-4904-8C5B-E019D592C9B0}"
 	ProjectSection(SolutionItems) = preProject
-		DailyLetProduct.text = DailyLetProduct.text
+		LetScript.text = LetScript.text
 	EndProjectSection
 EndProject
 Global

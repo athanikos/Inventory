@@ -4,8 +4,7 @@ namespace Inventory.Transactions.Repositories
 {
     public interface ITransactionRepository
     {
-        Task EmptyDB();// todo possible remove to another repo to another endpoint (admin)?
-
+        Task EmptyDB();
         Task<TemplateDto> AddTemplateAsync(TemplateDto dto);
         Task<TemplateDto> EditTemplateAsync(TemplateDto dto);
         Task DeleteTemplateAsync(TemplateDto dto);

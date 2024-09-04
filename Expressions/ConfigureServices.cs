@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using MediatR;
 using Expressions;
+using Inventory.Expressions.Repositories;
 
 namespace Inventory.Expressions
 {
@@ -30,7 +31,7 @@ namespace Inventory.Expressions
             services.AddScoped<IEvaluator, Evaluator>(
             sp =>
             {
-                return new Evaluator(sp.GetRequiredService<IMediator>(), sp.GetRequiredService<ExpressionsDbContext>());
+                return new Evaluator(sp.GetRequiredService<IMediator>(), sp.GetRequiredService<IExpressionRepository>());
             }
             );
                                

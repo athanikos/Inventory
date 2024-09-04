@@ -42,7 +42,7 @@ namespace Inventory.Products.Endpoints
                 return new ProblemDetails(ValidationFailures);
             }
 
-            if (_repo.ProductDescriptionOrCategoryIsUsed(dto))
+            if (await _repo.ProductDescriptionOrCategoryIsUsedAsync(dto))
             {
                 AddError("Product code or descr is used  ");
                 ThrowIfAnyErrors(); // If there are errors, execution shouldn't go beyond this point

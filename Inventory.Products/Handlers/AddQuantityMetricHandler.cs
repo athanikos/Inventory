@@ -1,5 +1,4 @@
 ﻿using Inventory.Products.Contracts;
-using dto = Inventory.Products.Contracts.Dto;
 using Inventory.Products.Repositories;
 using MediatR;
 using Serilog;
@@ -28,7 +27,7 @@ namespace Inventory.Products.Handlers
                                                 string.Empty);
             try
             {
-                await _repository.AddOrEditProductQuantityMetric(dto);
+                await _repository.AddQuantityMetricAsync(dto);
             }
             catch (Exception ex)
             {

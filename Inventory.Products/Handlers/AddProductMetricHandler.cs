@@ -32,7 +32,7 @@ namespace Inventory.Products.Handlers
                              );
             try
             {
-                await _repository.AddOrEditProductMetric(dto);
+                await _repository.AddOrEditProductMetricAsync(dto);
             }
             catch (Exception ex)
             {

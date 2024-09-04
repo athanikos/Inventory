@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Inventory.Expressions;
 using Serilog;
 using Inventory.Notifications.Contracts;
+using Inventory.Expressions.Repositories;
 
 namespace Expressions
 {
@@ -21,15 +22,15 @@ namespace Expressions
         private string ALLSpecifier = "[ALL]";
         private string _expression = string.Empty;
         private readonly IMediator _mediator;
-        private readonly ExpressionsDbContext _context;
+        private readonly IExpressionRepository _repo;
         private List<string> _allProductCodes= new List<string>();
         private List<string> _allMetricCodes= new List<string>();
         private Guid _inventoryId;
 
-        public Evaluator(IMediator mediator, ExpressionsDbContext context)
+        public Evaluator(IMediator mediator, IExpressionRepository repo)
         {
             _mediator = mediator;
-            _context = context;
+            _repo = repo;
         }
 
         public async Task<EvaluatorResult> Execute(Guid inventoryId, string expression)
@@ -38,6 +39,31 @@ namespace Expressions
             _inventoryId = inventoryId;
             GetCodes();
             return await ComputeTokens(BreakExpressionIntoListOfStrings());
+        }
+
+        private List<string> BreakExpressionIntoListOfStrings()
+        {
+            List<string> resultedList = new List<string>();
+            string currentToken = string.Empty;
+
+            for (int i = 0; i < _expression.Length; i++)
+            {
+                if (_operators.Contains(_expression[i]))
+                {
+                    if (currentToken != string.Empty)
+                        resultedList.Add(currentToken);
+
+                    currentToken = string.Empty;
+                    resultedList.Add(_expression[i].ToString());
+                }
+                else
+                    currentToken += _expression[i].ToString();
+            }
+
+            if (currentToken != string.Empty)
+                resultedList.Add(currentToken);
+
+            return resultedList;
         }
 
         private async Task<EvaluatorResult> ComputeTokens(List<string> tokens)
@@ -92,31 +118,7 @@ namespace Expressions
             _allMetricCodes = response.MetricCodes;
         }
 
-        private List<string> BreakExpressionIntoListOfStrings()
-        {
-            List<string> resultedList = new List<string>();
-            string currentToken = string.Empty;
-
-            for (int i = 0; i < _expression.Length; i++)
-            {
-                if (_operators.Contains(_expression[i]))
-                {
-                    if (currentToken != string.Empty)
-                        resultedList.Add(currentToken);
-            
-                    currentToken = string.Empty;
-                    resultedList.Add(_expression[i].ToString());
-                }
-                else
-                    currentToken += _expression[i].ToString();
-            }
-
-            if (currentToken != string.Empty)
-                resultedList.Add(currentToken);
-
-            return resultedList;
-        }
-
+  
         private string ExtractAggregateFunction(string token)
         {
             int indexOfParenthesis = token.IndexOf(OpenParenthesis);
@@ -230,9 +232,9 @@ namespace Expressions
                     metricCode = item;
             try
             {
-                string result =  (await _mediator.
-                      Send(new GetProductMetricQuery(InventoryId, productCode, metricCode, upperboundDate))).Value.ToString();
-              
+                string result =  ( await _mediator.Send(
+                                                   new GetProductMetricQuery(InventoryId,productCode,
+                                                   metricCode, upperboundDate))).Value.ToString();
 
                 return EvaluatorResult.NewEvaluatorResult(result);
 
@@ -310,37 +312,24 @@ namespace Expressions
 
 
 
+       
 
-        public List<Entities.ProductExpression> GetProductExpressions()
-        {
-            return [.. _context.ProductExpressions];
-        }
-
-        public List<Entities.InventoryExpression> GetInventoryExpressions()
-        {
-            return [.. _context.InventoryExpressions];
-        }
-
-        public List<Entities.BooleanExpression> GetBooleanExpressions()
-        {
-            return [.. _context.BooleanExpressions];
-        }
 
         #region Scheduler
 
         public void ScheduleJobs(IServiceProvider serviceProvider)
         {
-            var productExpressions = GetProductExpressions();
+            var productExpressions = _repo.GetProductExpressions();
             foreach (var p in productExpressions)
                 RecurringJob.AddOrUpdate(p.Id.ToString(), 
                     () => DoScheduledWork(p), Cron.Minutely);
 
-            var inventoryExpressions = GetInventoryExpressions();
+            var inventoryExpressions = _repo.GetInventoryExpressions();
             foreach (var i in inventoryExpressions)
                 RecurringJob.AddOrUpdate(i.Id.ToString(), 
                     () => DoScheduledWork(i), Cron.Minutely);
 
-            var booleanExpressions = GetBooleanExpressions();
+            var booleanExpressions = _repo. GetBooleanExpressions();
             foreach (var i in booleanExpressions)
                 RecurringJob.AddOrUpdate(i.Id.ToString(), 
                     () => DoScheduledWork(i), Cron.Minutely);
@@ -464,13 +453,13 @@ namespace Expressions
         {
             try
             {
-                foreach (var p in GetProductExpressions())
+                foreach (var p in _repo.GetProductExpressions())
                     DoScheduledWork(p);
 
-                foreach (var i in GetInventoryExpressions())
+                foreach (var i in _repo.GetInventoryExpressions())
                     DoScheduledWork(i);
 
-                foreach (var b in GetBooleanExpressions())
+                foreach (var b in _repo.GetBooleanExpressions())
                     DoScheduledWork(b);
 
             }

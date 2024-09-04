@@ -14,32 +14,31 @@ namespace Inventory.Products.Repositories
         Task<ProductDto> AddProductAsync(ProductDto dto);
         Task<ProductDto> EditProductAsync(ProductDto c);
         Task DeleteProductAsync(ProductDto c);
-        bool ProductDescriptionOrCategoryIsUsed(ProductDto c);
+        Task<bool> ProductDescriptionOrCategoryIsUsedAsync(ProductDto c);
 
         List<string> GetDistinctProductCodes(Guid InventoryId);
         List<string> GetDistinctMetricCodes();
+        Task AddOrEditProductMetricAsync(ProductMetricDto m);
+        Task<ProductMetricDto> GetProductMetricAsync(Guid ProductId, DateTime effectivedate    );
 
-        Task AddOrEditProductQuantityMetric(QuantityMetricDto m);
-        Task AddOrEditProductMetric(ProductMetricDto m);
         Task<MetricDto> AddMetricAsync(MetricDto dto);
         Task<MetricDto> EditMetricAsync(MetricDto c);
         Task DeleteMetricAsync(MetricDto c);
 
         Task AddOrEditInventoryMetric(InventoryMetricDto m);
-        bool CategoryFatherIdExists(Guid FatherId);
+        Task<bool> CategoryFatherIdExistsAsync(Guid FatherId);
 
         Task<CategoryDto> AddCategoryAsync(CategoryDto dto);
-        bool CategoryIdExists(Guid Id);
+        Task<bool> CategoryIdExistsAsync(Guid Id);
         Task<CategoryDto> EditCategoryAsync(CategoryDto c);
         Task DeleteCategoryAsync(CategoryDto c);
         Task<SourceDto> AddSourceAsync(SourceDto sourceDto);
 
-        Task<QuantityMetricDto> LetProduct(LetProductDto dto);    
-        ProductMetricDto GetProductMetric(string ProductCode, string MetricCode);
+        Task<QuantityMetricDto> LetProduct(LetProductDto dto);
+        Task<ProductMetricDto> GetProductMetricAsync(string ProductCode, string MetricCode);
+        Task<QuantityMetricDto> AddQuantityMetricAsync(QuantityMetricDto dto);
+        Task<QuantityMetricDto> GetQuantityMetricAsync(Guid ProductId, DateTime EffectiveDate);
 
-        Task<QuantityMetricDto> AddQuantityMetricAsync(QuantityMetricDto inventoryDto);
-
-        Task<QuantityMetricDto> GetQuantityMetricAsync(QuantityMetricDto inventoryDto);
 
 
         void EmptyDB();

@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Inventory.Products.Data.Migrations
 {
     [DbContext(typeof(ProductsDbContext))]
-    [Migration("20240902141841_PG2")]
-    partial class PG2
+    [Migration("20240903101139_PG70")]
+    partial class PG70
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -196,18 +196,11 @@ namespace Inventory.Products.Data.Migrations
 
             modelBuilder.Entity("Inventory.Products.Entities.QuantityMetric", b =>
                 {
-                    b.Property<Guid>("MetricId")
-                        .HasColumnType("uuid");
-
                     b.Property<Guid>("ProductId")
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("EffectiveDate")
                         .HasColumnType("timestamp without time zone");
-
-                    b.Property<string>("MetricCode")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.Property<string>("ProductCode")
                         .IsRequired()
@@ -217,9 +210,9 @@ namespace Inventory.Products.Data.Migrations
                         .HasPrecision(18, 6)
                         .HasColumnType("numeric(18,6)");
 
-                    b.HasKey("MetricId", "ProductId", "EffectiveDate");
+                    b.HasKey("ProductId", "EffectiveDate");
 
-                    b.ToTable("QuantityMetrics", "Products");
+                    b.ToTable("QuantityMetric", "Products");
                 });
 
             modelBuilder.Entity("Inventory.Products.Entities.Source", b =>

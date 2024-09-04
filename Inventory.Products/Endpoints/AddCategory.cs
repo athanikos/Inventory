@@ -42,16 +42,17 @@ namespace Category.Products.Endpoints
                         CancellationToken ct)
         {
 
-            if (!_repository.CategoryIdExists(req.FatherId))
+            if (await _repository.CategoryIdExistsAsync(req.FatherId))
+            {
+                var categoryDto = await _repository.AddCategoryAsync(new CategoryDto(Guid.NewGuid(), req.Description, req.FatherId));
+                return TypedResults.Ok(categoryDto);
+            }
+            else
             {
                 AddError("FatherId does not exist ");
                 ThrowIfAnyErrors(); // If there are errors, execution shouldn't go beyond this point
                 return new FastEndpoints.ProblemDetails(ValidationFailures);
-            }
-            else
-            {
-                var categoryDto =  await _repository.AddCategoryAsync(new CategoryDto(Guid.NewGuid(), req.Description, req.FatherId));
-                return TypedResults.Ok(categoryDto);
+
             }
         }
     }

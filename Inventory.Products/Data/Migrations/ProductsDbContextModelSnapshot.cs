@@ -193,18 +193,11 @@ namespace Inventory.Products.Data.Migrations
 
             modelBuilder.Entity("Inventory.Products.Entities.QuantityMetric", b =>
                 {
-                    b.Property<Guid>("MetricId")
-                        .HasColumnType("uuid");
-
                     b.Property<Guid>("ProductId")
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("EffectiveDate")
                         .HasColumnType("timestamp without time zone");
-
-                    b.Property<string>("MetricCode")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.Property<string>("ProductCode")
                         .IsRequired()
@@ -214,9 +207,9 @@ namespace Inventory.Products.Data.Migrations
                         .HasPrecision(18, 6)
                         .HasColumnType("numeric(18,6)");
 
-                    b.HasKey("MetricId", "ProductId", "EffectiveDate");
+                    b.HasKey("ProductId", "EffectiveDate");
 
-                    b.ToTable("QuantityMetrics", "Products");
+                    b.ToTable("QuantityMetric", "Products");
                 });
 
             modelBuilder.Entity("Inventory.Products.Entities.Source", b =>
