@@ -27,6 +27,8 @@ namespace Inventory.Expressions
             mediatRAssemblies.Add(typeof(ConfigureServices).Assembly);
             //mediatRAssemblies.Add(typeof(Products.Contracts.AddProductMetricCommand).Assembly);
             //mediatRAssemblies.Add(typeof(Products.ConfigureServices).Assembly);
+            services.AddScoped<IExpressionRepository, PostgresExpressionRepository>();
+
 
             services.AddScoped<IEvaluator, Evaluator>(
             sp =>

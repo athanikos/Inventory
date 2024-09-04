@@ -3,9 +3,9 @@
 namespace Inventory.Products.Handlers
 {
     public class LetProductHandler
-    : IRequestHandler<LetProductCommand, LetProductDto>
+    : IRequestHandler<LetProductCommand, ModifyQuantityDto>
     {
-        public Task<LetProductDto> Handle(LetProductCommand request, CancellationToken cancellationToken)
+        public Task<ModifyQuantityDto> Handle(LetProductCommand request, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }

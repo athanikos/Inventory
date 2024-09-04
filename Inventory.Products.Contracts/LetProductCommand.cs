@@ -2,7 +2,7 @@
 
 namespace Inventory.Products.Handlers
 {
-    public class LetProductCommand : IRequest<LetProductDto>
+    public class LetProductCommand : IRequest<ModifyQuantityDto>
     {
 
     }

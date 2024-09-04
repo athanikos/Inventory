@@ -30,7 +30,9 @@ namespace Tests.Inventory.Expressions
             options.UseNpgsql(configuration.
             GetConnectionString("Products")));
 
-             services.AddScoped<IInventoryRepository, InventoryRepository>();
+            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
+            services.AddScoped<IInventoryRepository, InventoryRepository>();
         }
 
         protected override ValueTask DisposeAsyncCore()

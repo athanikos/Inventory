@@ -3,6 +3,7 @@ using Inventory.Products.Contracts.Dto;
 using Inventory.Products.Dto;
 using Inventory.Products.Entities;
 using Inventory.Products.Handlers;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
 using System.Data.SqlClient;
 
@@ -10,11 +11,6 @@ namespace Inventory.Products.Repositories
 {
     public class InventoryRepository : IInventoryRepository
     {
-    
-   
-
-
-        
         private readonly ProductsDbContext _context;
 
         public InventoryRepository(ProductsDbContext context)
@@ -150,6 +146,12 @@ namespace Inventory.Products.Repositories
                 UpdateProductMetricCodes(m);
                 DecideNewOrEdit(m);
                 await _context.SaveChangesAsync();
+        }
+
+        public void AddOrEditProductMetric(ProductMetricDto m)
+        {
+            UpdateProductMetricCodes(m);
+            DecideNewOrEdit(m);
         }
 
         public async Task<ProductMetricDto> GetProductMetricAsync(string productCode, string metricCode, DateTime effectivedate )
@@ -451,10 +453,10 @@ namespace Inventory.Products.Repositories
             return new SourceDto(dto.Id, dto.Description);
         }
 
-        public async Task<bool> LetProduct(LetProductDto dto)  
+        public async Task<bool> LetProduct(ModifyQuantityDto dto)  
         {
             var ProductId = new SqlParameter("@ProductId", dto.ProductId);
-            var IncreaseBy = new SqlParameter("@IncreaseBy", dto.IncreaseBy);
+            var Diff = new SqlParameter("@Diff", dto.Diff);
 
             ////to get this to work, you will need to change your select inside dbo.insert_department to include name in the resultset
             //var department = _context.Database.SqlQuery<QuantityMetric>(
@@ -494,7 +496,7 @@ namespace Inventory.Products.Repositories
 
         }
 
-        Task<QuantityMetricDto> IInventoryRepository.LetProduct(LetProductDto dto)
+        Task<QuantityMetricDto> IInventoryRepository.LetProduct(ModifyQuantityDto dto)
         {
             throw new NotImplementedException();
         }
@@ -507,26 +509,56 @@ namespace Inventory.Products.Repositories
             qm.ProductCode = dto.ProductCode;
             qm.EffectiveDate = dto.EffectiveDate;
             _context.Add(qm);
+
             await _context.SaveChangesAsync();
 
+            
             Guid MetricId  = await _context.Metrics.
                                       Where(i => i.Code == Constants.QUANTITYCODE).
                                       Select(i=>i.Id).
                                       FirstOrDefaultAsync();
 
-            // same row as in quantity metric 
-           await  AddOrEditProductMetricAsync(new ProductMetricDto(
-                 dto.ProductId,   
-                 MetricId,
-                 dto.Value,
-                 dto.EffectiveDate,
-                 "EUR",
-                 Constants.QUANTITYCODE,
-                 dto.ProductCode
-            ));
-                
+            
+            await AddOrEditProductMetricAsync(new ProductMetricDto(
+                  dto.ProductId,
+                  MetricId,
+                  dto.Value,
+                  dto.EffectiveDate,
+                  "EUR",
+                  Constants.QUANTITYCODE,
+                  dto.ProductCode
+             ));
+
             return await  GetQuantityMetricAsync(qm.ProductId, qm.EffectiveDate);
         }
+
+
+        public void AddQuantityMetric(QuantityMetricDto dto)
+        {
+            QuantityMetric qm = new QuantityMetric();
+            qm.ProductId = dto.ProductId;
+            qm.Value = dto.Value;
+            qm.ProductCode = dto.ProductCode;
+            qm.EffectiveDate = dto.EffectiveDate;
+            _context.Add(qm);
+
+            Guid MetricId = _context.Metrics.
+                          Where(i => i.Code == Constants.QUANTITYCODE).
+                          Select(i => i.Id).
+                          FirstOrDefault();
+
+            AddOrEditProductMetric(new ProductMetricDto(
+                  dto.ProductId,
+                  MetricId,
+                  dto.Value,
+                  dto.EffectiveDate,
+                  "EUR",
+                  Constants.QUANTITYCODE,
+                  dto.ProductCode
+             ));
+        }
+
+
 
         public async Task<QuantityMetricDto> GetQuantityMetricAsync(Guid id, DateTime EffectiveDate)
         {
@@ -535,6 +567,18 @@ namespace Inventory.Products.Repositories
                                    Select(i =>new QuantityMetricDto(i.ProductId,i.Value,i.EffectiveDate,i.ProductCode)).
                                    SingleAsync();
 
+        }
+
+        public async Task<List<QuantityMetricDto>> GetQuantityMetricsAsync()
+        {
+            return await _context.QuantityMetrics.
+                                  Select(i => new QuantityMetricDto(i.ProductId, i.Value, i.EffectiveDate, i.ProductCode)).
+                                  ToListAsync();
+        }
+
+        public  async Task<int> SaveChangesAsync()
+        {
+            return await _context.SaveChangesAsync();
         }
 
 

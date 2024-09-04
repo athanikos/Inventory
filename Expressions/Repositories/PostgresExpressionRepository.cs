@@ -3,10 +3,10 @@ using Inventory.Products;
 
 namespace Inventory.Expressions.Repositories
 {
-    public  class PostgresRepository : IExpressionRepository
+    public  class PostgresExpressionRepository : IExpressionRepository
     {
 
-        public PostgresRepository(ExpressionsDbContext context)
+        public PostgresExpressionRepository(ExpressionsDbContext context)
         { _context = context; }
 
         private readonly ExpressionsDbContext _context;

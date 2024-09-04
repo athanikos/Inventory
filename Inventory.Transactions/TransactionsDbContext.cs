@@ -75,5 +75,7 @@ public class TransactionsDbContext : DbContext
         configurationBuilder.Properties<decimal>()
           .HavePrecision(18, 6);
     }
+
+
 }
 

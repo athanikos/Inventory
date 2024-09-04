@@ -16,8 +16,7 @@ namespace Inventory.Products
         {
 
             AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
-
-            services.
+             services.
                      AddDbContext<ProductsDbContext>(options =>  
                                                options.UseNpgsql(configuration
                                                .GetValue<String>("Products")));

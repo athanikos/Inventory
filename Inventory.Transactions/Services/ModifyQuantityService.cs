@@ -1,8 +1,8 @@
 ﻿namespace Inventory.Transactions.Services
 {
-    public  class LetService
+    public  class ModifyQuantityService
     {
-        public LetService() { }
+        public ModifyQuantityService() { }
 
         public void ReserveDates(DateTime from, DateTime to) 
         { 

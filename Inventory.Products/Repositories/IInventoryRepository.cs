@@ -34,12 +34,13 @@ namespace Inventory.Products.Repositories
         Task DeleteCategoryAsync(CategoryDto c);
         Task<SourceDto> AddSourceAsync(SourceDto sourceDto);
 
-        Task<QuantityMetricDto> LetProduct(LetProductDto dto);
+        Task<QuantityMetricDto> LetProduct(ModifyQuantityDto dto);
         Task<ProductMetricDto> GetProductMetricAsync(string ProductCode, string MetricCode);
         Task<QuantityMetricDto> AddQuantityMetricAsync(QuantityMetricDto dto);
         Task<QuantityMetricDto> GetQuantityMetricAsync(Guid ProductId, DateTime EffectiveDate);
-
-
+        Task<List<QuantityMetricDto>> GetQuantityMetricsAsync();
+        void  AddQuantityMetric(QuantityMetricDto dto);
+        Task<int> SaveChangesAsync();
 
         void EmptyDB();
     }
