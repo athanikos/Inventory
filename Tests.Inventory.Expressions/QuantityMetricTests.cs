@@ -74,15 +74,15 @@ namespace Tests.Inventory.Expressions
 
             DateTime dateWithMinutes = new DateTime(2020, 1, 1, 1, 1, 0);
             var quantityMetricDto = QuantityMetricDto.NewQuantityMetricDto(productId, 1, RoomProductCode, dateWithMinutes);
-        
+
             var qm1 = await _repo.AddQuantityMetricAsync(quantityMetricDto);
-            DateTime dateWithMinutes2 = new DateTime(2020, 1, 1, 1,12, 0);
-             
+            DateTime dateWithMinutes2 = new DateTime(2020, 1, 1, 1, 12, 0);
+
             var quantityMetricDto2 = QuantityMetricDto.NewQuantityMetricDto(productId, 1, RoomProductCode, dateWithMinutes2);
             await _repo.AddQuantityMetricAsync(quantityMetricDto2);
-            
+
             var qms = await _repo.GetQuantityMetricsAsync();
-            Assert.Equal(2,qms.Count);
+            Assert.Equal(2, qms.Count);
         }
 
         [Fact]
@@ -136,17 +136,30 @@ namespace Tests.Inventory.Expressions
             var quantityMetricDto = QuantityMetricDto.NewQuantityMetricDto(productId, 1, RoomProductCode, dateWithMinutes);
 
             _repo.AddQuantityMetric(quantityMetricDto);
-            _repo.AddQuantityMetric(quantityMetricDto);
-           
-            try { await _repo.SaveChangesAsync();  }
-            catch (Exception ex)        {          }
-            
+            _repo.AddQuantityMetric(quantityMetricDto); // fails on context add not even on saves 
+
+            try { await _repo.SaveChangesAsync(); }
+            catch (Exception ex) { }
+
             var qms = await _repo.GetQuantityMetricsAsync();
             Assert.Empty(qms);
         }
 
+        [Fact]
+        public async Task TestMultipleIntervalsAreNotSavedWhenAtleastOneIsNotAvailable()
+        {
+            var _mediator = _fixture.GetService<IMediator>(_testOutputHelper)!;
+            var _repo = _fixture.GetService<IInventoryRepository>(_testOutputHelper)!;
+            var _ProductsDbContext = _fixture.GetService<ExpressionsDbContext>(_testOutputHelper)!;
+
+            //todo implement  insert one qa for some interval 
+            // save 
+            // then attempt to add 3 intervals with 1 overalapping with then one above 
 
 
 
+            await _repo.GetQuantityMetricsAsync();
+        }
     }
+
 }

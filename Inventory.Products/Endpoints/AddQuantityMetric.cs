@@ -32,8 +32,8 @@ namespace Inventory.Products.Endpoints
                         CancellationToken ct)
         {
             var dto = await _repo.AddQuantityMetricAsync(
-                             new QuantityMetricDto(req.ProductId, req.Value,
-                                                   req.EffectiveDate, req.ProductCode));
+                                  new QuantityMetricDto(req.ProductId, req.Value,
+                                                       req.EffectiveDate, req.ProductCode));
             return TypedResults.Ok(dto);
         }  
     }

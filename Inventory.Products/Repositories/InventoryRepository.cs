@@ -5,6 +5,7 @@ using Inventory.Products.Entities;
 using Inventory.Products.Handlers;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
+using System.Data.Common;
 using System.Data.SqlClient;
 
 namespace Inventory.Products.Repositories
@@ -453,20 +454,7 @@ namespace Inventory.Products.Repositories
             return new SourceDto(dto.Id, dto.Description);
         }
 
-        public async Task<bool> LetProduct(ModifyQuantityDto dto)  
-        {
-            var ProductId = new SqlParameter("@ProductId", dto.ProductId);
-            var Diff = new SqlParameter("@Diff", dto.Diff);
-
-            ////to get this to work, you will need to change your select inside dbo.insert_department to include name in the resultset
-            //var department = _context.Database.SqlQuery<QuantityMetric>(
-            //    "dbo.insert_department @ProductId,@IncreaseBy ", ProductId  
-            //     ).SingleOrDefault();
-
-            await _context.SaveChangesAsync();
-            return true;    
-        }
-
+      
 
             /// <summary>
             /// returns the latest by effective date product metric row 
@@ -496,12 +484,95 @@ namespace Inventory.Products.Repositories
 
         }
 
-        Task<QuantityMetricDto> IInventoryRepository.LetProduct(ModifyQuantityDto dto)
+
+        /// <summary>
+        /// attempts to find previous entry per productId and effective date 
+        /// if found it adds dif to value and adds to context 
+        /// if not found throws Argument Exception 
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
+        public async Task ModifyQuantityMetric(ModifyQuantityDto dto)
         {
-            throw new NotImplementedException();
+
+            var previousInTimeEntry = await  _context
+                                            .QuantityMetrics
+                                            .FromSql
+                                             (
+                                                 $@"
+                                                  SELECT ""ProductId"", 
+                                                  ""EffectiveDate"", ""ProductCode"", ""Value"" 
+                                                  FROM ""Products"".""QuantityMetric"" 
+                                                  WHERE ""ProductId"" = {   dto.ProductId }
+                                                  AND ""EffectiveDate""  < { dto.EffectiveFrom }
+                                                  ORDER BY ""EffectiveDate"" DESC 
+                                                  FOR UPDATE NOWAIT"
+                                             ) // PostgreSQL: Lock or fail immediately
+                                            .FirstOrDefaultAsync();
+
+            if (previousInTimeEntry==null)
+            throw new ArgumentException($"no previous entry found with less than { dto.EffectiveFrom } ");
+
+
+            _context.QuantityMetrics.Add
+                (
+                   new QuantityMetric()
+                   {
+                       ProductId = dto.ProductId,
+                       Value = previousInTimeEntry.Value + dto.Diff,
+                       EffectiveDate = dto.EffectiveFrom,
+                       ProductCode = previousInTimeEntry.ProductCode
+                   }
+                );
+
         }
 
-      public   async Task<QuantityMetricDto> AddQuantityMetricAsync(QuantityMetricDto dto)
+
+
+        /// <summary>
+        /// https://www.milanjovanovic.tech/blog/a-clever-way-to-implement-pessimistic-locking-in-ef-core
+        /// </summary>
+        /// <param name="dtos"></param>
+        public async Task ModifyQuantityMetrics(List<ModifyQuantityDto> inboundQuantities)
+        {
+            await using DbTransaction transaction = (DbTransaction)await _context.Database
+                .BeginTransactionAsync();
+
+            var rollback = false;
+
+            try
+            {
+                            foreach (var item in inboundQuantities)
+                            {
+                                try
+                                {
+                                    await ModifyQuantityMetric(item);
+                                }
+                                catch (Exception ex)
+                                {
+                                    //todo log 
+                                    rollback = true; 
+                                }
+                            }
+          
+                             await _context.SaveChangesAsync();
+                             await transaction.CommitAsync();
+            }
+            catch (Exception ex)
+            {
+                // todo log
+                rollback = true;
+            }
+
+            if (rollback)
+                await transaction.RollbackAsync();
+          
+        }
+
+
+        [Obsolete]
+        public async Task<QuantityMetricDto> AddQuantityMetricAsync(QuantityMetricDto dto)
         {
             QuantityMetric qm = new QuantityMetric();
             qm.ProductId = dto.ProductId;
@@ -532,7 +603,7 @@ namespace Inventory.Products.Repositories
             return await  GetQuantityMetricAsync(qm.ProductId, qm.EffectiveDate);
         }
 
-
+        [Obsolete]
         public void AddQuantityMetric(QuantityMetricDto dto)
         {
             QuantityMetric qm = new QuantityMetric();

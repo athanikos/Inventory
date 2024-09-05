@@ -1,4 +1,4 @@
-﻿namespace Inventory.Products.Handlers
+﻿namespace Inventory.Products.Contracts.Dto
 {
     public class ModifyQuantityDto
     {
