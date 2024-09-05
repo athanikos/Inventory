@@ -21,8 +21,6 @@ namespace Inventory.Expressions
             options.UseNpgsql(configuration
             .GetValue<String>("Expressions")));
 
-
-
             //todo do i need all these?
             mediatRAssemblies.Add(typeof(ConfigureServices).Assembly);
             //mediatRAssemblies.Add(typeof(Products.Contracts.AddProductMetricCommand).Assembly);

@@ -2,7 +2,6 @@
 using Inventory.Products.Contracts;
 using Hangfire;
 using Microsoft.EntityFrameworkCore;
-using Inventory.Expressions;
 using Serilog;
 using Inventory.Notifications.Contracts;
 using Inventory.Expressions.Repositories;
@@ -18,7 +17,6 @@ namespace Expressions
         private const string SUM = "SUM";
         private char[] _operators = ['*', '/', '+', '-', '>', '<' ];
         private string[] aggregateFunctions = ["SUM", "AVG"];
-
         private string ALLSpecifier = "[ALL]";
         private string _expression = string.Empty;
         private readonly IMediator _mediator;
@@ -309,10 +307,6 @@ namespace Expressions
             return expressionType.inventoryBased == _type;
         }
         #endregion
-
-
-
-       
 
 
         #region Scheduler

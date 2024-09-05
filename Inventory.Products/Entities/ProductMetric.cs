@@ -20,9 +20,7 @@ public class ProductMetric
 
     public string Currency { get; set; } = string.Empty;
 
-
-    public DateTime EffectiveDate { get; internal set; }
-    = DateTime.MinValue;
+    public DateTime EffectiveDate { get; internal set; }  = DateTime.MinValue;
 
     public static ProductMetric CreateProductMetric(ProductMetricDto m)
     {

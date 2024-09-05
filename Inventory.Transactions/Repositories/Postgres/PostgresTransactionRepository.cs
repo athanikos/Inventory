@@ -305,9 +305,7 @@ namespace Inventory.Transactions.Repositories.Postgres
                    );
 
             await _context.SaveChangesAsync();
-
             return await GetTransactionAsync(t.Id);
-
         }
 
         public async Task<TransactionDto> GetTransactionAsync(Guid Id)
@@ -506,10 +504,5 @@ namespace Inventory.Transactions.Repositories.Postgres
 
 
         #endregion
-
-
-
-
-
     }
 }

@@ -20,14 +20,10 @@ namespace Inventory.Expressions.Handlers
         public async  Task<List<BooleanExpressionDto>> 
             Handle(GetBooleanExpressionsQuery request, CancellationToken cancellationToken)
         {
-
-
                  return   await   _context.BooleanExpressions
                 .Select(o=> new BooleanExpressionDto(o.Id, o.Expression,
                                         o.RunEveryMinutes, o.InventoryId))
                 .ToListAsync();
-
-            
         }
     }
 }

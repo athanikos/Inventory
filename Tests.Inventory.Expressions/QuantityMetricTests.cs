@@ -135,10 +135,13 @@ namespace Tests.Inventory.Expressions
             DateTime dateWithMinutes = new DateTime(2020, 1, 1, 1, 12, 0);
             var quantityMetricDto = QuantityMetricDto.NewQuantityMetricDto(productId, 1, RoomProductCode, dateWithMinutes);
 
-            _repo.AddQuantityMetric(quantityMetricDto);
-            _repo.AddQuantityMetric(quantityMetricDto); // fails on context add not even on saves 
-
-            try { await _repo.SaveChangesAsync(); }
+          
+            try 
+            {
+                _repo.AddQuantityMetric(quantityMetricDto);
+                _repo.AddQuantityMetric(quantityMetricDto); // fails on context add not even on saves 
+                await _repo.SaveChangesAsync(); 
+            }
             catch (Exception ex) { }
 
             var qms = await _repo.GetQuantityMetricsAsync();
