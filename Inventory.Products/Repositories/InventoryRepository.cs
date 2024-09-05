@@ -23,7 +23,6 @@ namespace Inventory.Products.Repositories
                    .Where(p => p.FatherId == FatherId)
                    .AnyAsync();
         }
-
         /// <summary>
         /// for testing 
         /// </summary>
@@ -78,7 +77,6 @@ namespace Inventory.Products.Repositories
              await _context.SaveChangesAsync();           
         }
         #endregion 
-
 
         public async Task<ProductDto> AddProductAsync(ProductDto c)
         {
@@ -175,7 +173,6 @@ namespace Inventory.Products.Repositories
                                   .SingleAsync();
         }
 
-
         public void UpdateProductMetricCodes(ProductMetricDto m)
         {
             string productCode, metricCode;
@@ -218,7 +215,7 @@ namespace Inventory.Products.Repositories
                 _context.Update(pm);
             }
             else
-                _context.ProductMetrics.Add(CreateProductMetric(m));
+                _context.ProductMetrics.Add(ProductMetric.CreateProductMetric(m));
         }
 
         public void DecideNewOrEdit(QuantityMetricDto m)
@@ -239,32 +236,7 @@ namespace Inventory.Products.Repositories
                 _context.Update(qm);
             }
             else
-                _context.QuantityMetrics.Add(CreateQuantityMetric(m));
-        }
-
-        private static ProductMetric CreateProductMetric(ProductMetricDto m)
-        {
-            return new ProductMetric()
-            {
-                MetricId = m.MetricId,
-                EffectiveDate = m.EffectiveDate,
-                ProductId = m.ProductId,
-                Value = m.Value,
-                Currency = m.Currency,
-                ProductCode = m.ProductCode,
-                MetricCode = m.MetricCode
-            };
-        }
-
-        private static QuantityMetric CreateQuantityMetric(QuantityMetricDto m)
-        {
-            return new QuantityMetric()
-            {
-                EffectiveDate = m.EffectiveDate,
-                ProductId = m.ProductId,
-                Value = m.Value,
-                ProductCode = m.ProductCode,
-            };
+                _context.QuantityMetrics.Add(QuantityMetric.CreateQuantityMetric(m));
         }
 
         public async Task AddOrEditInventoryMetric(InventoryMetricDto m)
@@ -289,7 +261,6 @@ namespace Inventory.Products.Repositories
 
         }
 
-
         public void DecideNewOrEdit(InventoryMetricDto m)
         {
             var metricExists = _context.InventoryMetrics
@@ -301,21 +272,7 @@ namespace Inventory.Products.Repositories
             if (metricExists)
                 _context.Update(m);
             else
-                _context.InventoryMetrics.Add(CreateInventoryMetric(m));
-        }
-
-        private static InventoryMetric CreateInventoryMetric(InventoryMetricDto m)
-        {
-            return new InventoryMetric()
-            {
-                MetricId = m.MetricId,
-                EffectiveDate = m.EffectiveDate,
-                InventoryId = m.InventoryId,
-                Value = m.Value,
-                Currency = m.Currency,
-                InventoryCode = m.InventoryCode,
-                MetricCode = m.MetricCode
-            };
+                _context.InventoryMetrics.Add(InventoryMetric.CreateInventoryMetric(m));
         }
 
         public async Task DeleteProductAsync(ProductDto c)
@@ -348,7 +305,6 @@ namespace Inventory.Products.Repositories
                            .AnyAsync();    
         }
 
-
         public async  Task<bool> CategoryIdExistsAsync(Guid Id)
         {
             return await _context.Categories
@@ -370,7 +326,6 @@ namespace Inventory.Products.Repositories
             return new CategoryDto(c.Id, c.Description, c.FatherId);
         }
 
-
         public async Task DeleteCategoryAsync(CategoryDto c)
         {
             List<ProductCategory> pcs = _context.ProductCategories
@@ -387,7 +342,6 @@ namespace Inventory.Products.Repositories
 
             await _context.SaveChangesAsync();
         }
-
 
         public async Task<MetricDto> AddMetricAsync(MetricDto c)
         {
@@ -416,7 +370,6 @@ namespace Inventory.Products.Repositories
             return new MetricDto(c.Id, c.Description, c.Code, c.SourceId);
         }
 
-
         public async Task DeleteMetricAsync(MetricDto c)
         {
             List<ProductMetric> pcs = _context.ProductMetrics
@@ -433,7 +386,6 @@ namespace Inventory.Products.Repositories
             _context.Remove(e);
             await _context.SaveChangesAsync();
         }
-
 
         public MetricDto GetMetric(Guid metricId)
         {
@@ -453,8 +405,6 @@ namespace Inventory.Products.Repositories
             await _context.SaveChangesAsync();
             return new SourceDto(dto.Id, dto.Description);
         }
-
-      
 
             /// <summary>
             /// returns the latest by effective date product metric row 
@@ -483,7 +433,6 @@ namespace Inventory.Products.Repositories
          
 
         }
-
 
         /// <summary>
         /// attempts to find previous entry per productId and effective date 
@@ -528,12 +477,9 @@ namespace Inventory.Products.Repositories
 
         }
 
-
-
         /// <summary>
         /// https://www.milanjovanovic.tech/blog/a-clever-way-to-implement-pessimistic-locking-in-ef-core
         /// </summary>
-        /// <param name="dtos"></param>
         public async Task ModifyQuantityMetrics(List<ModifyQuantityDto> inboundQuantities)
         {
             await using DbTransaction transaction = (DbTransaction)await _context.Database
@@ -570,8 +516,6 @@ namespace Inventory.Products.Repositories
           
         }
 
-
-        [Obsolete]
         public async Task<QuantityMetricDto> AddQuantityMetricAsync(QuantityMetricDto dto)
         {
             QuantityMetric qm = new QuantityMetric();
@@ -603,7 +547,6 @@ namespace Inventory.Products.Repositories
             return await  GetQuantityMetricAsync(qm.ProductId, qm.EffectiveDate);
         }
 
-        [Obsolete]
         public void AddQuantityMetric(QuantityMetricDto dto)
         {
             QuantityMetric qm = new QuantityMetric();
@@ -629,8 +572,6 @@ namespace Inventory.Products.Repositories
              ));
         }
 
-
-
         public async Task<QuantityMetricDto> GetQuantityMetricAsync(Guid id, DateTime EffectiveDate)
         {
             return  await _context.QuantityMetrics.
@@ -651,7 +592,6 @@ namespace Inventory.Products.Repositories
         {
             return await _context.SaveChangesAsync();
         }
-
 
     }
 }

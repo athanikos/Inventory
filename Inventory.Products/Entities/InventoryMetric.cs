@@ -1,4 +1,6 @@
-﻿namespace Inventory.Products.Entities
+﻿using Inventory.Products.Contracts.Dto;
+
+namespace Inventory.Products.Entities
 {
     public  class InventoryMetric
     {
@@ -16,5 +18,20 @@
 
         public DateTime EffectiveDate { get; internal set; }
         = DateTime.MinValue;
+
+        public static InventoryMetric CreateInventoryMetric(InventoryMetricDto m)
+        {
+            return new InventoryMetric()
+            {
+                MetricId = m.MetricId,
+                EffectiveDate = m.EffectiveDate,
+                InventoryId = m.InventoryId,
+                Value = m.Value,
+                Currency = m.Currency,
+                InventoryCode = m.InventoryCode,
+                MetricCode = m.MetricCode
+            };
+        }
+
     }
 }

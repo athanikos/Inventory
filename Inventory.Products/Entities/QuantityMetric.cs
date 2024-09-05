@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Inventory.Products.Contracts.Dto;
+using System.ComponentModel.DataAnnotations;
 
 namespace Inventory.Products.Entities;
 
@@ -16,6 +17,18 @@ public class QuantityMetric
 
     public DateTime EffectiveDate { get;  set; }
     = DateTime.MinValue;
+
+    public  static QuantityMetric CreateQuantityMetric(QuantityMetricDto m)
+    {
+        return new QuantityMetric()
+        {
+            EffectiveDate = m.EffectiveDate,
+            ProductId = m.ProductId,
+            Value = m.Value,
+            ProductCode = m.ProductCode,
+        };
+    }
+
 }
 
 
