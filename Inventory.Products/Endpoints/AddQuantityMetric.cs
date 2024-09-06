@@ -33,14 +33,14 @@ namespace Inventory.Products.Endpoints
         {
             var dto = await _repo.AddQuantityMetricAsync(
                                   new QuantityMetricDto(req.ProductId, req.Value,
-                                                       req.EffectiveDate, req.ProductCode));
+                                                       req.EffectiveDate));
             return TypedResults.Ok(dto);
         }  
     }
 
 
     public record AddQuantityMetricRequest(Guid ProductId, 
-         decimal Value, DateTime EffectiveDate, string ProductCode);
+         decimal Value, DateTime EffectiveDate);
 
 
 

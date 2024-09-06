@@ -6,5 +6,6 @@
         public decimal Diff { get; set; }   
         public DateTime EffectiveFrom { get; set; }
         public DateTime EffectiveTo { get; set; }
+        public ModificationType ModificationType { get; set; }  
     }
 }

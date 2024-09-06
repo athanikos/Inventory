@@ -1,6 +1,5 @@
 ﻿using Inventory.Products.Dto;
 using Inventory.Products.Contracts.Dto;
-using Inventory.Products.Handlers;
 
 namespace Inventory.Products.Repositories
 {
@@ -39,8 +38,7 @@ namespace Inventory.Products.Repositories
         Task<QuantityMetricDto> GetQuantityMetricAsync(Guid ProductId, DateTime EffectiveDate);
         Task<List<QuantityMetricDto>> GetQuantityMetricsAsync();
         void  AddQuantityMetric(QuantityMetricDto dto);
-        Task ModifyQuantityMetrics(List<ModifyQuantityDto> inboundQuantities);
-
+        
         Task<int> SaveChangesAsync();
         void EmptyDB();
     }

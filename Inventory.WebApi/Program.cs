@@ -54,7 +54,6 @@ namespace Inventory.WebApi
             options => { builder.Configuration.Bind("AzureAd", options); });
 
            List<Assembly> mediatRAssemblies = [typeof(Program).Assembly];
-           Users.ConfigureServices.AddServices(builder.Services, builder.Configuration);
            Products.ConfigureServices.AddServices(builder.Services,
            builder.Configuration, mediatRAssemblies);
             

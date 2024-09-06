@@ -1,12 +1,9 @@
-﻿using Expressions;
-using Inventory.Expressions;
+﻿using Inventory.Expressions;
 using Inventory.Products.Contracts;
 using Inventory.Products.Contracts.Dto;
 using Inventory.Products.Dto;
 using Inventory.Products.Repositories;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
-using System;
 using Xunit.Abstractions;
 using Xunit.Microsoft.DependencyInjection.Abstracts;
 
@@ -48,7 +45,7 @@ namespace Tests.Inventory.Expressions
             var metricId = (await _repo.AddMetricAsync(MetricDto.NewMetricDto(sourceId, Constants.QUANTITYCODE))).Id;
             ProductDto prodDto = ProductDto.NewProductDto(InventoryId, RoomProductCode);
             var productId = (await _repo.AddProductAsync(prodDto)).Id;
-            var quantityMetricDto = QuantityMetricDto.NewQuantityMetricDto(productId, 1, RoomProductCode, DateTime.MinValue);
+            var quantityMetricDto = QuantityMetricDto.NewQuantityMetricDto(productId, 1,  DateTime.MinValue);
 
             var qm = await _repo.AddQuantityMetricAsync(quantityMetricDto);
 
@@ -73,12 +70,12 @@ namespace Tests.Inventory.Expressions
             var productId = (await _repo.AddProductAsync(prodDto)).Id;
 
             DateTime dateWithMinutes = new DateTime(2020, 1, 1, 1, 1, 0);
-            var quantityMetricDto = QuantityMetricDto.NewQuantityMetricDto(productId, 1, RoomProductCode, dateWithMinutes);
+            var quantityMetricDto = QuantityMetricDto.NewQuantityMetricDto(productId, 1,  dateWithMinutes);
 
             var qm1 = await _repo.AddQuantityMetricAsync(quantityMetricDto);
             DateTime dateWithMinutes2 = new DateTime(2020, 1, 1, 1, 12, 0);
 
-            var quantityMetricDto2 = QuantityMetricDto.NewQuantityMetricDto(productId, 1, RoomProductCode, dateWithMinutes2);
+            var quantityMetricDto2 = QuantityMetricDto.NewQuantityMetricDto(productId, 1,  dateWithMinutes2);
             await _repo.AddQuantityMetricAsync(quantityMetricDto2);
 
             var qms = await _repo.GetQuantityMetricsAsync();
@@ -101,12 +98,12 @@ namespace Tests.Inventory.Expressions
             var productId = (await _repo.AddProductAsync(prodDto)).Id;
 
             DateTime dateWithMinutes = new DateTime(2020, 1, 1, 1, 12, 0);
-            var quantityMetricDto = QuantityMetricDto.NewQuantityMetricDto(productId, 1, RoomProductCode, dateWithMinutes);
+            var quantityMetricDto = QuantityMetricDto.NewQuantityMetricDto(productId, 1,  dateWithMinutes);
 
             var qm1 = await _repo.AddQuantityMetricAsync(quantityMetricDto);
             DateTime dateWithMinutes2 = new DateTime(2020, 1, 1, 1, 12, 0);
 
-            var quantityMetricDto2 = QuantityMetricDto.NewQuantityMetricDto(productId, 1, RoomProductCode, dateWithMinutes2);
+            var quantityMetricDto2 = QuantityMetricDto.NewQuantityMetricDto(productId, 1,  dateWithMinutes2);
             try
             {
                 await _repo.AddQuantityMetricAsync(quantityMetricDto2);
@@ -133,7 +130,7 @@ namespace Tests.Inventory.Expressions
             ProductDto prodDto = ProductDto.NewProductDto(InventoryId, RoomProductCode);
             var productId = (await _repo.AddProductAsync(prodDto)).Id;
             DateTime dateWithMinutes = new DateTime(2020, 1, 1, 1, 12, 0);
-            var quantityMetricDto = QuantityMetricDto.NewQuantityMetricDto(productId, 1, RoomProductCode, dateWithMinutes);
+            var quantityMetricDto = QuantityMetricDto.NewQuantityMetricDto(productId, 1,  dateWithMinutes);
 
           
             try 

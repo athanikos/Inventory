@@ -7,6 +7,7 @@ using System.Reflection;
 using Xunit.Microsoft.DependencyInjection;
 using Products = Inventory.Products;
 using Inventory.Expressions;
+using Inventory.Products.Services;
 
 namespace Tests.Inventory.Expressions
 {
@@ -32,7 +33,10 @@ namespace Tests.Inventory.Expressions
 
             AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
-            services.AddScoped<IInventoryRepository, InventoryRepository>();
+
+            services.AddScoped<IInventoryRepository, PostgresInventoryRepository>();
+            services.AddScoped<IModifyQuantityRepository, PostgresModifyQuantityRepository>();
+            services.AddScoped<IModifyQuantityService, ModifyQuantityService>();
         }
 
         protected override ValueTask DisposeAsyncCore()

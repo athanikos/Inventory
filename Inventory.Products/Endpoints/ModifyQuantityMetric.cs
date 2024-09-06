@@ -4,6 +4,7 @@ namespace Inventory.Products.Endpoints
     using FastEndpoints;
     using Inventory.Products.Contracts.Dto;
     using Inventory.Products.Repositories;
+    using Inventory.Products.Services;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Http.HttpResults;
     using System.Threading;
@@ -12,11 +13,11 @@ namespace Inventory.Products.Endpoints
     public class ModifyQuantityMetric :
         Endpoint<ModifyQuantityMetricListRequest>
     {
-        private readonly IInventoryRepository _repo;
+        private readonly IModifyQuantityService _service;
 
-        public ModifyQuantityMetric(IInventoryRepository repo)
+        public ModifyQuantityMetric(IModifyQuantityService service)
         {
-            _repo = repo;
+            _service = service ;
         }
 
         public override void Configure()
@@ -45,7 +46,7 @@ namespace Inventory.Products.Endpoints
                                            .ToList();
 
 
-            await _repo.ModifyQuantityMetrics(items);
+            await  _service.ModifyQuantityMetrics( items ); 
             return TypedResults.Ok();
         }  
     }

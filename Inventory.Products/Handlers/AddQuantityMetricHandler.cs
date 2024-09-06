@@ -23,8 +23,8 @@ namespace Inventory.Products.Handlers
         {
             var dto = new QuantityMetricDto(request.ProductId,
                                                 request.Value,
-                                                request.EffectiveDate,
-                                                string.Empty);
+                                                request.EffectiveDate
+                                               );
             try
             {
                 await _repository.AddQuantityMetricAsync(dto);

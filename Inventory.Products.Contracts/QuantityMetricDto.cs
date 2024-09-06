@@ -6,21 +6,20 @@
         public QuantityMetricDto(
             Guid productId, 
             decimal value, 
-            DateTime effectiveDate, 
-            string productCode
+            DateTime effectiveDate 
+         
             )
         {
             ProductId = productId;
             Value = value;
             EffectiveDate = effectiveDate;
-            ProductCode = productCode;
         }
 
         public static QuantityMetricDto NewQuantityMetricDto(
                                         Guid productId, decimal value,
-                                        string productCode, DateTime effectiveDate)
+                                        DateTime effectiveDate)
         {
-            return new QuantityMetricDto(productId, value, effectiveDate, productCode);
+            return new QuantityMetricDto(productId, value, effectiveDate);
         }
 
         public Guid ProductId { get; set; }

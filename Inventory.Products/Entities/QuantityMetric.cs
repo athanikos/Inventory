@@ -11,12 +11,9 @@ public class QuantityMetric
 {
     public Guid ProductId { get; set; }
      
-    public string ProductCode { get; set; } = string.Empty;
-        
     public decimal  Value { get; set; }
 
-    public DateTime EffectiveDate { get;  set; }
-    = DateTime.MinValue;
+    public DateTime EffectiveDate { get;  set; }  = DateTime.MinValue;
 
     public  static QuantityMetric CreateQuantityMetric(QuantityMetricDto m)
     {
@@ -24,11 +21,9 @@ public class QuantityMetric
         {
             EffectiveDate = m.EffectiveDate,
             ProductId = m.ProductId,
-            Value = m.Value,
-            ProductCode = m.ProductCode,
+            Value = m.Value            
         };
     }
-
 }
 
 

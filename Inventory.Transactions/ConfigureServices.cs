@@ -20,7 +20,7 @@ namespace Inventory.Transactions
 
             services.AddDbContext<TransactionsDbContext>(options =>
             options.UseNpgsql(configuration
-            .GetValue<String>("Transactions")));
+            .GetValue<string>("Transactions")));
 
             services.AddScoped<ITransactionRepository, PostgresTransactionRepository>();
        

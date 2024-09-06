@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Inventory.Products.Repositories;
+using Inventory.Products.Services;
 
 namespace Inventory.Products
 {
@@ -14,15 +15,14 @@ namespace Inventory.Products
             mediatRAssemblies
             )
         {
-
             AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
-             services.
-                     AddDbContext<ProductsDbContext>(options =>  
-                                               options.UseNpgsql(configuration
-                                               .GetValue<String>("Products")));
+            services.AddDbContext<ProductsDbContext>(options =>  
+                                                     options.UseNpgsql(configuration
+                                                     .GetValue<string>("Products")));
 
-
-            services.AddScoped<IInventoryRepository, InventoryRepository>();
+            services.AddScoped<IInventoryRepository, PostgresInventoryRepository>();
+            services.AddScoped<IModifyQuantityRepository, PostgresModifyQuantityRepository>();
+            services.AddScoped<IModifyQuantityService, ModifyQuantityService>();
             mediatRAssemblies.Add(typeof(ConfigureServices).Assembly);
             return services;
         }
