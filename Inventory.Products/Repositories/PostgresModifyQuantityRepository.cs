@@ -43,20 +43,34 @@ namespace Inventory.Products.Repositories
                    if (previousInTimeEntry == null)
                         throw new ArgumentException($"no previous entry found with less than {dto.EffectiveFrom} ");
 
-            QuantityMetric qm = new QuantityMetric()
+            QuantityMetric qmStart = new QuantityMetric()
             {
                 ProductId = dto.ProductId,
                 Value = previousInTimeEntry == null ? 0:  previousInTimeEntry.Value,
                 EffectiveDate = dto.EffectiveFrom
              };
-            qm.Value = ModifyQuantity(dto, qm);
-            _context.QuantityMetrics.Add(qm);
+            qmStart.Value = ModifyQuantity(dto, qmStart);
+            _context.QuantityMetrics.Add(qmStart);
+
+            // todo move to method 
+            if (dto.ModificationType == Contracts.ModificationType.Let)
+            {
+                // unlets 
+                QuantityMetric qmEnd = new QuantityMetric()
+                {
+                    ProductId = dto.ProductId,
+                    Value = qmStart.Value + dto.Diff,
+                    EffectiveDate = dto.EffectiveTo.AddDays(1) // todo parametrize increment this is daily !!!!
+                };
+                _context.QuantityMetrics.Add(qmEnd);
+            }
+
 
         }
 
         /// <summary>
         /// iterates through all records post effective date 
-        /// and updates quantity 
+        /// and updates quantity for buy and sell 
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
@@ -92,7 +106,9 @@ namespace Inventory.Products.Repositories
 
             if (dto.ModificationType == Contracts.ModificationType.Buy)
                 newValue = item.Value + dto.Diff;
-            else if (dto.ModificationType == Contracts.ModificationType.Sell)
+            else if (     dto.ModificationType == Contracts.ModificationType.Sell
+                       || dto.ModificationType == Contracts.ModificationType.Let
+                    )
                 newValue = item.Value - dto.Diff;
             return newValue;
         }
@@ -104,7 +120,6 @@ namespace Inventory.Products.Repositories
         {
             await using var transaction = await _context.Database
                 .BeginTransactionAsync();
-            
             
             try
             {
@@ -120,6 +135,7 @@ namespace Inventory.Products.Repositories
             catch (Exception ex)
             {
                 await transaction.RollbackAsync();
+                _context.ChangeTracker.Clear();
             }
 
                

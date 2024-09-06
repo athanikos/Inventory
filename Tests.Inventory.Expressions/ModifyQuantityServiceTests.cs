@@ -14,6 +14,7 @@ namespace Tests.Inventory.Expressions
 
     /// <summary>
     /// https://github.com/Umplify/xunit-dependency-injection/blob/main/examples/Xunit.Microsoft.DependencyInjection.ExampleTests/CalculatorTests.cs
+    /// Tests transaction based  quantity modifications in Buy / Sell and Let 
     /// </summary>
     [Collection("Our Test Collection #1")]
     public class ModifyQuantityServiceTests : TestBed<TestFixture>
@@ -67,7 +68,6 @@ namespace Tests.Inventory.Expressions
                     }
                });
 
-
             var qms = await _repo.GetQuantityMetricsAsync();
             Assert.Equal(0, qms[1].Value);
             Assert.Equal(2, qms.Count);
@@ -75,6 +75,44 @@ namespace Tests.Inventory.Expressions
 
         [Fact]
         public async Task TestOnSellOneItShouldNotCreateOneWhenQuantityIsZero()
+        {
+            var _mediator = _fixture.GetService<IMediator>(_testOutputHelper)!;
+            var _repo = _fixture.GetService<IInventoryRepository>(_testOutputHelper)!;
+            var _ProductsDbContext = _fixture.GetService<ExpressionsDbContext>(_testOutputHelper)!;
+            var _modificationService = _fixture.GetService<IModifyQuantityService>(_testOutputHelper)!;
+            _repo.EmptyDB();
+
+            var InventoryId = (await _repo.AddInventoryAsync(new InventoryDto(Guid.NewGuid(), Inventory))).Id;
+            var sourceId = (await _repo.AddSourceAsync(new SourceDto(Guid.NewGuid(), SourceName))).Id;
+            var metricId = (await _repo.AddMetricAsync(MetricDto.NewMetricDto(sourceId, Constants.QUANTITYCODE))).Id;
+            ProductDto prodDto = ProductDto.NewProductDto(InventoryId, RoomProductCode);
+            var productId = (await _repo.AddProductAsync(prodDto)).Id;
+
+            var firstDate = new DateTime(2022, 1, 1, 1, 1, 1);
+            var quantityMetricDto = QuantityMetricDto.NewQuantityMetricDto(productId, 0,  firstDate);
+            var qm = await _repo.AddQuantityMetricAsync(quantityMetricDto);
+
+            var secondDate = new DateTime(2023, 1, 1, 1, 1, 1);
+            await _modificationService.ModifyQuantityMetrics(
+               new List<ModifyQuantityDto>()
+               {
+                    new ModifyQuantityDto()
+                    {
+                        ProductId =       productId,
+                        Diff =    1,
+                        EffectiveFrom = secondDate,
+                        EffectiveTo = secondDate,
+                        ModificationType   = ModificationType.Sell
+                    }
+               });
+
+            var qms = await _repo.GetQuantityMetricsAsync();
+            Assert.Single(qms);
+        }
+
+
+        [Fact]
+        public async Task TestOnSellQuantityWithHigherValueThanPostEffectiveDateShouldAbort()
         {
             var _mediator = _fixture.GetService<IMediator>(_testOutputHelper)!;
             var _repo = _fixture.GetService<IInventoryRepository>(_testOutputHelper)!;
@@ -89,28 +127,79 @@ namespace Tests.Inventory.Expressions
             ProductDto prodDto = ProductDto.NewProductDto(InventoryId, RoomProductCode);
             var productId = (await _repo.AddProductAsync(prodDto)).Id;
 
-            var firstDate = new DateTime(2022, 1, 1, 1, 1, 1);
-            var quantityMetricDto = QuantityMetricDto.NewQuantityMetricDto(productId, 0,  firstDate);
+            var firstDate = new DateTime(2021, 1, 1, 1, 1, 1);
+            var quantityMetricDto = QuantityMetricDto.NewQuantityMetricDto(productId,10, firstDate);
             var qm = await _repo.AddQuantityMetricAsync(quantityMetricDto);
 
-            var secondDate = new DateTime(2023, 1, 1, 1, 1, 1);
+            var secondDate = new DateTime(2025, 1, 1, 1, 1, 1);
+            var quantityMetricDto2 = QuantityMetricDto.NewQuantityMetricDto(productId, 5, secondDate);
+            var qm2 = await _repo.AddQuantityMetricAsync(quantityMetricDto2);
 
+            var thirdDate = new DateTime(2023, 1, 1, 1, 1, 1);
             await _modificationService.ModifyQuantityMetrics(
                new List<ModifyQuantityDto>()
                {
                     new ModifyQuantityDto()
                     {
                         ProductId =       productId,
-                        Diff =    1,
-                        EffectiveFrom = secondDate,
-                        EffectiveTo = secondDate,
+                        Diff =  8,
+                        EffectiveFrom = thirdDate,
+                        EffectiveTo = thirdDate,
+                        ModificationType   = ModificationType.Sell
+                    }
+               });
+            var qms = await _repo.GetQuantityMetricsAsync();
+            Assert.Equal(2, qms.Count);
+
+        }
+
+
+
+        [Fact]
+        public async Task TestOnSellQuantityWillDecrementPostEffectiveDate()
+        {
+            var _mediator = _fixture.GetService<IMediator>(_testOutputHelper)!;
+            var _repo = _fixture.GetService<IInventoryRepository>(_testOutputHelper)!;
+            var _ProductsDbContext = _fixture.GetService<ExpressionsDbContext>(_testOutputHelper)!;
+            var _modificationService = _fixture.GetService<IModifyQuantityService>(_testOutputHelper)!;
+
+            _repo.EmptyDB();
+
+            var InventoryId = (await _repo.AddInventoryAsync(new InventoryDto(Guid.NewGuid(), Inventory))).Id;
+            var sourceId = (await _repo.AddSourceAsync(new SourceDto(Guid.NewGuid(), SourceName))).Id;
+            var metricId = (await _repo.AddMetricAsync(MetricDto.NewMetricDto(sourceId, Constants.QUANTITYCODE))).Id;
+            ProductDto prodDto = ProductDto.NewProductDto(InventoryId, RoomProductCode);
+            var productId = (await _repo.AddProductAsync(prodDto)).Id;
+
+            var firstDate = new DateTime(2021, 1, 1, 1, 1, 1);
+            var quantityMetricDto = QuantityMetricDto.NewQuantityMetricDto(productId, 10, firstDate);
+            var qm = await _repo.AddQuantityMetricAsync(quantityMetricDto);
+
+            var secondDate = new DateTime(2025, 1, 1, 1, 1, 1);
+            var quantityMetricDto2 = QuantityMetricDto.NewQuantityMetricDto(productId, 5, secondDate);
+            var qm2 = await _repo.AddQuantityMetricAsync(quantityMetricDto2);
+
+
+            var thirdDate = new DateTime(2023, 1, 1, 1, 1, 1);
+            await _modificationService.ModifyQuantityMetrics(
+               new List<ModifyQuantityDto>()
+               {
+                    new ModifyQuantityDto()
+                    {
+                        ProductId =       productId,
+                        Diff =  3,
+                        EffectiveFrom = thirdDate,
+                        EffectiveTo = thirdDate,
                         ModificationType   = ModificationType.Sell
                     }
                });
 
+            var qms = (await _repo.GetQuantityMetricsAsync()).OrderByDescending(p => p.EffectiveDate).ToList();
 
-            var qms = await _repo.GetQuantityMetricsAsync();
-            Assert.Single(qms);
+            Assert.Equal(10, qms[2].Value);
+            Assert.Equal(7, qms[1].Value);
+            Assert.Equal(2, qms[0].Value);
+            Assert.Equal(3, qms.Count);
         }
 
 
@@ -138,7 +227,7 @@ namespace Tests.Inventory.Expressions
             var quantityMetricDto2 = QuantityMetricDto.NewQuantityMetricDto(productId, 5,  secondDate);
             var qm2 = await _repo.AddQuantityMetricAsync(quantityMetricDto2);
 
-            var thirdDate = new DateTime(2021, 1, 1, 1, 1, 1);
+            var thirdDate = new DateTime(2023, 1, 1, 1, 1, 1);
             await _modificationService.ModifyQuantityMetrics(
                new List<ModifyQuantityDto>()
                {
@@ -158,5 +247,70 @@ namespace Tests.Inventory.Expressions
             Assert.Equal(10, qms[0].Value);
             Assert.Equal(3, qms.Count);
         }
+
+       
+
+
+
+        [Fact]
+      public async Task TestLetWithEffectiveToOverlappingWithExistingWillNotSave()
+        {
+            var _mediator = _fixture.GetService<IMediator>(_testOutputHelper)!;
+            var _repo = _fixture.GetService<IInventoryRepository>(_testOutputHelper)!;
+            var _ProductsDbContext = _fixture.GetService<ExpressionsDbContext>(_testOutputHelper)!;
+            var _modificationService = _fixture.GetService<IModifyQuantityService>(_testOutputHelper)!;
+
+            _repo.EmptyDB();
+
+            var InventoryId = (await _repo.AddInventoryAsync(new InventoryDto(Guid.NewGuid(), Inventory))).Id;
+            var sourceId = (await _repo.AddSourceAsync(new SourceDto(Guid.NewGuid(), SourceName))).Id;
+            var metricId = (await _repo.AddMetricAsync(MetricDto.NewMetricDto(sourceId, Constants.QUANTITYCODE))).Id;
+            ProductDto prodDto = ProductDto.NewProductDto(InventoryId, RoomProductCode);
+            var productId = (await _repo.AddProductAsync(prodDto)).Id;
+
+
+
+
+            var firstDate = new DateTime(2000, 1, 1, 1, 1, 1);
+            var quantityMetricDto = QuantityMetricDto.NewQuantityMetricDto(productId, 1, firstDate);
+            await _repo.AddQuantityMetricAsync(quantityMetricDto);
+
+
+
+
+
+            var firstEntryDate = new DateTime(2023, 1, 1, 1, 1, 1);
+            await _modificationService.ModifyQuantityMetrics(
+               new List<ModifyQuantityDto>()
+               {
+                    new ModifyQuantityDto()
+                    {
+                        ProductId =       productId,
+                        Diff =   1,
+                        EffectiveFrom = firstEntryDate,
+                        EffectiveTo = firstEntryDate.AddDays(300),
+                        ModificationType   = ModificationType.Let
+                    }
+               });
+
+            await _modificationService.ModifyQuantityMetrics(
+               new List<ModifyQuantityDto>()
+               {
+                    new ModifyQuantityDto()
+                    {
+                        ProductId =       productId,
+                        Diff =  1,
+                        EffectiveFrom = firstEntryDate.AddDays(-1),
+                        EffectiveTo = firstEntryDate.AddDays(3),
+                        ModificationType   = ModificationType.Let
+                    }
+               });
+
+
+            var qms = await _repo.GetQuantityMetricsAsync();
+            Assert.Equal(2, qms.Count);
+
+        }
     }
- }
+}
+ 

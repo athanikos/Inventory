@@ -27,6 +27,8 @@ namespace Tests.Inventory.Expressions
             options.UseNpgsql(configuration.
             GetConnectionString("Expressions")));
 
+
+
             services.AddDbContext<ProductsDbContext>(options =>
             options.UseNpgsql(configuration.
             GetConnectionString("Products")));
