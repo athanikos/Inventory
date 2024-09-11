@@ -3,8 +3,10 @@ using FluentValidation.Validators;
 using Inventory.Products.Contracts.Dto;
 using Inventory.Products.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Identity.Client;
 using System.ComponentModel;
+using System.Transactions;
 
 namespace Inventory.Products.Repositories
 {
@@ -13,44 +15,25 @@ namespace Inventory.Products.Repositories
     /// </summary>
     public  class PostgresModifyQuantityRepository : IModifyQuantityRepository
     {
-        private ProductsDbContext _context; 
+        private ProductsDbContext _context;
 
-        public PostgresModifyQuantityRepository(ProductsDbContext context )
-        {
-            _context = context;     
-        }
+        public ProductsDbContext Context { get => _context; set => _context = value; }
 
-        /// <summary>
-        /// https://www.milanjovanovic.tech/blog/a-clever-way-to-implement-pessimistic-locking-in-ef-core
-        /// </summary>
-        public async Task ModifyQuantityMetrics(List<ModifyQuantityDto> inboundQuantities)
-        {
-            await using var transaction = await _context.Database
-                .BeginTransactionAsync();
-
-            try
-            {
-                InboundEntitiesAreOverlapping(inboundQuantities);   
-
-                foreach (var item in inboundQuantities)
-                {
-                    await AddBasedOnPrevious(item);
-                    await ModifyQuantityPostEffectiveDate(item);
-                    await IsOverlappingWithExistingIntervalWithNoLeftQuantity(item);
-
-                }
+        public PostgresModifyQuantityRepository(ProductsDbContext context) => Context = context;
 
 
 
-                await _context.SaveChangesAsync();
-                await transaction.CommitAsync();
-            }
-            catch (Exception ex)
-            {
-                await transaction.RollbackAsync();
-                _context.ChangeTracker.Clear();
-            }
-        }
+
+        //public async Task  SaveAndCommit(IDbContextTransaction transaction)
+        //{
+
+        //}
+
+        //public async Task Rollback(IDbContextTransaction transaction)
+        //{
+        //    await transaction.RollbackAsync();
+        //    Context.ChangeTracker.Clear();
+        //}
 
 
         /// <summary>
@@ -61,9 +44,9 @@ namespace Inventory.Products.Repositories
         /// <param name="dto"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentException"></exception>
-        public async Task AddBasedOnPrevious(ModifyQuantityDto dto)
+        public async Task<QuantityMetric?> GetPreviousWithLockAsync(ModifyQuantityDto dto)
         {
-            var previousInTimeEntry = await _context
+            return  await                    Context
                                             .QuantityMetrics
                                             .FromSql
                                              (
@@ -77,47 +60,27 @@ namespace Inventory.Products.Repositories
                                                   FOR UPDATE NOWAIT"
                                              ) // PostgreSQL: Lock or fail immediately
                                             .FirstOrDefaultAsync();
-
-            if (dto.ModificationType != Contracts.ModificationType.Buy)
-                if (previousInTimeEntry == null)
-                    throw new ArgumentException($"no previous entry found with less than {dto.EffectiveFrom} ");
-
-            QuantityMetric qmStart = new QuantityMetric()
-            {
-                ProductId = dto.ProductId,
-                Value = previousInTimeEntry == null ? 0 : previousInTimeEntry.Value,
-                EffectiveDate = dto.EffectiveFrom
-            };
-            qmStart.Value = ModifyQuantity(dto, qmStart);
-            _context.QuantityMetrics.Add(qmStart);
-            
-            if (dto.ModificationType == Contracts.ModificationType.Let)
-                Unlet(dto, qmStart);
+     
         }
 
         private void Unlet(ModifyQuantityDto dto, QuantityMetric qmStart)
         {
-                QuantityMetric qmEnd = new QuantityMetric()
+            if (dto.ModificationType != Contracts.ModificationType.Let)
+                return;
+
+            QuantityMetric qmEnd = new QuantityMetric()
                 {
                     ProductId = dto.ProductId,
                     Value = qmStart.Value + dto.Diff,
                     EffectiveDate = dto.EffectiveTo.AddDays(1) // todo parametrize increment this is daily !!!!
                 };
-                _context.QuantityMetrics.Add(qmEnd);
+                Context.QuantityMetrics.Add(qmEnd);
         }
 
-        /// <summary>
-        /// iterates through all records post effective date 
-        /// and updates quantity for buy and sell 
-        /// </summary>
-        /// <param name="dto"></param>
-        /// <returns></returns>
-        public async Task ModifyQuantityPostEffectiveDate(ModifyQuantityDto dto)
+        
+        public async Task<List<QuantityMetric>> GetPostEffectiveDateRowsWithLockAsync(ModifyQuantityDto dto)
         {
-            if (dto.ModificationType == Contracts.ModificationType.Let)
-                return;
-
-            var postEffectiveDateRows = await _context
+                   return await Context
                                             .QuantityMetrics
                                             .FromSql
                                              (
@@ -132,33 +95,16 @@ namespace Inventory.Products.Repositories
                                              ) // PostgreSQL: Lock or fail immediately
                                             .ToListAsync();
 
-            foreach (var item in postEffectiveDateRows)
-            {
-                 item.Value = ModifyQuantity(dto, item);
-            }
         }
 
-        private static decimal ModifyQuantity(ModifyQuantityDto dto, QuantityMetric item)
-        {
-            decimal newValue = 0;
-
-            if (dto.ModificationType == Contracts.ModificationType.Buy)
-                newValue = item.Value + dto.Diff;
-            else if (     dto.ModificationType == Contracts.ModificationType.Sell
-                       || dto.ModificationType == Contracts.ModificationType.Let
-                    )
-                newValue = item.Value - dto.Diff;
-            return newValue;
-        }
-
-        private async   Task IsOverlappingWithExistingIntervalWithNoLeftQuantity(ModifyQuantityDto dto )
+        public  async   Task HasOverlappingRecordsWithLockAsync(ModifyQuantityDto dto )
         {
             if (dto.ModificationType == Contracts.ModificationType.Buy)
                 return;
 
 
 
-            if (await _context
+            if (await Context
                                             .QuantityMetrics
                                             .FromSql
                                              (
@@ -177,34 +123,19 @@ namespace Inventory.Products.Repositories
                 throw new ArgumentException(); // todo exception and message 
         
         }
-    
-        private void InboundEntitiesAreOverlapping(List<ModifyQuantityDto> inboundQuantities)
+
+
+        public void AddQuantityMetric(Guid productId, decimal value, DateTime effectiveDate )
         {
-            var indexedList = inboundQuantities
-                       .Select((dto, index) => new { Index = index, Dto = dto });
-
-
-            if  ((
-                        from item in indexedList
-                        join otherItem in indexedList
-                        on item.Dto.ProductId equals otherItem.Dto.ProductId  
-                        select new { item, otherItem}
-                    ).Where
-                    ( 
-                        i=>i.item.Index != i.otherItem.Index && 
-                            (
-                                    i.item.Dto.EffectiveFrom >= i.otherItem.Dto.EffectiveFrom
-                                    &&
-                                    i.item.Dto.EffectiveFrom <= i.otherItem.Dto.EffectiveTo
-                            )                    
-                    ).Any())
-                    throw new ArgumentException();
-                       
-
-
+            QuantityMetric qmStart = new QuantityMetric()
+            {
+                ProductId = productId,
+                Value = value, 
+                EffectiveDate = effectiveDate
+            };
+             Context.QuantityMetrics.Add(qmStart);
         }
-            
-            
-            
+
+     
     }
 }

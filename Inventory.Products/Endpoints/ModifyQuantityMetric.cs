@@ -46,7 +46,7 @@ namespace Inventory.Products.Endpoints
                                            .ToList();
 
 
-            await  _service.ModifyQuantityMetrics( items ); 
+            await  _service.ModifyQuantityMetricsAsync( items ); 
             return TypedResults.Ok();
         }  
     }

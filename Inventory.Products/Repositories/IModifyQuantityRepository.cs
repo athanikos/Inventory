@@ -1,10 +1,18 @@
 ﻿using Inventory.Products.Contracts.Dto;
+using Inventory.Products.Entities;
 
 namespace Inventory.Products.Repositories
 {
     public  interface IModifyQuantityRepository
     {
-        public Task AddBasedOnPrevious(ModifyQuantityDto dto);
-        public Task ModifyQuantityMetrics(List<ModifyQuantityDto> inboundQuantities);
+        public Task<QuantityMetric?> GetPreviousWithLockAsync(ModifyQuantityDto dto);
+
+        public  Task<List<QuantityMetric>> GetPostEffectiveDateRowsWithLockAsync(ModifyQuantityDto dto);
+
+        public  Task HasOverlappingRecordsWithLockAsync(ModifyQuantityDto dto);
+
+        public void AddQuantityMetric(Guid productId, decimal value, DateTime effectiveDate);
+
+        public ProductsDbContext Context { get; } 
     }
 }

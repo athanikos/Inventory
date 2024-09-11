@@ -55,7 +55,7 @@ namespace Tests.Inventory.Expressions
             var qm = await _repo.AddQuantityMetricAsync(quantityMetricDto);
             var secondDate = new DateTime(2023, 1, 1, 1, 1, 1);
 
-            await _modificationService.ModifyQuantityMetrics(
+            await _modificationService.ModifyQuantityMetricsAsync(
                new List<ModifyQuantityDto>()
                {
                     new ModifyQuantityDto()
@@ -93,7 +93,7 @@ namespace Tests.Inventory.Expressions
             var qm = await _repo.AddQuantityMetricAsync(quantityMetricDto);
 
             var secondDate = new DateTime(2023, 1, 1, 1, 1, 1);
-            await _modificationService.ModifyQuantityMetrics(
+            await _modificationService.ModifyQuantityMetricsAsync(
                new List<ModifyQuantityDto>()
                {
                     new ModifyQuantityDto()
@@ -136,7 +136,7 @@ namespace Tests.Inventory.Expressions
             var qm2 = await _repo.AddQuantityMetricAsync(quantityMetricDto2);
 
             var thirdDate = new DateTime(2023, 1, 1, 1, 1, 1);
-            await _modificationService.ModifyQuantityMetrics(
+            await _modificationService.ModifyQuantityMetricsAsync(
                new List<ModifyQuantityDto>()
                {
                     new ModifyQuantityDto()
@@ -181,7 +181,7 @@ namespace Tests.Inventory.Expressions
 
 
             var thirdDate = new DateTime(2023, 1, 1, 1, 1, 1);
-            await _modificationService.ModifyQuantityMetrics(
+            await _modificationService.ModifyQuantityMetricsAsync(
                new List<ModifyQuantityDto>()
                {
                     new ModifyQuantityDto()
@@ -228,7 +228,7 @@ namespace Tests.Inventory.Expressions
             var qm2 = await _repo.AddQuantityMetricAsync(quantityMetricDto2);
 
             var thirdDate = new DateTime(2023, 1, 1, 1, 1, 1);
-            await _modificationService.ModifyQuantityMetrics(
+            await _modificationService.ModifyQuantityMetricsAsync(
                new List<ModifyQuantityDto>()
                {
                     new ModifyQuantityDto()
@@ -278,7 +278,7 @@ namespace Tests.Inventory.Expressions
 
 
             var firstEntryDate = new DateTime(2023, 1, 1, 1, 1, 1);
-            await _modificationService.ModifyQuantityMetrics(
+            await _modificationService.ModifyQuantityMetricsAsync(
                new List<ModifyQuantityDto>()
                {
                     new ModifyQuantityDto()
@@ -334,7 +334,7 @@ namespace Tests.Inventory.Expressions
 
 
             var firstEntryDate = new DateTime(2023, 1, 1, 1, 1, 1);
-            await _modificationService.ModifyQuantityMetrics(
+            await _modificationService.ModifyQuantityMetricsAsync(
                new List<ModifyQuantityDto>()
                {
                     new ModifyQuantityDto()
@@ -347,7 +347,7 @@ namespace Tests.Inventory.Expressions
                     }
                });
 
-            await _modificationService.ModifyQuantityMetrics(
+            await _modificationService.ModifyQuantityMetricsAsync(
                new List<ModifyQuantityDto>()
                {
                     new ModifyQuantityDto()
