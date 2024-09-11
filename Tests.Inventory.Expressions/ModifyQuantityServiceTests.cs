@@ -248,7 +248,61 @@ namespace Tests.Inventory.Expressions
             Assert.Equal(3, qms.Count);
         }
 
-       
+
+
+        [Fact]
+        public async Task TestOverlappingInBoundDtosWillNotSave()
+        {
+            var _mediator = _fixture.GetService<IMediator>(_testOutputHelper)!;
+            var _repo = _fixture.GetService<IInventoryRepository>(_testOutputHelper)!;
+            var _ProductsDbContext = _fixture.GetService<ExpressionsDbContext>(_testOutputHelper)!;
+            var _modificationService = _fixture.GetService<IModifyQuantityService>(_testOutputHelper)!;
+
+            _repo.EmptyDB();
+
+            var InventoryId = (await _repo.AddInventoryAsync(new InventoryDto(Guid.NewGuid(), Inventory))).Id;
+            var sourceId = (await _repo.AddSourceAsync(new SourceDto(Guid.NewGuid(), SourceName))).Id;
+            var metricId = (await _repo.AddMetricAsync(MetricDto.NewMetricDto(sourceId, Constants.QUANTITYCODE))).Id;
+            ProductDto prodDto = ProductDto.NewProductDto(InventoryId, RoomProductCode);
+            var productId = (await _repo.AddProductAsync(prodDto)).Id;
+
+
+
+
+            var firstDate = new DateTime(2000, 1, 1, 1, 1, 1);
+            var quantityMetricDto = QuantityMetricDto.NewQuantityMetricDto(productId, 1, firstDate);
+            await _repo.AddQuantityMetricAsync(quantityMetricDto);
+
+
+
+
+
+            var firstEntryDate = new DateTime(2023, 1, 1, 1, 1, 1);
+            await _modificationService.ModifyQuantityMetrics(
+               new List<ModifyQuantityDto>()
+               {
+                    new ModifyQuantityDto()
+                    {
+                        ProductId =       productId,
+                        Diff =   1,
+                        EffectiveFrom = firstEntryDate,
+                        EffectiveTo = firstEntryDate.AddDays(300),
+                        ModificationType   = ModificationType.Let
+                    } ,
+                          new ModifyQuantityDto()
+                    {
+                        ProductId =       productId,
+                        Diff =   1,
+                        EffectiveFrom = firstEntryDate.AddDays(-10),
+                        EffectiveTo = firstEntryDate.AddDays(100),
+                        ModificationType   = ModificationType.Let
+                    }
+               });
+
+            var qms = await _repo.GetQuantityMetricsAsync();
+            Assert.Single(qms);  
+
+        }
 
 
 
@@ -308,7 +362,7 @@ namespace Tests.Inventory.Expressions
 
 
             var qms = await _repo.GetQuantityMetricsAsync();
-            Assert.Equal(2, qms.Count);
+            Assert.Equal(3, qms.Count);
 
         }
     }

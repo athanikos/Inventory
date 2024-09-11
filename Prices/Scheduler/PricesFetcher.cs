@@ -6,6 +6,7 @@ using Newtonsoft.Json.Linq;
 using Inventory.Products.Contracts;
 using MediatR;
 using Serilog;
+using Inventory.Prices.Repositories;
 
 
 namespace Prices
@@ -16,37 +17,26 @@ namespace Prices
         {
             private string _parameterType = "COINGECKO";
            
-            private readonly PricesDbContext _context;
+            private readonly IFetcherRepository _repository;
             private readonly IMediator _mediator;
 
-            private List<Entities.PricesParameter> Parameters { get; set; } =
-                new List<Entities.PricesParameter>();
+            private List<Entities.PricesParameter> Parameters { get; set; } =   new List<Entities.PricesParameter>();
 
-            public PricesFetcher(PricesDbContext context, IMediator mediator)
-            { 
-                _context = context;
+            public PricesFetcher(IFetcherRepository repository, IMediator mediator)
+            {
+                _repository = repository;
                 _mediator = mediator;
             }
             
-            protected virtual List<Entities.PricesParameter> GetParameters()
-            {
-                if (string.IsNullOrEmpty(_parameterType))
-                    throw new ArgumentNullException(nameof(_parameterType));
-                return [.. _context.Parameters.Where(p => p.ParameterType == _parameterType).ToList()];
-            }
-
             public void ScedhuleJobs(IServiceProvider serviceProvider)
             {
-                Parameters = GetParameters();
+                Parameters = _repository.GetParameters();
 
                 if (string.IsNullOrEmpty(_parameterType))
                     throw new ArgumentNullException(nameof(_parameterType));
 
                 foreach (var p in Parameters)
-                {
                         RecurringJob.AddOrUpdate(p.Id.ToString(), () => DoScheduledWork(p), Cron.Minutely);
-                    
-                }
             }
 
             public async Task DoScheduledWork(Entities.PricesParameter p)
@@ -58,18 +48,10 @@ namespace Prices
 
                     var options = new RestClientOptions(p.TargetURL + p.TargetProductCode);
                     var client = new RestClient(options);
-
                     var request = new RestRequest("");
                     request.AddHeader("accept", "application/json");
                     request.AddHeader("x-cg-demo-api-key", p.TargetKey);
-
-
                     // Log.Information(" client.Get(request) ");
-
-
-
-
-
 
                     var response = client.Get(request);
                     JObject o = JObject.Parse(response.Content);
@@ -79,12 +61,9 @@ namespace Prices
 
                     // Log.Information("AddProductMetricCommand  _mediator.Send " + p.ProductId + " " + p.MetricId);
 
-
-
                    await  _mediator.Send(command);
                     
                     // Log.Information("After mediator.send ");
-
 
                 }
                 catch (Exception ex)
@@ -99,7 +78,7 @@ namespace Prices
             public async Task  DoScedhuledWork()
             {
 
-                var items = GetParameters();
+                var items = _repository.    GetParameters();
                 foreach (var p in items)
                   await  DoScheduledWork(p);
             }

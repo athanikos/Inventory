@@ -1,10 +1,16 @@
-﻿using Inventory.Products.Contracts.Dto;
+﻿using FastEndpoints;
+using FluentValidation.Validators;
+using Inventory.Products.Contracts.Dto;
 using Inventory.Products.Entities;
 using Microsoft.EntityFrameworkCore;
-using System.Data.Common;
+using Microsoft.Identity.Client;
+using System.ComponentModel;
 
 namespace Inventory.Products.Repositories
 {
+    /// <summary>
+    /// todo move buinsess code to service this does not seem to be repo code
+    /// </summary>
     public  class PostgresModifyQuantityRepository : IModifyQuantityRepository
     {
         private ProductsDbContext _context; 
@@ -13,6 +19,39 @@ namespace Inventory.Products.Repositories
         {
             _context = context;     
         }
+
+        /// <summary>
+        /// https://www.milanjovanovic.tech/blog/a-clever-way-to-implement-pessimistic-locking-in-ef-core
+        /// </summary>
+        public async Task ModifyQuantityMetrics(List<ModifyQuantityDto> inboundQuantities)
+        {
+            await using var transaction = await _context.Database
+                .BeginTransactionAsync();
+
+            try
+            {
+                InboundEntitiesAreOverlapping(inboundQuantities);   
+
+                foreach (var item in inboundQuantities)
+                {
+                    await AddBasedOnPrevious(item);
+                    await ModifyQuantityPostEffectiveDate(item);
+                    await IsOverlappingWithExistingIntervalWithNoLeftQuantity(item);
+
+                }
+
+
+
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                _context.ChangeTracker.Clear();
+            }
+        }
+
 
         /// <summary>
         /// attempts to find previous entry per productId and effective date 
@@ -39,23 +78,25 @@ namespace Inventory.Products.Repositories
                                              ) // PostgreSQL: Lock or fail immediately
                                             .FirstOrDefaultAsync();
 
-            if (dto.ModificationType!=Contracts.ModificationType.Buy)
-                   if (previousInTimeEntry == null)
-                        throw new ArgumentException($"no previous entry found with less than {dto.EffectiveFrom} ");
+            if (dto.ModificationType != Contracts.ModificationType.Buy)
+                if (previousInTimeEntry == null)
+                    throw new ArgumentException($"no previous entry found with less than {dto.EffectiveFrom} ");
 
             QuantityMetric qmStart = new QuantityMetric()
             {
                 ProductId = dto.ProductId,
-                Value = previousInTimeEntry == null ? 0:  previousInTimeEntry.Value,
+                Value = previousInTimeEntry == null ? 0 : previousInTimeEntry.Value,
                 EffectiveDate = dto.EffectiveFrom
-             };
+            };
             qmStart.Value = ModifyQuantity(dto, qmStart);
             _context.QuantityMetrics.Add(qmStart);
-
-            // todo move to method 
+            
             if (dto.ModificationType == Contracts.ModificationType.Let)
-            {
-                // unlets 
+                Unlet(dto, qmStart);
+        }
+
+        private void Unlet(ModifyQuantityDto dto, QuantityMetric qmStart)
+        {
                 QuantityMetric qmEnd = new QuantityMetric()
                 {
                     ProductId = dto.ProductId,
@@ -63,9 +104,6 @@ namespace Inventory.Products.Repositories
                     EffectiveDate = dto.EffectiveTo.AddDays(1) // todo parametrize increment this is daily !!!!
                 };
                 _context.QuantityMetrics.Add(qmEnd);
-            }
-
-
         }
 
         /// <summary>
@@ -113,32 +151,60 @@ namespace Inventory.Products.Repositories
             return newValue;
         }
 
-        /// <summary>
-        /// https://www.milanjovanovic.tech/blog/a-clever-way-to-implement-pessimistic-locking-in-ef-core
-        /// </summary>
-        public async Task ModifyQuantityMetrics(List<ModifyQuantityDto> inboundQuantities)
+        private async   Task IsOverlappingWithExistingIntervalWithNoLeftQuantity(ModifyQuantityDto dto )
         {
-            await using var transaction = await _context.Database
-                .BeginTransactionAsync();
-            
-            try
-            {
-                foreach (var item in inboundQuantities)
-                {
-                        await AddBasedOnPrevious(item);
-                        await ModifyQuantityPostEffectiveDate(item); 
-                }
+            if (dto.ModificationType == Contracts.ModificationType.Buy)
+                return;
 
-                await _context.SaveChangesAsync();
-                await transaction.CommitAsync();
-            }
-            catch (Exception ex)
-            {
-                await transaction.RollbackAsync();
-                _context.ChangeTracker.Clear();
-            }
 
-               
+
+            if (await _context
+                                            .QuantityMetrics
+                                            .FromSql
+                                             (
+                                                 $@"
+                                                  SELECT ""ProductId"", 
+                                                  ""EffectiveDate"",  ""Value"" 
+                                                  FROM ""Products"".""QuantityMetric"" 
+                                                  WHERE ""ProductId"" = {dto.ProductId}
+                                                  AND ""EffectiveDate""  < {dto.EffectiveTo}
+                                                  AND ""EffectiveDate""  > {dto.EffectiveFrom}
+                                                  AND ""Value""  - {dto.Diff} < 0 
+                                                  ORDER BY ""EffectiveDate"" DESC 
+                                                  FOR UPDATE NOWAIT"
+                                             ) // PostgreSQL: Lock or fail immediately
+                                            .AnyAsync())
+                throw new ArgumentException(); // todo exception and message 
+        
         }
+    
+        private void InboundEntitiesAreOverlapping(List<ModifyQuantityDto> inboundQuantities)
+        {
+            var indexedList = inboundQuantities
+                       .Select((dto, index) => new { Index = index, Dto = dto });
+
+
+            if  ((
+                        from item in indexedList
+                        join otherItem in indexedList
+                        on item.Dto.ProductId equals otherItem.Dto.ProductId  
+                        select new { item, otherItem}
+                    ).Where
+                    ( 
+                        i=>i.item.Index != i.otherItem.Index && 
+                            (
+                                    i.item.Dto.EffectiveFrom >= i.otherItem.Dto.EffectiveFrom
+                                    &&
+                                    i.item.Dto.EffectiveFrom <= i.otherItem.Dto.EffectiveTo
+                            )                    
+                    ).Any())
+                    throw new ArgumentException();
+                       
+
+
+        }
+            
+            
+            
     }
 }

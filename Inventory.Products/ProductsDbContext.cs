@@ -11,15 +11,15 @@ public class ProductsDbContext : DbContext
             <ProductsDbContext> options) :
             base(options)  { }
            
-        public   DbSet<Entities.Product> Products { get; set; }
+        public   DbSet<Product> Products { get; set; }
         public   DbSet<Entities.Inventory> Inventories { get; set; }
         public   DbSet<Entities.Category> Categories { get; set; }
-        public   DbSet<Entities.Metric> Metrics { get; set; }
+        public   DbSet<Metric> Metrics { get; set; }
         public   DbSet<Entities.Source> Sources { get; set; }
-        public   DbSet<Entities.ProductCategory> ProductCategories { get; set; }
-        public   DbSet<Entities.ProductMetric> ProductMetrics { get; set; }
-        public   DbSet<Entities.QuantityMetric> QuantityMetrics { get; set; }
-        public   DbSet<Entities.InventoryMetric> InventoryMetrics { get; set; }
+        public   DbSet<ProductCategory> ProductCategories { get; set; }
+        public   DbSet<ProductMetric> ProductMetrics { get; set; }
+        public   DbSet<QuantityMetric> QuantityMetrics { get; set; }
+        public   DbSet<InventoryMetric> InventoryMetrics { get; set; }
     
         protected override void OnModelCreating
         (ModelBuilder modelBuilder)

@@ -7,6 +7,7 @@ using Serilog;
 using MediatR;
 using Hangfire.MemoryStorage;
 using Hangfire.SqlServer;
+using Inventory.Prices.Repositories;
 
 
 
@@ -47,7 +48,7 @@ namespace Inventory.Prices
             services.AddScoped<IPricesFetcher, PricesFetcher>(
             sp =>
             {   
-                return new PricesFetcher(sp.GetRequiredService<PricesDbContext>(), 
+                return new PricesFetcher(sp.GetRequiredService<IFetcherRepository>(), 
                                           sp.GetRequiredService<IMediator>()
                                           );
             }

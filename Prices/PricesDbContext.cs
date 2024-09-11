@@ -16,10 +16,9 @@ public  class PricesDbContext : DbContext
          {
                         base.OnModelCreating(modelBuilder);
                         modelBuilder.HasDefaultSchema("Prices");
+                        modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
-                          modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
-
-        var config = 
+                        var config = 
                         modelBuilder.Entity<Entities.PricesParameter>();
                         config.ToTable("PricesParameter").HasKey(p=>p.Id);
 
