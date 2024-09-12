@@ -1,8 +1,7 @@
-﻿using Inventory.Products.Contracts.Dto;
-using Inventory.Products.Endpoints;
+﻿using Inventory.Products.Contracts;
+using Inventory.Products.Contracts.Dto;
 using Inventory.Products.Entities;
 using Inventory.Products.Repositories;
-using Microsoft.EntityFrameworkCore;
 
 namespace Inventory.Products.Services
 {
@@ -10,107 +9,138 @@ namespace Inventory.Products.Services
     ///  Implements quantity increment / decrement with locks in quantity metric entity  
     ///  Validates inbound intervals against store entries
     ///  Validates inbound entries aginst each other 
-    ///  
     /// </summary>
     public class ModifyQuantityService : IModifyQuantityService
     {
         private readonly IModifyQuantityRepository _repo;
+        private ModifyQuantityInterval _interval = ModifyQuantityInterval.Daily;
+
+        public enum ModifyQuantityInterval
+        {
+            Daily = 0 ,
+            Hourly = 1 ,    
+            Minutely = 2 ,  
+        }
 
         public ModifyQuantityService(IModifyQuantityRepository repo)
         {
             _repo = repo;
         }
 
+        private  static void  Validate(List<ModifyQuantityDto> inboundQuantities)
+        {
+            if  (inboundQuantities.Select(o=>o.Diff < 0).Any())
+                throw new InvalidDiffException();
+
+        }
+
+
         public async Task ModifyQuantityMetricsAsync(List<ModifyQuantityDto> inboundQuantities)
         {
+            Validate(inboundQuantities);
+               
+
+            inboundQuantities = inboundQuantities.OrderBy(o => o.EffectiveFrom).ToList();
+    
             await using var transaction = await _repo.Context.Database.BeginTransactionAsync();
             try
             {
-                InboundEntitiesAreOverlapping(inboundQuantities);
-
+              
                 foreach (var item in inboundQuantities)
                 {
-                    await AddBasedOnPrevious(item);
+                    await AddWithUpdatedQuantityyBasedOnPrevious(item);
                     await ModifyQuantityPostEffectiveDate(item);
-                    await _repo.HasOverlappingRecordsWithLockAsync(item);
+                    await _repo.Context.SaveChangesAsync();
                 }
-           
-                await _repo.Context.SaveChangesAsync();
                 await transaction.CommitAsync();
-            }                           
+            }
             catch (Exception ex)
             {
-                  await transaction.RollbackAsync();
-                  _repo.Context.ChangeTracker.Clear();
+                await transaction.RollbackAsync();
+                _repo.Context.ChangeTracker.Clear();
             }
         }
 
-
-        private async Task  AddBasedOnPrevious(ModifyQuantityDto dto)
+        /// <summary>
+        /// fetches previous record 
+        /// updates dto current quantity and adds to context 
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
+        private async Task AddWithUpdatedQuantityyBasedOnPrevious(ModifyQuantityDto dto)
         {
-            var previousInTimeEntry = await _repo.GetPreviousWithLockAsync(dto);
+            var previousInStore = await _repo.GetPreviousWithLockAsync(dto);
 
             if (dto.ModificationType != Contracts.ModificationType.Buy)
-                if (previousInTimeEntry == null)
+                if (previousInStore == null)
                     throw new ArgumentException($"no previous entry found with less than {dto.EffectiveFrom} ");
 
-            _repo.AddQuantityMetric(dto.ProductId, 
-                                    CalculateQuantity(dto, previousInTimeEntry), 
+            var qmStart =  _repo.AddQuantityMetric(dto.ProductId,
+                                    CalculateQuantity(dto, previousInStore),
                                     dto.EffectiveFrom);
+
+            Unlet(dto, qmStart);
         }
 
-      
 
-        private void InboundEntitiesAreOverlapping(List<ModifyQuantityDto> inboundQuantities)
+
+        /// <summary>
+        /// adds the effective end equivalent record in quantity metrics 
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <param name="qmStart"></param>
+        private void Unlet(ModifyQuantityDto dto, QuantityMetric qmStart)
         {
-            var indexedList = inboundQuantities
-                       .Select((dto, index) => new { Index = index, Dto = dto });
-
-
-            if ((
-                        from item in indexedList
-                        join otherItem in indexedList
-                        on item.Dto.ProductId equals otherItem.Dto.ProductId
-                        select new { item, otherItem }
-                    ).Where
-                    (
-                        i => i.item.Index != i.otherItem.Index &&
-                            (
-                                    i.item.Dto.EffectiveFrom >= i.otherItem.Dto.EffectiveFrom
-                                    &&
-                                    i.item.Dto.EffectiveFrom <= i.otherItem.Dto.EffectiveTo
-                            )
-                    ).Any())
-                throw new ArgumentException();
-
-
-
-        }
-
-        public async Task ModifyQuantityPostEffectiveDate(ModifyQuantityDto dto)
-        {
-            if (dto.ModificationType == Contracts.ModificationType.Let)
+            if (dto.ModificationType != Contracts.ModificationType.Let)
                 return;
 
+            DateTime effectiveEndDate;
+
+            if (_interval == ModifyQuantityInterval.Daily)
+                effectiveEndDate = dto.EffectiveTo.AddDays(1);
+            else 
+                throw new NotImplementedException();
+
+            QuantityMetric qmEnd = new QuantityMetric()
+            {
+                ProductId = dto.ProductId,
+                Value = qmStart.Value + dto.Diff,
+                EffectiveDate = effectiveEndDate
+            };
+            _repo.Context.QuantityMetrics.Add(qmEnd);
+        }
+
+
+        /// <summary>
+        /// gets all post effecive date from records with lock  and updates quantity
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        private async Task ModifyQuantityPostEffectiveDate(ModifyQuantityDto dto)
+        {
             var postEffectiveDateRows = await _repo.GetPostEffectiveDateRowsWithLockAsync(dto);
 
             foreach (var item in postEffectiveDateRows)
                  item.Value = CalculateQuantity(dto, item);
-            
-
         }
 
-        private static decimal CalculateQuantity(ModifyQuantityDto cureentItem, QuantityMetric previousItem)
+        /// <summary>
+        /// given a previous Item and a current item updates currentItem Value based on previousItem 
+        /// when modification type is buy or sell 
+        /// </summary>
+        /// <param name="currentItem"></param>
+        /// <param name="previousItem"></param>
+        /// <returns></returns>
+        private static decimal CalculateQuantity(ModifyQuantityDto currentItem, QuantityMetric previousItem)
         {
             decimal newValue = 0;
             decimal itemValue = previousItem ==null ? 0 : previousItem.Value;
 
-            if (cureentItem.ModificationType == Contracts.ModificationType.Buy)
-                newValue = itemValue + cureentItem.Diff;
-            else if (cureentItem.ModificationType == Contracts.ModificationType.Sell
-                       || cureentItem.ModificationType == Contracts.ModificationType.Let
-                    )
-                newValue = itemValue - cureentItem.Diff;
+            if (currentItem.ModificationType == Contracts.ModificationType.Buy)
+                newValue = itemValue + currentItem.Diff;
+            else if (ModificationTypeHelper.IsBuyOrSell(currentItem.ModificationType))
+                newValue = itemValue - currentItem.Diff;
             return newValue;
         }
     }

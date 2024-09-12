@@ -11,7 +11,7 @@ namespace Inventory.Products.Repositories
 
         public  Task HasOverlappingRecordsWithLockAsync(ModifyQuantityDto dto);
 
-        public void AddQuantityMetric(Guid productId, decimal value, DateTime effectiveDate);
+        public QuantityMetric AddQuantityMetric(Guid productId, decimal value, DateTime effectiveDate);
 
         public ProductsDbContext Context { get; } 
     }

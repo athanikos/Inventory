@@ -2,10 +2,11 @@
 {
     public class ModifyQuantityDto
     {
-        public Guid ProductId { get; set; }   
-        public decimal Diff { get; set; }   
+        public Guid ProductId { get; set; }
+        public decimal Diff;
         public DateTime EffectiveFrom { get; set; }
         public DateTime EffectiveTo { get; set; }
         public ModificationType ModificationType { get; set; }  
     }
+
 }
