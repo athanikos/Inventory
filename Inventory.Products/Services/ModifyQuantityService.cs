@@ -31,24 +31,63 @@ namespace Inventory.Products.Services
         {
             if  (inboundQuantities.Select(o=>o.Diff < 0).Any())
                 throw new InvalidDiffException();
-
         }
 
 
+        public async Task CancelQuantityMetricsAsync(List<ModifyQuantityDto> inboundQuantities)
+        {
+            Validate(inboundQuantities);
+          
+             var groupedInboundQuantities = inboundQuantities.
+                                Where(o => ModificationTypeHelper.IsBuyOrSell(o.ModificationType)).
+                                GroupBy(p => new { p.ProductId, p.EffectiveFrom, p.ModificationType }).
+                                
+                                ToList();
+                
+         
+            await using var transaction = await _repo.Context.Database.BeginTransactionAsync();
+            try
+            {
+                // cancel all records 
+
+                foreach (var item in inboundQuantities)
+                {
+                    var previousInStore = await _repo.GetPreviousWithLockAsync(item);
+                    // find next in post effective 
+                    await ModifyQuantityPostEffectiveDate(item,true);
+
+                    await _repo.Context.SaveChangesAsync();
+                }
+                await transaction.CommitAsync();
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                _repo.Context.ChangeTracker.Clear();
+            }
+
+        }
+
+            /// <summary>
+            ///  Given a list of modifications on product's quantity 
+            ///  opens a transaction locks all quantity metrics per productId 
+            ///  and attempts to add the new records by adding / subtracting quantities 
+            ///  if there are entities after it updates all records post effective date 
+            ///  the transaction will fail if quantity is less than 0 
+            /// </summary>
+            /// <param name="inboundQuantities"></param>
+            /// <returns></returns>
         public async Task ModifyQuantityMetricsAsync(List<ModifyQuantityDto> inboundQuantities)
         {
             Validate(inboundQuantities);
-               
-
             inboundQuantities = inboundQuantities.OrderBy(o => o.EffectiveFrom).ToList();
-    
             await using var transaction = await _repo.Context.Database.BeginTransactionAsync();
             try
             {
               
                 foreach (var item in inboundQuantities)
                 {
-                    await AddWithUpdatedQuantityyBasedOnPrevious(item);
+                    await AddWithUpdatedQuantityBasedOnPrevious(item);
                     await ModifyQuantityPostEffectiveDate(item);
                     await _repo.Context.SaveChangesAsync();
                 }
@@ -68,7 +107,7 @@ namespace Inventory.Products.Services
         /// <param name="dto"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentException"></exception>
-        private async Task AddWithUpdatedQuantityyBasedOnPrevious(ModifyQuantityDto dto)
+        private async Task AddWithUpdatedQuantityBasedOnPrevious(ModifyQuantityDto dto)
         {
             var previousInStore = await _repo.GetPreviousWithLockAsync(dto);
 
@@ -115,32 +154,35 @@ namespace Inventory.Products.Services
         /// <summary>
         /// gets all post effecive date from records with lock  and updates quantity
         /// </summary>
-        /// <param name="dto"></param>
+        /// <param name="baseItem"></param>
         /// <returns></returns>
-        private async Task ModifyQuantityPostEffectiveDate(ModifyQuantityDto dto)
+        private async Task ModifyQuantityPostEffectiveDate(ModifyQuantityDto baseItem, bool IsCancellation = false)
         {
-            var postEffectiveDateRows = await _repo.GetPostEffectiveDateRowsWithLockAsync(dto);
+            var postEffectiveDateRows = await _repo.GetPostEffectiveDateRowsWithLockAsync(baseItem);
 
-            foreach (var item in postEffectiveDateRows)
-                 item.Value = CalculateQuantity(dto, item);
+            foreach (var postItem in postEffectiveDateRows)
+                 postItem.Value = CalculateQuantity(baseItem, postItem, IsCancellation);
         }
 
         /// <summary>
         /// given a previous Item and a current item updates currentItem Value based on previousItem 
         /// when modification type is buy or sell 
+        /// if cancellation it does the reverse operation 
         /// </summary>
         /// <param name="currentItem"></param>
         /// <param name="previousItem"></param>
         /// <returns></returns>
-        private static decimal CalculateQuantity(ModifyQuantityDto currentItem, QuantityMetric previousItem)
+        private static decimal CalculateQuantity(ModifyQuantityDto currentItem, 
+                                                 QuantityMetric previousItem, 
+                                                 bool IsCancellation = false )
         {
             decimal newValue = 0;
             decimal itemValue = previousItem ==null ? 0 : previousItem.Value;
 
             if (currentItem.ModificationType == Contracts.ModificationType.Buy)
-                newValue = itemValue + currentItem.Diff;
+                newValue = itemValue + (IsCancellation?-1:1) * currentItem.Diff;
             else if (ModificationTypeHelper.IsBuyOrSell(currentItem.ModificationType))
-                newValue = itemValue - currentItem.Diff;
+                newValue = itemValue - (IsCancellation ? -1 : 1) * currentItem.Diff;
             return newValue;
         }
     }

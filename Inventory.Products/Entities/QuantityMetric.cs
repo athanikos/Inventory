@@ -9,8 +9,12 @@ namespace Inventory.Products.Entities;
 /// </summary>
 public class QuantityMetric
 {
+    public Guid TransactionId { get; set; }
+    public decimal Diff { get; set; }
+    public bool IsCancelled { get; set; }   
+
+
     public Guid ProductId { get; set; }
-     
     public decimal  Value { get; set; }
 
     public DateTime EffectiveDate { get;  set; }  = DateTime.MinValue;

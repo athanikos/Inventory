@@ -51,7 +51,9 @@ namespace Tests.Inventory.Expressions
             var productId = (await _repo.AddProductAsync(prodDto)).Id;
 
             var firstDate = new DateTime(2022, 1, 1, 1, 1, 1);
-            var quantityMetricDto = QuantityMetricDto.NewQuantityMetricDto(productId, 1,  firstDate);
+            var quantityMetricDto = QuantityMetricDto.NewQuantityMetricDto(productId, 1,  firstDate
+                
+                );
             var qm = await _repo.AddQuantityMetricAsync(quantityMetricDto);
             var secondDate = new DateTime(2023, 1, 1, 1, 1, 1);
 

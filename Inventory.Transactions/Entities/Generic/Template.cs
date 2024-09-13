@@ -13,6 +13,9 @@
 
         public List<Section> Sections { get; set; } = new();
 
+    //    public List<Field> Fields { get; set; } = new();
+
+
         public TemplateType Type { get; set; }
 
         public DateTime Created { get;set; }

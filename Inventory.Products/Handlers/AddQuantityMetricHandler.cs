@@ -23,7 +23,10 @@ namespace Inventory.Products.Handlers
         {
             var dto = new QuantityMetricDto(request.ProductId,
                                                 request.Value,
-                                                request.EffectiveDate
+                                                request.EffectiveDate,
+                                                request.TransactionId,
+                                                request.Diff,
+                                                request.IsCancelled
                                                );
             try
             {

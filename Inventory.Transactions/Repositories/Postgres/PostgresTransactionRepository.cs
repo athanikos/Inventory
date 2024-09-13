@@ -84,11 +84,15 @@ namespace Inventory.Transactions.Repositories.Postgres
         public async Task DeleteTemplateAsync(TemplateDto c)
         {
             Template t = _context.Templates.Where(p => p.Id == c.Id).Single();
+            if (t != null)
+                foreach (var item in t.Sections)
+                    DeleteSection(new SectionDto(t.Id));
+
             _context.Remove(t);
 
-            List<Field> fs = _context.Fields.Where(p => p.TemplateId == c.Id).ToList();
-            foreach (Field f in fs)
-                _context.Remove(f);
+
+
+   
             await _context.SaveChangesAsync();
         }
 
@@ -127,8 +131,7 @@ namespace Inventory.Transactions.Repositories.Postgres
                     Expression = f.Expression,
                     Id = f.Id,
                     SectionId = s.Id,
-                    TemplateId = c.TemplateId,
-                    Type = f.Type,
+                     Type = f.Type,
                 });
 
             await _context.SaveChangesAsync();
@@ -152,7 +155,7 @@ namespace Inventory.Transactions.Repositories.Postgres
             
             foreach (var storedField in inStoreSection.Fields)
             {
-                if (inboundSection.Fields.Where(t => storedField.TemplateId == t.Id).Any() == false)
+                if (inboundSection.Fields.Where(t => storedField.SectionId == t.SectionId).Any() == false)
                     DeleteField(new FieldDto(storedField.Id));
             }
             _context.Update(f);
@@ -160,8 +163,12 @@ namespace Inventory.Transactions.Repositories.Postgres
 
         public void DeleteSection(SectionDto dto)
         {
-            Section f = _context.Sections.Where(p => p.Id == dto.Id).Single();
-            _context.Remove(f);
+            Section s = _context.Sections.Where(p => p.Id == dto.Id).Single();
+            _context.Remove(s);
+
+            foreach (Field f in s.Fields)
+                _context.Remove(f);
+
         }
 
         #endregion 
@@ -169,14 +176,19 @@ namespace Inventory.Transactions.Repositories.Postgres
         #region Fields 
         public async Task<ICollection<FieldDto>> GetFieldsAsync(Guid TemplateId)
         {
-            return await _context.Fields.Where(o => o.TemplateId == TemplateId)
+            var SectionId = await _context.Sections
+                            .Where(o => o.TemplateId == TemplateId)
+                            .Select(i=>i.Id).SingleOrDefaultAsync();  
+
+
+            return await _context.Fields.Where(o => o.SectionId == SectionId)
                            .Select(i => new FieldDto()
                            {
                                Id = i.Id,
                                Expression = i.Expression,
                                Name = i.Name,
                                Type = i.Type,
-                               TemplateId = i.TemplateId,
+                               TemplateId = TemplateId,
                                SectionId = i.SectionId,
                            }).ToListAsync();
         }
@@ -189,8 +201,7 @@ namespace Inventory.Transactions.Repositories.Postgres
                 Expression = c.Expression,
                 Name = c.Name,
                 Type = c.Type,
-                SectionId = c.SectionId,
-                TemplateId = c.TemplateId,
+                SectionId = c.SectionId,    
             });
         }
 
@@ -201,7 +212,6 @@ namespace Inventory.Transactions.Repositories.Postgres
                 Id = dto.Id,
                 Name = dto.Name,
                 Expression = dto.Expression,
-                TemplateId = dto.TemplateId,
                 Type = dto.Type,
                 SectionId = dto.SectionId
             };

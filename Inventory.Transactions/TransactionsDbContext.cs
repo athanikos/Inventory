@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Reflection.Metadata;
 namespace Inventory.Transactions;
 
 public class TransactionsDbContext : DbContext
@@ -40,9 +41,15 @@ public class TransactionsDbContext : DbContext
         modelBuilder.Entity<Entities.Section>().HasKey(e => e.Id);
         modelBuilder.Entity<Entities.Template>().HasKey(e => e.Id);
         modelBuilder.Entity<Entities.TransactionSection>().HasKey(e => e.Id);
-       
-        //modelBuilder.Entity<Entities.Field>().HasMany(e => e.Values)
-          //                                     .WithOne(e => e.Field);
+
+        modelBuilder.Entity<Entities.Field>().HasMany(e => e.Values);
+
+
+
+        //modelBuilder.Entity<Entities.Template>()
+        //                            .HasMany(e => e.Fields)
+        //                            .WithOne(a => a.Template)
+        //                            .HasForeignKey(e => e.TemplateId);
 
         modelBuilder.Entity<Entities.Field>().HasKey(e => e.Id);
         modelBuilder.Entity < Entities.Value>().HasKey(e => e.Id);

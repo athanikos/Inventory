@@ -13,7 +13,7 @@
 
         public Guid SectionId { get; set; }
 
-        public Guid TemplateId { get; set; }
+      //  public Guid TemplateId { get; set; }
 
         /// <summary>
         /// total price 
@@ -25,11 +25,11 @@
         /// </summary>
         public string Expression { get; set; } = string.Empty;
 
-        
+
         //todo data source , this is for a combo equivalent 
         // the source can be products from inventory possible use labels (categories ) to limit dataset 
 
-
+    //    public Template Template { get; set; }=null;
 
 
         /// <summary>

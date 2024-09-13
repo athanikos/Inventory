@@ -486,7 +486,7 @@ namespace Inventory.Products.Repositories
         {
             return  await _context.QuantityMetrics.
                                    Where(i => i.ProductId == id && i.EffectiveDate == EffectiveDate).
-                                   Select(i =>new QuantityMetricDto(i.ProductId,i.Value,i.EffectiveDate)).
+                                   Select(i =>new QuantityMetricDto(i.ProductId,i.Value,i.EffectiveDate,i.TransactionId, i.Diff,i.IsCancelled)).
                                    SingleAsync();
 
         }
@@ -494,7 +494,7 @@ namespace Inventory.Products.Repositories
         public async Task<List<QuantityMetricDto>> GetQuantityMetricsAsync()
         {
             return await _context.QuantityMetrics.
-                                  Select(i => new QuantityMetricDto(i.ProductId, i.Value, i.EffectiveDate)).
+                                  Select(i => new QuantityMetricDto(i.ProductId, i.Value, i.EffectiveDate, i.TransactionId, i.Diff, i.IsCancelled   )).
                                   ToListAsync();
         }
 
