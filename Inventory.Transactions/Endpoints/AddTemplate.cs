@@ -40,9 +40,6 @@ namespace Transaction.Transactions.Endpoints
         }
     }
 
-
-
-
     public class AddTemplateRequest
     {
         public AddTemplateRequest(Guid Id, string Name, TemplateType Type, DateTime Created, ICollection<SectionDto> Sections)
@@ -54,19 +51,12 @@ namespace Transaction.Transactions.Endpoints
             this.Sections = Sections;
         }
 
-
         public Guid Id { get; set; }
         public string Name { get; set; }
-
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public TemplateType Type { get; set; }
-
         public DateTime Created { get; set; }
-
         public ICollection<SectionDto> Sections { get; set; }
 
     }
-
-
-
 }

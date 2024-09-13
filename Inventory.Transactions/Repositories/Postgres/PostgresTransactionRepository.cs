@@ -15,11 +15,15 @@ namespace Inventory.Transactions.Repositories.Postgres
         public async Task EmptyDB()
         {
             _context.Values.RemoveRange(_context.Values);
-            _context.Transactions.RemoveRange(_context.Transactions);
             _context.Fields.RemoveRange(_context.Fields);
             _context.Sections.RemoveRange(_context.Sections);
             _context.Templates.RemoveRange(_context.Templates);
-            await _context.SaveChangesAsync();
+
+            _context.TransactionSectionGroups.RemoveRange(_context.TransactionSectionGroups);
+            _context.TransactionSections.RemoveRange(_context.TransactionSections);
+            _context.Transactions.RemoveRange(_context.Transactions);
+    
+             await _context.SaveChangesAsync();
         }
 
         public async Task<TemplateDto> GetTemplateAsync(Guid Id)

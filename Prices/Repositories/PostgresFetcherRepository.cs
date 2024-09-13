@@ -1,6 +1,6 @@
 ﻿namespace Inventory.Prices.Repositories
 {
-    public  class PostgresFetcherRepository
+    public  class PostgresFetcherRepository: IFetcherRepository
     {
         private readonly PricesDbContext _context;
 

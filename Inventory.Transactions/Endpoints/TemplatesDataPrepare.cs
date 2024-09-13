@@ -5,30 +5,38 @@ namespace Transaction.Transactions.Endpoints
     using Microsoft.AspNetCore.Http.HttpResults;
     using System.Threading;
     using System.Threading.Tasks;
+    using Inventory.Transactions.Dto;
     using Inventory.Transactions.Repositories;
     using Microsoft.AspNetCore.Http;
 
-    public class EmptyDB :
-        Endpoint<EmptyDBRequest>
+    public class TemplatesDataPrepare :
+        Endpoint<DataPrepareRequest>
     {
-        private readonly ITransactionRepository _repo;
-        public EmptyDB(ITransactionRepository repo)  {  _repo = repo;  }
+        private readonly IDataPrepareRepository _repo;
+
+        public TemplatesDataPrepare(IDataPrepareRepository repo)
+        {
+            _repo = repo;
+        }
 
         public override void Configure()
         {
-            Post("/transactionsEmptyDB");
+            Post("/TemplatesDataPrepare");
             AllowAnonymous();
             // to do claims this is per EntityId claim
             //  something like Admin_<EntityId>
         }
 
         public override async Task<Results<Ok, NotFound, ProblemDetails>>
-            HandleAsync(EmptyDBRequest edbr, CancellationToken ct)
+            HandleAsync(DataPrepareRequest edbr, CancellationToken ct)
         {
-            await _repo.EmptyDB();
-            return TypedResults.Ok();
+
+             _repo.RoomsPrepare();
+             await   _repo.SaveChangesAsync();   
+             return TypedResults.Ok();
         }
     }
   
-    public record EmptyDBRequest(string Name) { }
+    public record DataPrepareRequest(string Name)
+    { }
 }

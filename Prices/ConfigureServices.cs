@@ -38,7 +38,8 @@ namespace Inventory.Prices
             mediatRAssemblies.Add(typeof(Products.ConfigureServices).Assembly);
 
 
-           
+            services.AddScoped<IFetcherRepository, PostgresFetcherRepository>();
+
 
             // Log.Logger  = new LoggerConfiguration()
             //.MinimumLevel.Debug()
