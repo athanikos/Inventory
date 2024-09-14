@@ -4,6 +4,8 @@ using Inventory.Products.Contracts.Dto;
 using Inventory.Products.Dto;
 using Inventory.Products.Repositories;
 using Inventory.Products.Services;
+using Inventory.Transactions.Dto;
+using Inventory.Transactions.Repositories;
 using MediatR;
 using Xunit.Abstractions;
 using Xunit.Microsoft.DependencyInjection.Abstracts;
@@ -39,21 +41,27 @@ namespace Tests.Inventory.Expressions
         {
             var _mediator = _fixture.GetService<IMediator>(_testOutputHelper)!;
             var _repo = _fixture.GetService<IInventoryRepository>(_testOutputHelper)!;
+            var _transrepo = _fixture.GetService<ITransactionRepository>(_testOutputHelper)!;
             var _ProductsDbContext = _fixture.GetService<ExpressionsDbContext>(_testOutputHelper)!;
             var _modificationService = _fixture.GetService<IModifyQuantityService>(_testOutputHelper)!;
-
+            
             _repo.EmptyDB();
 
+         
             var InventoryId = (await _repo.AddInventoryAsync(new InventoryDto(Guid.NewGuid(), Inventory))).Id;
             var sourceId = (await _repo.AddSourceAsync(new SourceDto(Guid.NewGuid(), SourceName))).Id;
             var metricId = (await _repo.AddMetricAsync(MetricDto.NewMetricDto(sourceId, Constants.QUANTITYCODE))).Id;
             ProductDto prodDto = ProductDto.NewProductDto(InventoryId, RoomProductCode);
             var productId = (await _repo.AddProductAsync(prodDto)).Id;
 
+            var _datarepo = _fixture.GetService<IDataPrepareRepository>(_testOutputHelper)!;
+            var templateId = await _datarepo.RoomsPrepareAsync();
+            var TransactionId = (await _transrepo.AddTransactionAsync(new TransactionDto(Guid.NewGuid(), "", DateTime.Now, templateId, null))).Id;
+
+
+
             var firstDate = new DateTime(2022, 1, 1, 1, 1, 1);
-            var quantityMetricDto = QuantityMetricDto.NewQuantityMetricDto(productId, 1,  firstDate
-                
-                );
+            var quantityMetricDto = QuantityMetricDto.NewQuantityMetricDto(productId, 1, firstDate, TransactionId, 1, false);
             var qm = await _repo.AddQuantityMetricAsync(quantityMetricDto);
             var secondDate = new DateTime(2023, 1, 1, 1, 1, 1);
 
@@ -89,9 +97,16 @@ namespace Tests.Inventory.Expressions
             var metricId = (await _repo.AddMetricAsync(MetricDto.NewMetricDto(sourceId, Constants.QUANTITYCODE))).Id;
             ProductDto prodDto = ProductDto.NewProductDto(InventoryId, RoomProductCode);
             var productId = (await _repo.AddProductAsync(prodDto)).Id;
+            var _transrepo = _fixture.GetService<ITransactionRepository>(_testOutputHelper)!;
+
+            var _datarepo = _fixture.GetService<IDataPrepareRepository>(_testOutputHelper)!;
+            var templateId = await _datarepo.RoomsPrepareAsync();
+            var TransactionId = (await _transrepo.AddTransactionAsync(new TransactionDto(Guid.NewGuid(), "", DateTime.Now, templateId, null))).Id;
+
+
 
             var firstDate = new DateTime(2022, 1, 1, 1, 1, 1);
-            var quantityMetricDto = QuantityMetricDto.NewQuantityMetricDto(productId, 0,  firstDate);
+            var quantityMetricDto = QuantityMetricDto.NewQuantityMetricDto(productId, 0,  firstDate, TransactionId, 1, false);
             var qm = await _repo.AddQuantityMetricAsync(quantityMetricDto);
 
             var secondDate = new DateTime(2023, 1, 1, 1, 1, 1);
@@ -128,12 +143,20 @@ namespace Tests.Inventory.Expressions
             ProductDto prodDto = ProductDto.NewProductDto(InventoryId, RoomProductCode);
             var productId = (await _repo.AddProductAsync(prodDto)).Id;
 
+            var _datarepo = _fixture.GetService<IDataPrepareRepository>(_testOutputHelper)!;
+
+            var templateId = await _datarepo.RoomsPrepareAsync();
+            var _transrepo = _fixture.GetService<ITransactionRepository>(_testOutputHelper)!;
+            var TransactionId = (await _transrepo.AddTransactionAsync(new TransactionDto(Guid.NewGuid(), "", DateTime.Now, templateId, null))).Id;
+
+
+
             var firstDate = new DateTime(2021, 1, 1, 1, 1, 1);
-            var quantityMetricDto = QuantityMetricDto.NewQuantityMetricDto(productId,10, firstDate);
+            var quantityMetricDto = QuantityMetricDto.NewQuantityMetricDto(productId,10, firstDate, TransactionId, 1, false);
             var qm = await _repo.AddQuantityMetricAsync(quantityMetricDto);
 
             var secondDate = new DateTime(2025, 1, 1, 1, 1, 1);
-            var quantityMetricDto2 = QuantityMetricDto.NewQuantityMetricDto(productId, 5, secondDate);
+            var quantityMetricDto2 = QuantityMetricDto.NewQuantityMetricDto(productId, 5, secondDate, TransactionId, 1, false);
             var qm2 = await _repo.AddQuantityMetricAsync(quantityMetricDto2);
 
             var thirdDate = new DateTime(2023, 1, 1, 1, 1, 1);
@@ -169,13 +192,20 @@ namespace Tests.Inventory.Expressions
             var metricId = (await _repo.AddMetricAsync(MetricDto.NewMetricDto(sourceId, Constants.QUANTITYCODE))).Id;
             ProductDto prodDto = ProductDto.NewProductDto(InventoryId, RoomProductCode);
             var productId = (await _repo.AddProductAsync(prodDto)).Id;
+            var _transrepo = _fixture.GetService<ITransactionRepository>(_testOutputHelper)!;
+          
+            
+            var _datarepo = _fixture.GetService<IDataPrepareRepository>(_testOutputHelper)!;
+            var templateId = await _datarepo.RoomsPrepareAsync();
+            var TransactionId = (await _transrepo.AddTransactionAsync(new TransactionDto(Guid.NewGuid(), "", DateTime.Now, templateId, null))).Id;
+
 
             var firstDate = new DateTime(2021, 1, 1, 1, 1, 1);
-            var quantityMetricDto = QuantityMetricDto.NewQuantityMetricDto(productId, 10, firstDate);
+            var quantityMetricDto = QuantityMetricDto.NewQuantityMetricDto(productId, 10, firstDate, TransactionId, 1, false);
             var qm = await _repo.AddQuantityMetricAsync(quantityMetricDto);
 
             var secondDate = new DateTime(2025, 1, 1, 1, 1, 1);
-            var quantityMetricDto2 = QuantityMetricDto.NewQuantityMetricDto(productId, 5, secondDate);
+            var quantityMetricDto2 = QuantityMetricDto.NewQuantityMetricDto(productId, 5, secondDate, TransactionId, 1, false);
             var qm2 = await _repo.AddQuantityMetricAsync(quantityMetricDto2);
 
 
@@ -216,13 +246,18 @@ namespace Tests.Inventory.Expressions
             var metricId = (await _repo.AddMetricAsync(MetricDto.NewMetricDto(sourceId, Constants.QUANTITYCODE))).Id;
             ProductDto prodDto = ProductDto.NewProductDto(InventoryId, RoomProductCode);
             var productId = (await _repo.AddProductAsync(prodDto)).Id;
+            var _transrepo = _fixture.GetService<ITransactionRepository>(_testOutputHelper)!;
+         
+            var _datarepo = _fixture.GetService<IDataPrepareRepository>(_testOutputHelper)!;
+            var templateId = await _datarepo.RoomsPrepareAsync();
+            var TransactionId = (await _transrepo.AddTransactionAsync(new TransactionDto(Guid.NewGuid(), "", DateTime.Now, templateId, null))).Id;
 
             var firstDate = new DateTime(2024, 1, 1, 1, 1, 1);
-            var quantityMetricDto = QuantityMetricDto.NewQuantityMetricDto(productId, 0,  firstDate);
+            var quantityMetricDto = QuantityMetricDto.NewQuantityMetricDto(productId, 0,  firstDate, TransactionId, 1, false);
             var qm = await _repo.AddQuantityMetricAsync(quantityMetricDto);
 
             var secondDate = new DateTime(2025, 1, 1, 1, 1, 1);
-            var quantityMetricDto2 = QuantityMetricDto.NewQuantityMetricDto(productId, 5,  secondDate);
+            var quantityMetricDto2 = QuantityMetricDto.NewQuantityMetricDto(productId, 5,  secondDate, TransactionId, 1, false);
             var qm2 = await _repo.AddQuantityMetricAsync(quantityMetricDto2);
 
             var thirdDate = new DateTime(2023, 1, 1, 1, 1, 1);
@@ -261,9 +296,14 @@ namespace Tests.Inventory.Expressions
             var metricId = (await _repo.AddMetricAsync(MetricDto.NewMetricDto(sourceId, Constants.QUANTITYCODE))).Id;
             ProductDto prodDto = ProductDto.NewProductDto(InventoryId, RoomProductCode);
             var productId = (await _repo.AddProductAsync(prodDto)).Id;
+            var _transrepo = _fixture.GetService<ITransactionRepository>(_testOutputHelper)!;
+          
+            var _datarepo = _fixture.GetService<IDataPrepareRepository>(_testOutputHelper)!;
+            var templateId = await _datarepo.RoomsPrepareAsync();
+            var TransactionId = (await _transrepo.AddTransactionAsync(new TransactionDto(Guid.NewGuid(), "", DateTime.Now, templateId, null))).Id;
 
             var firstDate = new DateTime(2000, 1, 1, 1, 1, 1);
-            var quantityMetricDto = QuantityMetricDto.NewQuantityMetricDto(productId, 1, firstDate);
+            var quantityMetricDto = QuantityMetricDto.NewQuantityMetricDto(productId, 1, firstDate, TransactionId, 1, false);
             await _repo.AddQuantityMetricAsync(quantityMetricDto);
 
             var firstEntryDate = new DateTime(2023, 1, 1, 1, 1, 1);
@@ -308,9 +348,15 @@ namespace Tests.Inventory.Expressions
             var metricId = (await _repo.AddMetricAsync(MetricDto.NewMetricDto(sourceId, Constants.QUANTITYCODE))).Id;
             ProductDto prodDto = ProductDto.NewProductDto(InventoryId, RoomProductCode);
             var productId = (await _repo.AddProductAsync(prodDto)).Id;
+            var _transrepo = _fixture.GetService<ITransactionRepository>(_testOutputHelper)!;
+
+
+            var _datarepo = _fixture.GetService<IDataPrepareRepository>(_testOutputHelper)!;
+            var templateId = await _datarepo.RoomsPrepareAsync();
+            var TransactionId = (await _transrepo.AddTransactionAsync(new TransactionDto(Guid.NewGuid(), "", DateTime.Now, templateId, null))).Id;
 
             var firstDate = new DateTime(2000, 1, 1, 1, 1, 1);
-            var quantityMetricDto = QuantityMetricDto.NewQuantityMetricDto(productId, 1, firstDate);
+            var quantityMetricDto = QuantityMetricDto.NewQuantityMetricDto(productId, 1, firstDate, TransactionId, 1, false);
             await _repo.AddQuantityMetricAsync(quantityMetricDto);
 
             var firstEntryDate = new DateTime(2023, 1, 1, 1, 1, 1);
@@ -362,9 +408,14 @@ namespace Tests.Inventory.Expressions
             var metricId = (await _repo.AddMetricAsync(MetricDto.NewMetricDto(sourceId, Constants.QUANTITYCODE))).Id;
             ProductDto prodDto = ProductDto.NewProductDto(InventoryId, RoomProductCode);
             var productId = (await _repo.AddProductAsync(prodDto)).Id;
+            var _transrepo = _fixture.GetService<ITransactionRepository>(_testOutputHelper)!;
+            var _datarepo = _fixture.GetService<IDataPrepareRepository>(_testOutputHelper)!;
+
+            var templateId = await _datarepo.RoomsPrepareAsync();
+            var TransactionId = (await _transrepo.AddTransactionAsync(new TransactionDto(Guid.NewGuid(), "", DateTime.Now, templateId, null))).Id;
 
             var firstDate = new DateTime(2000, 1, 1, 1, 1, 1);
-            var quantityMetricDto = QuantityMetricDto.NewQuantityMetricDto(productId, 2, firstDate);
+            var quantityMetricDto = QuantityMetricDto.NewQuantityMetricDto(productId, 2, firstDate, TransactionId, 1, false);
             await _repo.AddQuantityMetricAsync(quantityMetricDto);
 
             var firstEntryDate = new DateTime(2023, 1, 1, 1, 1, 1);
@@ -415,9 +466,14 @@ namespace Tests.Inventory.Expressions
             var metricId = (await _repo.AddMetricAsync(MetricDto.NewMetricDto(sourceId, Constants.QUANTITYCODE))).Id;
             ProductDto prodDto = ProductDto.NewProductDto(InventoryId, RoomProductCode);
             var productId = (await _repo.AddProductAsync(prodDto)).Id;
+            var _transrepo = _fixture.GetService<ITransactionRepository>(_testOutputHelper)!;
+          
+            var _datarepo = _fixture.GetService<IDataPrepareRepository>(_testOutputHelper)!;
+            var templateId = await _datarepo.RoomsPrepareAsync();
+            var TransactionId = (await _transrepo.AddTransactionAsync(new TransactionDto(Guid.NewGuid(), "", DateTime.Now, templateId, null))).Id;
 
             var firstDate = new DateTime(2000, 1, 1, 1, 1, 1);
-            var quantityMetricDto = QuantityMetricDto.NewQuantityMetricDto(productId, 2, firstDate);
+            var quantityMetricDto = QuantityMetricDto.NewQuantityMetricDto(productId, 2, firstDate, TransactionId, 1, false);
             await _repo.AddQuantityMetricAsync(quantityMetricDto);
 
             var firstEntryDate = new DateTime(2023, 1, 1, 1, 1, 1);

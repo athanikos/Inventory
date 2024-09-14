@@ -49,6 +49,7 @@
     <ProjectReference Include="..\Inventory.Notifier\Inventory.Notifications.csproj" />
     <ProjectReference Include="..\Inventory.Products.Contracts\Inventory.Products.Contracts.csproj" />
     <ProjectReference Include="..\Inventory.Products\Inventory.Products.csproj" />
+    <ProjectReference Include="..\Inventory.Transactions\Inventory.Transactions.csproj" />
   </ItemGroup>
 
   <ItemGroup>

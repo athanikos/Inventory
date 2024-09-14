@@ -31,8 +31,7 @@ namespace Transaction.Transactions.Endpoints
             HandleAsync(DataPrepareRequest edbr, CancellationToken ct)
         {
 
-             _repo.RoomsPrepare();
-             await   _repo.SaveChangesAsync();   
+             await _repo.RoomsPrepareAsync();
              return TypedResults.Ok();
         }
     }

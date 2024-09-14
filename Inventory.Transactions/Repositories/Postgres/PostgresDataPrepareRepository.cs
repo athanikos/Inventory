@@ -1,11 +1,4 @@
-﻿using Inventory.Transactions.Dto;
-using Inventory.Transactions.Entities;
-using Npgsql.Internal.Postgres;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Inventory.Transactions.Entities;
 
 namespace Inventory.Transactions.Repositories.Postgres
 {
@@ -18,30 +11,35 @@ namespace Inventory.Transactions.Repositories.Postgres
         { _context = context; }
 
 
-        public void RoomsPrepare()
+        public async Task<Guid> RoomsPrepareAsync()
         {
-            AddRoomsLetTemplate();
+           return await  AddRoomsLetTemplate();
 
         }
 
 
 
-        private void AddRoomsLetTemplate()
+        private async Task<Guid> AddRoomsLetTemplate()
         {
-            _context.Add(
-                new Entities.Template()
-                {
-                    Id = Guid.NewGuid(),
-                    Name = "Rooms To Let Template",
-                    Sections =
+            var t = new Entities.Template()
+            {
+                Id = Guid.NewGuid(),
+                Name = "Rooms To Let Template",
+                Sections =
                     {
                         AddRoomsLetSection(),
                         AddRoomsLetIndividualEntitySection()
 
                      }
 
-                }
+            };
+
+            _context.Add(
+               t
             );
+
+            await _context.SaveChangesAsync(); 
+            return t.Id;    
         }
 
         private static Section AddRoomsLetIndividualEntitySection()
@@ -112,10 +110,5 @@ namespace Inventory.Transactions.Repositories.Postgres
         }
 
 
-
-        public async Task SaveChangesAsync()
-        {
-           await  _context.SaveChangesAsync();    
-        }
     }
 }

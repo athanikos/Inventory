@@ -2,7 +2,7 @@
 {
     public  interface IDataPrepareRepository
     {
-        void RoomsPrepare();
-        Task SaveChangesAsync();
+        Task< Guid> RoomsPrepareAsync();
+     
     }
 }
