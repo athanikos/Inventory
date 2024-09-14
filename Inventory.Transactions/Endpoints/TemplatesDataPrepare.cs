@@ -12,9 +12,9 @@ namespace Transaction.Transactions.Endpoints
     public class TemplatesDataPrepare :
         Endpoint<DataPrepareRequest>
     {
-        private readonly IDataPrepareRepository _repo;
+        private readonly ITransactionRepository _repo;
 
-        public TemplatesDataPrepare(IDataPrepareRepository repo)
+        public TemplatesDataPrepare(ITransactionRepository repo)
         {
             _repo = repo;
         }

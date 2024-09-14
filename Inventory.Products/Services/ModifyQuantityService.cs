@@ -29,7 +29,7 @@ namespace Inventory.Products.Services
 
         private  static void  Validate(List<ModifyQuantityDto> inboundQuantities)
         {
-            if  (inboundQuantities.Select(o=>o.Diff < 0).Any())
+            if  (inboundQuantities.Where(o=>o.Diff < 0).Any())
                 throw new InvalidDiffException();
         }
 

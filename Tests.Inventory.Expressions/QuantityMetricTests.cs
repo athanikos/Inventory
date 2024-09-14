@@ -6,6 +6,7 @@ using Inventory.Products.Repositories;
 using Inventory.Transactions.Dto;
 using Inventory.Transactions.Repositories;
 using MediatR;
+using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Xunit.Abstractions;
 using Xunit.Microsoft.DependencyInjection.Abstracts;
 
@@ -37,55 +38,36 @@ namespace Tests.Inventory.Expressions
         [Fact]
         public async Task TestOnAddQuantityMetricItShouldAddtoProductMetricAsWell()
         {
-            var _mediator = _fixture.GetService<IMediator>(_testOutputHelper)!;
-            var _repo = _fixture.GetService<IInventoryRepository>(_testOutputHelper)!;
-            var _ProductsDbContext = _fixture.GetService<ExpressionsDbContext>(_testOutputHelper)!;
-            _repo.EmptyDB();
+          
+        
+            var output = await TestSetup.Setup(_testOutputHelper,this._fixture);
 
-            var InventoryId = (await _repo.AddInventoryAsync(new InventoryDto(Guid.NewGuid(), Inventory))).Id;
-            var sourceId = (await _repo.AddSourceAsync(new SourceDto(Guid.NewGuid(), SourceName))).Id;
-            var metricId = (await _repo.AddMetricAsync(MetricDto.NewMetricDto(sourceId, Constants.QUANTITYCODE))).Id;
-            ProductDto prodDto = ProductDto.NewProductDto(InventoryId, RoomProductCode);
-            var productId = (await _repo.AddProductAsync(prodDto)).Id;
-            var _transrepo = _fixture.GetService<ITransactionRepository>(_testOutputHelper)!;
-            var TransactionId = (await _transrepo.AddTransactionAsync(new TransactionDto(Guid.NewGuid(), "", DateTime.Now, Guid.NewGuid(), null))).Id;
-
-            var quantityMetricDto = QuantityMetricDto.NewQuantityMetricDto(productId, 1,  DateTime.MinValue, TransactionId, 1, false);
-
-            var qm = await _repo.AddQuantityMetricAsync(quantityMetricDto);
-
-            var pm = await _repo.GetProductMetricAsync(productId, DateTime.MinValue);
+          
+            var quantityMetricDto = QuantityMetricDto.NewQuantityMetricDto(output.ProductId, 1, DateTime.MinValue, output.TransactionId, 1, false);
+            var qm = await output.InventoryRepo.AddQuantityMetricAsync(quantityMetricDto);
+            var pm = await output.InventoryRepo.GetProductMetricAsync(output.ProductId, DateTime.MinValue);
             Assert.NotNull(pm);
             Assert.NotNull(qm);
         }
 
+  
         [Fact]
         public async Task TestUniqueConstraintOnMinutesDifferenceTwoRecordsAreInserted()
         {
 
-            var _mediator = _fixture.GetService<IMediator>(_testOutputHelper)!;
-            var _repo = _fixture.GetService<IInventoryRepository>(_testOutputHelper)!;
-            var _ProductsDbContext = _fixture.GetService<ExpressionsDbContext>(_testOutputHelper)!;
-            _repo.EmptyDB();
+            var output = await TestSetup.Setup(_testOutputHelper, this._fixture);
 
-            var InventoryId = (await _repo.AddInventoryAsync(new InventoryDto(Guid.NewGuid(), Inventory))).Id;
-            var sourceId = (await _repo.AddSourceAsync(new SourceDto(Guid.NewGuid(), SourceName))).Id;
-            var metricId = (await _repo.AddMetricAsync(MetricDto.NewMetricDto(sourceId, Constants.QUANTITYCODE))).Id;
-            ProductDto prodDto = ProductDto.NewProductDto(InventoryId, RoomProductCode);
-            var productId = (await _repo.AddProductAsync(prodDto)).Id;
-            var _transrepo = _fixture.GetService<ITransactionRepository>(_testOutputHelper)!;
-            var TransactionId = (await _transrepo.AddTransactionAsync(new TransactionDto(Guid.NewGuid(), "", DateTime.Now, Guid.NewGuid(), null))).Id;
 
             DateTime dateWithMinutes = new DateTime(2020, 1, 1, 1, 1, 0);
-            var quantityMetricDto = QuantityMetricDto.NewQuantityMetricDto(productId, 1,  dateWithMinutes, TransactionId, 1, false);
+            var quantityMetricDto = QuantityMetricDto.NewQuantityMetricDto(output.ProductId, 1,  dateWithMinutes, output. TransactionId, 1, false);
 
-            var qm1 = await _repo.AddQuantityMetricAsync(quantityMetricDto);
+            var qm1 = await output.InventoryRepo.AddQuantityMetricAsync(quantityMetricDto);
             DateTime dateWithMinutes2 = new DateTime(2020, 1, 1, 1, 12, 0);
 
-            var quantityMetricDto2 = QuantityMetricDto.NewQuantityMetricDto(productId, 1,  dateWithMinutes2, TransactionId, 1, false);
-            await _repo.AddQuantityMetricAsync(quantityMetricDto2);
+            var quantityMetricDto2 = QuantityMetricDto.NewQuantityMetricDto(output.ProductId, 1,  dateWithMinutes2, output.TransactionId, 1, false);
+            await output.InventoryRepo.AddQuantityMetricAsync(quantityMetricDto2);
 
-            var qms = await _repo.GetQuantityMetricsAsync();
+            var qms = await output.InventoryRepo.GetQuantityMetricsAsync();
             Assert.Equal(2, qms.Count);
         }
 
@@ -93,34 +75,23 @@ namespace Tests.Inventory.Expressions
         public async Task TestUniqueConstraintSameRecordIsNotInsertedTwice()
         {
 
-            var _mediator = _fixture.GetService<IMediator>(_testOutputHelper)!;
-            var _repo = _fixture.GetService<IInventoryRepository>(_testOutputHelper)!;
-            var _ProductsDbContext = _fixture.GetService<ExpressionsDbContext>(_testOutputHelper)!;
-            _repo.EmptyDB();
-
-            var InventoryId = (await _repo.AddInventoryAsync(new InventoryDto(Guid.NewGuid(), Inventory))).Id;
-            var sourceId = (await _repo.AddSourceAsync(new SourceDto(Guid.NewGuid(), SourceName))).Id;
-            var metricId = (await _repo.AddMetricAsync(MetricDto.NewMetricDto(sourceId, Constants.QUANTITYCODE))).Id;
-            ProductDto prodDto = ProductDto.NewProductDto(InventoryId, RoomProductCode);
-            var productId = (await _repo.AddProductAsync(prodDto)).Id;
-            var _transrepo = _fixture.GetService<ITransactionRepository>(_testOutputHelper)!;
-            var TransactionId = (await _transrepo.AddTransactionAsync(new TransactionDto(Guid.NewGuid(), "", DateTime.Now, Guid.NewGuid(), null))).Id;
+            var output = await TestSetup.Setup(_testOutputHelper, this._fixture);
 
             DateTime dateWithMinutes = new DateTime(2020, 1, 1, 1, 12, 0);
-            var quantityMetricDto = QuantityMetricDto.NewQuantityMetricDto(productId, 1,  dateWithMinutes, TransactionId, 1, false);
+            var quantityMetricDto = QuantityMetricDto.NewQuantityMetricDto(output.ProductId, 1,  dateWithMinutes, output.TransactionId, 1, false);
 
-            var qm1 = await _repo.AddQuantityMetricAsync(quantityMetricDto);
+            var qm1 = await output.InventoryRepo.AddQuantityMetricAsync(quantityMetricDto);
             DateTime dateWithMinutes2 = new DateTime(2020, 1, 1, 1, 12, 0);
 
-            var quantityMetricDto2 = QuantityMetricDto.NewQuantityMetricDto(productId, 1,  dateWithMinutes2, TransactionId, 1, false);
+            var quantityMetricDto2 = QuantityMetricDto.NewQuantityMetricDto(output.ProductId, 1,  dateWithMinutes2, output.TransactionId, 1, false);
             try
             {
-                await _repo.AddQuantityMetricAsync(quantityMetricDto2);
+                await output.InventoryRepo.AddQuantityMetricAsync(quantityMetricDto2);
             }
             catch (Exception ex) // throws exeeption on unique constraint 
             {
             }
-            var qms = await _repo.GetQuantityMetricsAsync();
+            var qms = await output.InventoryRepo.GetQuantityMetricsAsync();
             Assert.Single(qms);
         }
 
@@ -128,40 +99,33 @@ namespace Tests.Inventory.Expressions
         public async Task TestTwoIdenticalRecordsAddedToContextNoneIsSaved()
         {
 
-            var _mediator = _fixture.GetService<IMediator>(_testOutputHelper)!;
-            var _repo = _fixture.GetService<IInventoryRepository>(_testOutputHelper)!;
-            var _ProductsDbContext = _fixture.GetService<ExpressionsDbContext>(_testOutputHelper)!;
+            var output = await TestSetup.Setup(_testOutputHelper, this._fixture);
 
-            _repo.EmptyDB();
-            var InventoryId = (await _repo.AddInventoryAsync(new InventoryDto(Guid.NewGuid(), Inventory))).Id;
-            var sourceId = (await _repo.AddSourceAsync(new SourceDto(Guid.NewGuid(), SourceName))).Id;
-            var metricId = (await _repo.AddMetricAsync(MetricDto.NewMetricDto(sourceId, Constants.QUANTITYCODE))).Id;
-            ProductDto prodDto = ProductDto.NewProductDto(InventoryId, RoomProductCode);
-            var productId = (await _repo.AddProductAsync(prodDto)).Id;
-            DateTime dateWithMinutes = new DateTime(2020, 1, 1, 1, 12, 0);
+
+            var templateId = await output.TransactionRepo.RoomsPrepareAsync();
+            var TransactionId = (await output.TransactionRepo.AddTransactionAsync(new TransactionDto(Guid.NewGuid(), "", DateTime.Now, templateId, null))).Id;
             var _transrepo = _fixture.GetService<ITransactionRepository>(_testOutputHelper)!;
-            var TransactionId = (await _transrepo.AddTransactionAsync(new TransactionDto(Guid.NewGuid(), "", DateTime.Now, Guid.NewGuid(), null))).Id;
 
-            var quantityMetricDto = QuantityMetricDto.NewQuantityMetricDto(productId, 1,  dateWithMinutes, TransactionId, 1, false);
+
+            var quantityMetricDto = QuantityMetricDto.NewQuantityMetricDto(output.ProductId, 1,  new DateTime(2000,1,1,1,1,1), TransactionId, 1, false);
 
 
             try 
             {
-                _repo.AddQuantityMetric(quantityMetricDto);
-                _repo.AddQuantityMetric(quantityMetricDto); // fails on context add not even on saves 
-                await _repo.SaveChangesAsync(); 
+                output.InventoryRepo.AddQuantityMetric(quantityMetricDto);
+                output.InventoryRepo.AddQuantityMetric(quantityMetricDto); // fails on context add not even on saves 
+                await output.InventoryRepo.SaveChangesAsync(); 
             }
             catch (Exception ex) { }
 
-            var qms = await _repo.GetQuantityMetricsAsync();
+            var qms = await  output.InventoryRepo.GetQuantityMetricsAsync();
             Assert.Empty(qms);
         }
 
         [Fact]
         public async Task TestMultipleIntervalsAreNotSavedWhenAtleastOneIsNotAvailable()
         {
-            var _mediator = _fixture.GetService<IMediator>(_testOutputHelper)!;
-            var _repo = _fixture.GetService<IInventoryRepository>(_testOutputHelper)!;
+             var _repo = _fixture.GetService<IInventoryRepository>(_testOutputHelper)!;
             var _ProductsDbContext = _fixture.GetService<ExpressionsDbContext>(_testOutputHelper)!;
 
             //todo implement  insert one qa for some interval 

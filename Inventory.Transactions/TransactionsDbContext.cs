@@ -44,13 +44,6 @@ public class TransactionsDbContext : DbContext
 
         modelBuilder.Entity<Entities.Field>().HasMany(e => e.Values);
 
-
-
-        //modelBuilder.Entity<Entities.Template>()
-        //                            .HasMany(e => e.Fields)
-        //                            .WithOne(a => a.Template)
-        //                            .HasForeignKey(e => e.TemplateId);
-
         modelBuilder.Entity<Entities.Field>().HasKey(e => e.Id);
         modelBuilder.Entity < Entities.Value>().HasKey(e => e.Id);
 
@@ -62,8 +55,6 @@ public class TransactionsDbContext : DbContext
                                     .HasMany(e => e.TransactionSections)
                                     .WithOne(a => a.Transaction)
                                     .HasForeignKey(e => e.TransactionId);
-
-
 
         modelBuilder.Entity<Entities.TransactionSection>()
                                     .HasMany(e => e.SectionGroups)

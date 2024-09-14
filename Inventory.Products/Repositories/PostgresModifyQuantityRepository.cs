@@ -21,7 +21,8 @@ namespace Inventory.Products.Repositories
                                              (
                                                  $@"
                                                   SELECT ""ProductId"", 
-                                                  ""EffectiveDate"",  ""Value"" 
+                                                  ""EffectiveDate"",  ""Value"" , 
+                                                  ""Diff"", ""IsCancelled"", ""TransactionId""
                                                   FROM ""Products"".""QuantityMetric"" 
                                                   WHERE ""ProductId"" = {dto.ProductId}
                                                   AND ""EffectiveDate""  < {dto.EffectiveFrom}
@@ -43,7 +44,8 @@ namespace Inventory.Products.Repositories
                                              (
                                                  $@"
                                                   SELECT ""ProductId"", 
-                                                  ""EffectiveDate"",  ""Value"" 
+                                                  ""EffectiveDate"",  ""Value"" ,
+                                                  ""Diff"", ""IsCancelled"", ""TransactionId""
                                                   FROM ""Products"".""QuantityMetric"" 
                                                   WHERE ""ProductId"" = {dto.ProductId}
                                                   AND ""EffectiveDate""  > {dto.EffectiveFrom}
@@ -67,7 +69,8 @@ namespace Inventory.Products.Repositories
                                              (
                                                  $@"
                                                   SELECT ""ProductId"", 
-                                                  ""EffectiveDate"",  ""Value"" 
+                                                  ""EffectiveDate"",  ""Value"" ,
+                                                  ""Diff"", ""IsCancelled"", ""TransactionId""
                                                   FROM ""Products"".""QuantityMetric"" 
                                                   WHERE ""ProductId"" = {dto.ProductId}
                                                   AND ""EffectiveDate""  < {dto.EffectiveTo}

@@ -8,6 +8,9 @@ using Xunit.Microsoft.DependencyInjection;
 using Products = Inventory.Products;
 using Inventory.Expressions;
 using Inventory.Products.Services;
+using Inventory.Transactions.Repositories;
+using Inventory.Transactions.Repositories.Postgres;
+using Inventory.Transactions;
 
 namespace Tests.Inventory.Expressions
 {
@@ -26,19 +29,30 @@ namespace Tests.Inventory.Expressions
             services.AddDbContext<ExpressionsDbContext>(options =>
             options.UseNpgsql(configuration.
             GetConnectionString("Expressions")));
-
-
-
+            services.AddDbContext<TransactionsDbContext>(options =>
+             options.UseNpgsql(configuration
+             .GetValue<string>("Transactions")));
             services.AddDbContext<ProductsDbContext>(options =>
             options.UseNpgsql(configuration.
             GetConnectionString("Products")));
 
+
             AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
+        
+
+            services.AddScoped<ITransactionRepository, PostgresTransactionRepository>();
+        
+
 
 
             services.AddScoped<IInventoryRepository, PostgresInventoryRepository>();
             services.AddScoped<IModifyQuantityRepository, PostgresModifyQuantityRepository>();
             services.AddScoped<IModifyQuantityService, ModifyQuantityService>();
+   
+
+
+
         }
 
         protected override ValueTask DisposeAsyncCore()

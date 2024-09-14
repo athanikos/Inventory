@@ -32,6 +32,9 @@ namespace Inventory.Products.Repositories
             _context.ProductMetrics.RemoveRange(_context.ProductMetrics);
             _context.QuantityMetrics.RemoveRange(_context.QuantityMetrics);
             _context.Products.RemoveRange(_context.Products);
+
+
+
                 _context.SaveChanges();
         }
 

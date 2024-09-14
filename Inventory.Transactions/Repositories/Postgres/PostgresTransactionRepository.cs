@@ -17,13 +17,13 @@ namespace Inventory.Transactions.Repositories.Postgres
             _context.Values.RemoveRange(_context.Values);
             _context.Fields.RemoveRange(_context.Fields);
             _context.Sections.RemoveRange(_context.Sections);
-            _context.Templates.RemoveRange(_context.Templates);
-
+       
             _context.TransactionSectionGroups.RemoveRange(_context.TransactionSectionGroups);
             _context.TransactionSections.RemoveRange(_context.TransactionSections);
             _context.Transactions.RemoveRange(_context.Transactions);
-    
-             await _context.SaveChangesAsync();
+            _context.Templates.RemoveRange(_context.Templates);
+
+            await _context.SaveChangesAsync();
         }
 
         public async Task<TemplateDto> GetTemplateAsync(Guid Id)
@@ -306,8 +306,10 @@ namespace Inventory.Transactions.Repositories.Postgres
 
             };
             _context.Transactions.Add(t);
-            foreach (var ts in dto.Sections)
-                AddTransactionSection(
+            
+            if (dto.Sections!=null)
+                foreach (var ts in dto.Sections)
+                    AddTransactionSection(
                                    t
                                    , new TransactionSectionDto()
                                    {
@@ -514,9 +516,107 @@ namespace Inventory.Transactions.Repositories.Postgres
             }
         }
 
-        
+
 
 
         #endregion
+
+        public async Task<Guid> RoomsPrepareAsync()
+        {
+            return await AddRoomsLetTemplate();
+
+        }
+
+
+
+        public async Task<Guid> AddRoomsLetTemplate()
+        {
+            var t = new Entities.Template()
+            {
+                Id = Guid.NewGuid(),
+                Name = "Rooms To Let Template",
+                Sections =
+                    {
+                        AddRoomsLetSection(),
+                        AddRoomsLetIndividualEntitySection()
+
+                     }
+
+            };
+
+            _context.Add(
+               t
+            );
+
+            await _context.SaveChangesAsync();
+            return t.Id;
+        }
+
+        private static Section AddRoomsLetIndividualEntitySection()
+        {
+            return new Entities.Section()
+            {
+                Id = Guid.Empty,
+                Name = "Rooms Individual Entity Template",
+                SectionType = Contracts.SectionType.IndividualEntity,
+                Fields = new List<Entities.Field> {
+
+                                new Entities.Field()
+                                {
+                                    Expression = string.Empty,
+                                    Name="ID",
+                                    Type= FieldType.String
+                                },
+                                new Entities.Field()
+                                {
+                                    Expression = string.Empty,
+                                    Name="Name",
+                                    Type= FieldType.String
+                                },
+                                new Entities.Field()
+                                {
+                                  Expression  = string.Empty,
+                                  Name="FullName",
+                                  Type= FieldType.String
+                                },
+                                  new Entities.Field()
+                                {
+                                  Expression  = string.Empty,
+                                  Name="Email",
+                                  Type= FieldType.String
+                                },
+                            }
+            };
+        }
+
+        private static Section AddRoomsLetSection()
+        {
+            return new Entities.Section()
+            {
+                Id = Guid.Empty,
+                Name = "Rooms Let Section",
+                SectionType = Contracts.SectionType.ProductLet,
+                Fields = new List<Entities.Field> {
+
+                                            new()
+                                            {
+                                                Expression = string.Empty,
+                                                Name="DateFrom",
+                                                Type= FieldType.Date
+                                            },
+                                            new()
+                                            {
+                                                Expression = string.Empty,
+                                                Name="DateTo",
+                                                Type= FieldType.Date
+                                            },
+                                            new Entities.Field()
+                                            { Expression = "DateTo - DateFrom",
+                                              Name="Days",
+                                              Type= FieldType.Date
+                                            },
+                                        }
+            };
+        }
     }
 }
