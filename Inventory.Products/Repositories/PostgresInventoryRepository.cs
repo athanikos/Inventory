@@ -3,6 +3,7 @@ using Inventory.Products.Contracts.Dto;
 using Inventory.Products.Dto;
 using Inventory.Products.Entities;
 using Microsoft.EntityFrameworkCore;
+using System.Net;
 
 namespace Inventory.Products.Repositories
 {
@@ -41,7 +42,7 @@ namespace Inventory.Products.Repositories
         #region Inventory
         public bool InventoryIdExists(Guid Id)
         {
-            return _context.Inventories.Where(p => p.Id == Id).Count() > 0;
+            return _context.Inventories.Where(p => p.Id == Id).Any();
         }
 
         public async Task<InventoryDto> AddInventoryAsync(InventoryDto c)
@@ -66,7 +67,7 @@ namespace Inventory.Products.Repositories
 
         public async Task DeleteInventoryAsync(InventoryDto c)
         {
-            List<Product> products = _context.Products.Where(p=>p.InventoryId == c.Id).ToList();
+            List<Product> products = [.. _context.Products.Where(p=>p.InventoryId == c.Id)];
 
             foreach (Product pc in products)
                 _context.Remove(pc);
@@ -111,32 +112,30 @@ namespace Inventory.Products.Repositories
                                    entity.Description,
                                    entity.Code,
                                    entity.InventoryId,
-                                   new List<ProductMetricDto>() // todo populate 
+                                   [] // todo populate 
                                    );
         }
 
         public List<string> GetDistinctProductCodes(Guid InventoryId)
         {
             if (!_context.Products.Any())
-                return new List<string>();
+                return [];
 
-            return  _context.Products
+            return [.. _context.Products
                     .Where(r => !String.IsNullOrEmpty(r.Code))
                     .Select(t => t.Code.ToUpper())
-                    .Distinct()
-                    .ToList();
+                    .Distinct()];
         }
 
         public  List<string> GetDistinctMetricCodes()
         {
             if (!_context.Metrics.Any()) 
-                return new List<string>();
+                return [];
         
-            return  _context.Metrics
+            return [.. _context.Metrics
                          .Where(r => !String.IsNullOrEmpty(r.Code))
                          .Select(t=> t.Code.ToUpper())
-                         .Distinct()    
-                         .ToList();
+                         .Distinct()];
         }
            
         public async Task AddOrEditProductMetricAsync(ProductMetricDto m)
@@ -274,21 +273,21 @@ namespace Inventory.Products.Repositories
 
         public async Task DeleteProductAsync(ProductDto c)
         {
-            List<ProductCategory> pcs = _context.ProductCategories
-            .Where(p => p.ProductId == c.Id).ToList();
+            List<ProductCategory> pcs = [.. _context.ProductCategories.
+                                            Where(p => p.ProductId == c.Id)];
             
             foreach (ProductCategory pc in pcs)
                 _context.Remove(pc);
 
-            List<ProductMetric> pms = _context.ProductMetrics.
-                Where(p => p.ProductId == c.Id).ToList();
+            List<ProductMetric> pms = [.. _context.ProductMetrics.
+                                           Where(p => p.ProductId == c.Id)];
            
             foreach (ProductMetric pm in pms)
                 _context.Remove(pm);
 
             var p = _context.Products.
-                         Where(p => p.Id == c.Id).
-                         Single();
+                             Where(p => p.Id == c.Id).
+                             Single();
             _context.Remove(p);
 
             await _context.SaveChangesAsync();
@@ -325,9 +324,7 @@ namespace Inventory.Products.Repositories
 
         public async Task DeleteCategoryAsync(CategoryDto c)
         {
-            List<ProductCategory> pcs = _context.ProductCategories
-                                 .Where(p => p.CategoryId == c.Id)
-                                 .ToList();
+            List<ProductCategory> pcs = [.. _context.ProductCategories.Where(p => p.CategoryId == c.Id)];
            
             foreach (ProductCategory pc in pcs)
                 _context.Remove(pc);
@@ -369,9 +366,7 @@ namespace Inventory.Products.Repositories
 
         public async Task DeleteMetricAsync(MetricDto c)
         {
-            List<ProductMetric> pcs = _context.ProductMetrics
-                                      .Where(p => p.MetricId == c.Id)
-                                      .ToList();
+            List<ProductMetric> pcs = [.. _context.ProductMetrics.Where(p => p.MetricId == c.Id)];
             
             foreach (ProductMetric pc in pcs)
                 _context.Remove(pc);
@@ -411,6 +406,15 @@ namespace Inventory.Products.Repositories
             /// <returns></returns>
         public async Task<ProductMetricDto> GetProductMetricAsync(string ProductCode, string MetricCode)
         {
+
+               // todo special case for quantity 
+               // if metric code is QUANTITY or whatever is used in Constants
+               // get it from quantitymetric 
+               // need to first translate productCode to productId and use that to query quantity metric 
+
+
+
+
                 ProductCode = ProductCode.ToUpper().Trim();
                 MetricCode = MetricCode.ToUpper().Trim();
 
@@ -430,7 +434,11 @@ namespace Inventory.Products.Repositories
          
 
         }
-
+        /// <summary>
+        /// adds to quantity metric and product metric table 
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
         public async Task<QuantityMetricDto> AddQuantityMetricAsync(QuantityMetricDto dto)
         {
             QuantityMetric qm = new QuantityMetric();
@@ -442,6 +450,7 @@ namespace Inventory.Products.Repositories
             await _context.SaveChangesAsync();
 
             
+            // todo remove dont bind the two tables together 
             Guid MetricId  = await _context.Metrics.
                                       Where(i => i.Code == Constants.QUANTITYCODE).
                                       Select(i=>i.Id).
@@ -453,7 +462,7 @@ namespace Inventory.Products.Repositories
                   MetricId,
                   dto.Value,
                   dto.EffectiveDate,
-                  "EUR",
+                  "EUR",// todo handle currency 
                   Constants.QUANTITYCODE,
                   dto.ProductCode
              ));
@@ -467,8 +476,13 @@ namespace Inventory.Products.Repositories
             qm.ProductId = dto.ProductId;
             qm.Value = dto.Value;
             qm.EffectiveDate = dto.EffectiveDate;
+            qm.Diff = dto.Diff;
+            qm.IsCancelled = dto.IsCancelled;   
+            qm.TransactionId = dto.TransactionId;
+           
             _context.Add(qm);
 
+            // todo remove dont bind the two tables together 
             Guid MetricId = _context.Metrics.
                           Where(i => i.Code == Constants.QUANTITYCODE).
                           Select(i => i.Id).
@@ -479,7 +493,7 @@ namespace Inventory.Products.Repositories
                   MetricId,
                   dto.Value,
                   dto.EffectiveDate,
-                  "EUR",
+                  "EUR",// todo handle currency 
                   Constants.QUANTITYCODE,
                   dto.ProductCode
              ));
@@ -493,7 +507,10 @@ namespace Inventory.Products.Repositories
                                    SingleAsync();
 
         }
-
+        /// <summary>
+        ///only for testing returns all rows of the table 
+        /// </summary>
+        /// <returns></returns>
         public async Task<List<QuantityMetricDto>> GetQuantityMetricsAsync()
         {
             return await _context.QuantityMetrics.

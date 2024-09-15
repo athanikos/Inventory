@@ -35,8 +35,7 @@ namespace Transaction.Transactions.Endpoints
             var dto = await _repo.AddTemplateAsync(
                 new TemplateDto(Guid.Empty, req.Name, req.Type, DateTime.UtcNow, req.Sections));
                 
-            return TypedResults.Ok
-                <TemplateDto>(dto);
+            return TypedResults.Ok(dto);
         }
     }
 

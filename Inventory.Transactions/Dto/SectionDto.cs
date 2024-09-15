@@ -16,7 +16,7 @@ namespace Inventory.Transactions.Dto
 
         public string Name { get; set; } = string.Empty;
 
-        public List<FieldDto> Fields { get; set; } = new();
+        public List<FieldDto> Fields { get; set; } = [];
 
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public SectionType SectionType { get; set; }

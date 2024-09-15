@@ -16,7 +16,7 @@ namespace Inventory.Transactions.Entities
         public Guid Id { get; set; }
         public Guid TransactionSectionId { get; set; }
         public int GroupValue { get; set; }
-        public ICollection<Value> Values { get; set; } = new List<Value>();
+        public ICollection<Value> Values { get; set; } = [];
         public required TransactionSection TransactionSection { get; set; }
 
 

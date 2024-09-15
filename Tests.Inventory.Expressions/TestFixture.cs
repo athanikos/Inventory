@@ -38,21 +38,10 @@ namespace Tests.Inventory.Expressions
 
 
             AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
-
-        
-
             services.AddScoped<ITransactionRepository, PostgresTransactionRepository>();
-        
-
-
-
             services.AddScoped<IInventoryRepository, PostgresInventoryRepository>();
             services.AddScoped<IModifyQuantityRepository, PostgresModifyQuantityRepository>();
             services.AddScoped<IModifyQuantityService, ModifyQuantityService>();
-   
-
-
-
         }
 
         protected override ValueTask DisposeAsyncCore()

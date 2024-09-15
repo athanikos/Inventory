@@ -111,7 +111,7 @@ namespace Inventory.Transactions.Repositories.Postgres
 
         public async Task AddSection(SectionDto c)
         {
-            List<Field> fields = new List<Field>();
+            List<Field> fields = [];
             Section s = new Section()
             {
                 Id = c.Id,
@@ -143,7 +143,7 @@ namespace Inventory.Transactions.Repositories.Postgres
 
             var inStoreSection = _context.Sections.Where(i => i.Id == inboundSection.Id).Single();
 
-            Section f = new Section()
+            Section f = new ()
             { Id = inboundSection.Id, Name = inboundSection.Name, TemplateId = inboundSection.TemplateId, SectionType = inboundSection.SectionType };
 
 
@@ -554,49 +554,47 @@ namespace Inventory.Transactions.Repositories.Postgres
 
         private static Section AddRoomsLetIndividualEntitySection()
         {
-            return new Entities.Section()
+            return new Section()
             {
                 Id = Guid.Empty,
                 Name = "Rooms Individual Entity Template",
                 SectionType = Contracts.SectionType.IndividualEntity,
-                Fields = new List<Entities.Field> {
+                Fields = [
 
-                                new Entities.Field()
+                                new()
                                 {
                                     Expression = string.Empty,
                                     Name="ID",
                                     Type= FieldType.String
                                 },
-                                new Entities.Field()
+                                new()
                                 {
                                     Expression = string.Empty,
                                     Name="Name",
                                     Type= FieldType.String
                                 },
-                                new Entities.Field()
+                                new()
                                 {
                                   Expression  = string.Empty,
                                   Name="FullName",
                                   Type= FieldType.String
                                 },
-                                  new Entities.Field()
+                                  new()
                                 {
                                   Expression  = string.Empty,
                                   Name="Email",
                                   Type= FieldType.String
                                 },
-                            }
+                            ]
             };
         }
 
-        private static Section AddRoomsLetSection()
+        private static Section AddRoomsLetSection() => new()
         {
-            return new Entities.Section()
-            {
-                Id = Guid.Empty,
-                Name = "Rooms Let Section",
-                SectionType = Contracts.SectionType.ProductLet,
-                Fields = new List<Entities.Field> {
+            Id = Guid.Empty,
+            Name = "Rooms Let Section",
+            SectionType = Contracts.SectionType.ProductLet,
+            Fields = [
 
                                             new()
                                             {
@@ -610,13 +608,12 @@ namespace Inventory.Transactions.Repositories.Postgres
                                                 Name="DateTo",
                                                 Type= FieldType.Date
                                             },
-                                            new Entities.Field()
+                                            new()
                                             { Expression = "DateTo - DateFrom",
                                               Name="Days",
                                               Type= FieldType.Date
                                             },
-                                        }
-            };
-        }
+                                        ]
+        };
     }
 }

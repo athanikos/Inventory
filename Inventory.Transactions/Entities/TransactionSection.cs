@@ -14,7 +14,7 @@ namespace Inventory.Transactions.Entities
         public Transaction Transaction { get; set; } = null;
 
         public ICollection<TransactionSectionGroup> SectionGroups { get; set; } 
-        = new List<TransactionSectionGroup>();
+        = [];
 
     }
 }

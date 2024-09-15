@@ -26,6 +26,7 @@ namespace Inventory.Products.Repositories
                                                   FROM ""Products"".""QuantityMetric"" 
                                                   WHERE ""ProductId"" = {dto.ProductId}
                                                   AND ""EffectiveDate""  < {dto.EffectiveFrom}
+                                                  AND ""IsCancelled"" IS NOT TRUE 
                                                   ORDER BY ""EffectiveDate"" DESC 
                                                   FOR UPDATE NOWAIT"
                                              ) // PostgreSQL: Lock or fail immediately
@@ -49,6 +50,7 @@ namespace Inventory.Products.Repositories
                                                   FROM ""Products"".""QuantityMetric"" 
                                                   WHERE ""ProductId"" = {dto.ProductId}
                                                   AND ""EffectiveDate""  > {dto.EffectiveFrom}
+                                                  AND ""IsCancelled"" IS NOT TRUE 
                                                   ORDER BY ""EffectiveDate"" ASC 
                                                   FOR UPDATE NOWAIT"
                                              ) // PostgreSQL: Lock or fail immediately
@@ -76,6 +78,7 @@ namespace Inventory.Products.Repositories
                                                   AND ""EffectiveDate""  < {dto.EffectiveTo}
                                                   AND ""EffectiveDate""  > {dto.EffectiveFrom}
                                                   AND ""Value""  - {dto.Diff} < 0 
+                                                  AND ""IsCancelled"" IS NOT TRUE 
                                                   ORDER BY ""EffectiveDate"" DESC 
                                                   FOR UPDATE NOWAIT"
                                              ) // PostgreSQL: Lock or fail immediately
@@ -84,7 +87,13 @@ namespace Inventory.Products.Repositories
         
         }
 
-
+        /// <summary>
+        /// todo move to repo 
+        /// </summary>
+        /// <param name="productId"></param>
+        /// <param name="value"></param>
+        /// <param name="effectiveDate"></param>
+        /// <returns></returns>
         public QuantityMetric  AddQuantityMetric(Guid productId, decimal value, DateTime effectiveDate )
         {
             QuantityMetric qmStart = new QuantityMetric()
@@ -97,6 +106,17 @@ namespace Inventory.Products.Repositories
             return qmStart; 
         }
 
-     
+        public QuantityMetric EditQuantityMetric(Guid productId,  DateTime effectiveDate, bool IsCancelled)
+        {
+            QuantityMetric qmStart = new QuantityMetric(productId, effectiveDate, IsCancelled);
+            Context.QuantityMetrics.Attach(qmStart);
+            return qmStart;
+        }
+
+        public async Task SaveChangesAsync()
+        {
+            await _context.SaveChangesAsync();
+        }
+
     }
 }
