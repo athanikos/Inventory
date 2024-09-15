@@ -3,22 +3,25 @@
     public class  EvaluatorResult
     {
         private string _result = string.Empty;
-        private EvaluatorResultType _type = EvaluatorResultType.undefined;
+        private readonly EvaluatorResultType _type = EvaluatorResultType.undefined;
         private const string TRUE = "TRUE";
         private const string FALSE = "FALSE";
 
         public static EvaluatorResult NewUndefinedResult() 
         {
-              var res = new EvaluatorResult();
-              res._result = string.Empty;
-              res._type = EvaluatorResultType.undefined;
-              return res; 
+            var res = new EvaluatorResult
+            {
+                _result = string.Empty
+            };
+            return res; 
         }
 
         public static EvaluatorResult NewEvaluatorResult(string result)
         {
-            var res = new EvaluatorResult();
-            res._result = result;
+            var res = new EvaluatorResult
+            {
+                _result = result
+            };
             return res;
         }
      

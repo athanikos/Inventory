@@ -9,15 +9,12 @@ namespace Inventory.Products.Handlers
     public class AddProductMetricHandler :
         IRequestHandler<AddProductMetricCommand, dto.ProductMetricDto>
     {
-        private IInventoryRepository _repository;
+        private readonly IInventoryRepository _repository;
 
         public AddProductMetricHandler(IInventoryRepository
-            repository)
-        {
-            _repository = repository;
-        }
+            repository) => _repository = repository;
 
-
+       
         public async Task<dto.ProductMetricDto> Handle(AddProductMetricCommand request,
             CancellationToken cancellationToken)
         {

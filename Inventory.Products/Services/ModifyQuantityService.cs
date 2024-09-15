@@ -10,10 +10,10 @@ namespace Inventory.Products.Services
     ///  Validates inbound intervals against store entries
     ///  Validates inbound entries aginst each other 
     /// </summary>
-    public class ModifyQuantityService : IModifyQuantityService
+    public class ModifyQuantityService(IModifyQuantityRepository repo) : IModifyQuantityService
     {
-        private readonly IModifyQuantityRepository _repo;
-        private ModifyQuantityInterval _interval = ModifyQuantityInterval.Daily;
+        private readonly IModifyQuantityRepository _repo = repo;
+        private readonly ModifyQuantityInterval _interval = ModifyQuantityInterval.Daily;
 
         public enum ModifyQuantityInterval
         {
@@ -22,12 +22,7 @@ namespace Inventory.Products.Services
             Minutely = 2 ,  
         }
 
-        public ModifyQuantityService(IModifyQuantityRepository repo)
-        {
-            _repo = repo;
-        }
-
-        private  static void  Validate(List<ModifyQuantityDto> inboundQuantities)
+        private static void  Validate(List<ModifyQuantityDto> inboundQuantities)
         {
             if  (inboundQuantities.Where(o=>o.Diff < 0).Any())
                 throw new InvalidDiffException();
@@ -83,7 +78,7 @@ namespace Inventory.Products.Services
                 await _repo.Context.SaveChangesAsync();
                 await transaction.CommitAsync();
             }
-            catch (Exception ex)
+            catch (Exception )
             {
                 await transaction.RollbackAsync();
                 _repo.Context.ChangeTracker.Clear();
@@ -103,7 +98,7 @@ namespace Inventory.Products.Services
         public async Task ModifyQuantityMetricsAsync(List<ModifyQuantityDto> inboundQuantities)
         {
             Validate(inboundQuantities);
-            inboundQuantities = inboundQuantities.OrderBy(o => o.EffectiveFrom).ToList();
+            inboundQuantities = [.. inboundQuantities.OrderBy(o => o.EffectiveFrom)];
             await using var transaction = await _repo.Context.Database.BeginTransactionAsync();
             try
             {
@@ -116,7 +111,7 @@ namespace Inventory.Products.Services
                 }
                 await transaction.CommitAsync();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 await transaction.RollbackAsync();
                 _repo.Context.ChangeTracker.Clear();
@@ -142,7 +137,7 @@ namespace Inventory.Products.Services
                                     CalculateQuantity(dto, previousInStore),
                                     dto.EffectiveFrom);
 
-            Unlet(dto, qmStart);`
+            Unlet(dto, qmStart);
         }
 
 
@@ -164,7 +159,7 @@ namespace Inventory.Products.Services
             else 
                 throw new NotImplementedException();
 
-            QuantityMetric qmEnd = new QuantityMetric()
+            QuantityMetric qmEnd = new()
             {
                 ProductId = dto.ProductId,
                 Value = qmStart.Value + dto.Diff,
