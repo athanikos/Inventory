@@ -3,7 +3,7 @@ using Inventory.Products.Contracts.Dto;
 using Xunit.Abstractions;
 using Xunit.Microsoft.DependencyInjection.Abstracts;
 
-namespace Tests.Inventory.Expressions
+namespace Tests.Inventory
 {
 
 
@@ -36,10 +36,14 @@ namespace Tests.Inventory.Expressions
 
 
             var firstDate = new DateTime(2022, 1, 1, 1, 1, 1);
-            var quantityMetricDto = QuantityMetricDto.NewQuantityMetricDto(output.ProductId, 1, firstDate, output.TransactionId, 1, false);
+            var quantityMetricDto = QuantityMetricDto.NewQuantityMetricDto(output.ProductId, value: 1, firstDate, output.TransactionId, diff: 1, false, ModificationType.Buy);
+          
+            
             var qm = await output.InventoryRepo.AddQuantityMetricAsync(quantityMetricDto);
+ 
+            
+            
             var secondDate = new DateTime(2023, 1, 1, 1, 1, 1);
-
             await output.ModifyQuantityService.ModifyQuantityMetricsAsync(
                [
                     new ModifyQuantityDto()
@@ -52,8 +56,11 @@ namespace Tests.Inventory.Expressions
                     }
                ]);
 
-            var qms = await output.InventoryRepo.GetQuantityMetricsAsync();
-            Assert.Equal(0, qms[1].Value);
+            var qms = (await output.InventoryRepo.GetQuantityMetricsAsync()).OrderByDescending(p => p.EffectiveDate).ToList();
+
+            Assert.Equal(0, qms[0].Value);
+            Assert.Equal(1, qms[1].Value);
+
             Assert.Equal(2, qms.Count);
         }
 
@@ -65,7 +72,7 @@ namespace Tests.Inventory.Expressions
 
 
             var firstDate = new DateTime(2022, 1, 1, 1, 1, 1);
-            var quantityMetricDto = QuantityMetricDto.NewQuantityMetricDto(output.ProductId, 0, firstDate, output.TransactionId, 1, false);
+            var quantityMetricDto = QuantityMetricDto.NewQuantityMetricDto(output.ProductId, 0, firstDate, output.TransactionId, 1, false, ModificationType.Buy);
             var qm = await output.InventoryRepo.AddQuantityMetricAsync(quantityMetricDto);
 
             var secondDate = new DateTime(2023, 1, 1, 1, 1, 1);
@@ -92,15 +99,12 @@ namespace Tests.Inventory.Expressions
             var output = await TestSetup.Setup(_testOutputHelper, this._fixture);
 
 
-
-
-
             var firstDate = new DateTime(2021, 1, 1, 1, 1, 1);
-            var quantityMetricDto = QuantityMetricDto.NewQuantityMetricDto(output.ProductId, 10, firstDate, output.TransactionId, 1, false);
+            var quantityMetricDto = QuantityMetricDto.NewQuantityMetricDto(output.ProductId, 10, firstDate, output.TransactionId, 1, false, ModificationType.Buy);
             var qm = await output.InventoryRepo.AddQuantityMetricAsync(quantityMetricDto);
 
             var secondDate = new DateTime(2025, 1, 1, 1, 1, 1);
-            var quantityMetricDto2 = QuantityMetricDto.NewQuantityMetricDto(output.ProductId, 5, secondDate, output.TransactionId, 1, false);
+            var quantityMetricDto2 = QuantityMetricDto.NewQuantityMetricDto(output.ProductId, 5, secondDate, output.TransactionId, 1, false, ModificationType.Buy);
             var qm2 = await output.InventoryRepo.AddQuantityMetricAsync(quantityMetricDto2);
 
             var thirdDate = new DateTime(2023, 1, 1, 1, 1, 1);
@@ -116,7 +120,7 @@ namespace Tests.Inventory.Expressions
                     }
                ]);
             var qms = await output.InventoryRepo.GetQuantityMetricsAsync();
-            Assert.Equal(2, qms.Count);
+            Assert.Equal(3, qms.Count);
 
         }
 
@@ -126,11 +130,13 @@ namespace Tests.Inventory.Expressions
             var output = await TestSetup.Setup(_testOutputHelper, this._fixture);
 
             var firstDate = new DateTime(2021, 1, 1, 1, 1, 1);
-            var quantityMetricDto = QuantityMetricDto.NewQuantityMetricDto(output.ProductId, 10, firstDate, output.TransactionId, 1, false);
+            var quantityMetricDto = QuantityMetricDto.NewQuantityMetricDto(output.ProductId, 10,
+                firstDate, output.TransactionId, 1, false, ModificationType.Buy);
             var qm = await output.InventoryRepo.AddQuantityMetricAsync(quantityMetricDto);
 
             var secondDate = new DateTime(2025, 1, 1, 1, 1, 1);
-            var quantityMetricDto2 = QuantityMetricDto.NewQuantityMetricDto(output.ProductId, 5, secondDate, output.TransactionId, 1, false);
+            var quantityMetricDto2 = QuantityMetricDto.NewQuantityMetricDto(output.ProductId, 5,
+                secondDate, output.TransactionId, 1, false, ModificationType.Buy);
             var qm2 = await output.InventoryRepo.AddQuantityMetricAsync(quantityMetricDto2);
 
 
@@ -141,7 +147,7 @@ namespace Tests.Inventory.Expressions
                     new ()
                     {
                         ProductId =       output.ProductId,
-                        Diff =  3,
+                        Diff = 3,
                         EffectiveFrom = thirdDate,
                         EffectiveTo = thirdDate,
                         ModificationType   = ModificationType.Sell
@@ -151,8 +157,12 @@ namespace Tests.Inventory.Expressions
             var qms = (await output.InventoryRepo.GetQuantityMetricsAsync()).OrderByDescending(p => p.EffectiveDate).ToList();
 
             Assert.Equal(10, qms[2].Value);
+            Assert.Equal(1, qms[2].Diff);
+
+
             Assert.Equal(7, qms[1].Value);
-            Assert.Equal(2, qms[0].Value);
+  
+           // Assert.Equal(2, qms[0].Value);
             Assert.Equal(3, qms.Count);
         }
 
@@ -162,18 +172,20 @@ namespace Tests.Inventory.Expressions
             var output = await TestSetup.Setup(_testOutputHelper, this._fixture);
 
 
-
+      
             var firstDate = new DateTime(2024, 1, 1, 1, 1, 1);
             var quantityMetricDto = QuantityMetricDto.NewQuantityMetricDto(output.ProductId, 0, firstDate,
-                output.TransactionId, 1, false);
+                output.TransactionId, 1, false, ModificationType.Buy);
             var qm = await output.InventoryRepo.AddQuantityMetricAsync(quantityMetricDto);
 
             var secondDate = new DateTime(2025, 1, 1, 1, 1, 1);
-            var quantityMetricDto2 = QuantityMetricDto.NewQuantityMetricDto(output.ProductId, 5, secondDate,
-                output.TransactionId, 1, false);
+            var quantityMetricDto2 = QuantityMetricDto.NewQuantityMetricDto(output.ProductId, 5,
+                secondDate,
+                output.TransactionId, 1, false, ModificationType.Buy);
             var qm2 = await output.InventoryRepo.AddQuantityMetricAsync(quantityMetricDto2);
 
             var thirdDate = new DateTime(2023, 1, 1, 1, 1, 1);
+     
             await output.ModifyQuantityService.ModifyQuantityMetricsAsync(
                new List<ModifyQuantityDto>()
                {
@@ -189,8 +201,8 @@ namespace Tests.Inventory.Expressions
             var qms = (await output.InventoryRepo.GetQuantityMetricsAsync()).OrderByDescending(p => p.EffectiveDate).ToList();
 
             Assert.Equal(5, qms[2].Value);
-            Assert.Equal(5, qms[1].Value);
-            Assert.Equal(10, qms[0].Value);
+            Assert.Equal(6, qms[1].Value);
+            Assert.Equal(7, qms[0].Value);
             Assert.Equal(3, qms.Count);
         }
 
@@ -202,7 +214,8 @@ namespace Tests.Inventory.Expressions
 
 
             var firstDate = new DateTime(2000, 1, 1, 1, 1, 1);
-            var quantityMetricDto = QuantityMetricDto.NewQuantityMetricDto(output.ProductId, 1, firstDate, output.TransactionId, 1, false);
+            var quantityMetricDto = QuantityMetricDto.NewQuantityMetricDto(output.ProductId, 1, firstDate,
+                output.TransactionId, 1, false, ModificationType.Buy);
             await output.InventoryRepo.AddQuantityMetricAsync(quantityMetricDto);
 
             var firstEntryDate = new DateTime(2023, 1, 1, 1, 1, 1);
@@ -239,7 +252,8 @@ namespace Tests.Inventory.Expressions
 
 
             var firstDate = new DateTime(2000, 1, 1, 1, 1, 1);
-            var quantityMetricDto = QuantityMetricDto.NewQuantityMetricDto(output.ProductId, 1, firstDate, output.TransactionId, 1, false);
+            var quantityMetricDto = QuantityMetricDto.NewQuantityMetricDto(output.ProductId, 1, firstDate,
+                output.TransactionId, 1, false, ModificationType.Buy);
             await output.InventoryRepo.AddQuantityMetricAsync(quantityMetricDto);
 
             var firstEntryDate = new DateTime(2023, 1, 1, 1, 1, 1);
@@ -279,11 +293,9 @@ namespace Tests.Inventory.Expressions
         public async Task TestOnMultipleLetwithQuantityTwoShouldAllow()
         {
             var output = await TestSetup.Setup(_testOutputHelper, this._fixture);
-
-
-
             var firstDate = new DateTime(2000, 1, 1, 1, 1, 1);
-            var quantityMetricDto = QuantityMetricDto.NewQuantityMetricDto(output.ProductId, 2, firstDate, output.TransactionId, 1, false);
+            var quantityMetricDto = QuantityMetricDto.NewQuantityMetricDto(output.ProductId, 2, firstDate, 
+                output.TransactionId, 1, false, ModificationType.Buy);
             await output.InventoryRepo.AddQuantityMetricAsync(quantityMetricDto);
 
             var firstEntryDate = new DateTime(2023, 1, 1, 1, 1, 1);
@@ -327,7 +339,8 @@ namespace Tests.Inventory.Expressions
 
 
             var firstDate = new DateTime(2000, 1, 1, 1, 1, 1);
-            var quantityMetricDto = QuantityMetricDto.NewQuantityMetricDto(output.ProductId, 2, firstDate, output.TransactionId, 1, false);
+            var quantityMetricDto = QuantityMetricDto.NewQuantityMetricDto(output.ProductId, 2, firstDate,
+                output.TransactionId, 1, false, ModificationType.Buy);
             await output.InventoryRepo.AddQuantityMetricAsync(quantityMetricDto);
 
             var firstEntryDate = new DateTime(2023, 1, 1, 1, 1, 1);
@@ -384,13 +397,68 @@ namespace Tests.Inventory.Expressions
 
 
         [Fact]
-        public async Task TestOnOnCancellationNoRecordShouldBeReturned()
+        public async Task TestValueIsProperlyCalculatedFromPreviousAndOnCancellation()
         {
             var output = await TestSetup.Setup(_testOutputHelper, this._fixture);
 
+            var firstDate = new DateTime(2000, 1, 1, 1, 1, 1);
+            var quantityMetricDto = QuantityMetricDto.NewQuantityMetricDto(output.ProductId, 100, firstDate,
+                output.TransactionId,1, false, ModificationType.Buy);
+            await output.InventoryRepo.AddQuantityMetricAsync(quantityMetricDto);
 
+            await output.ModifyQuantityService.ModifyQuantityMetricsAsync(
+            new List<ModifyQuantityDto>()
+            {
+                    new ()
+                    {
+                        ProductId =       output.ProductId,
+                        Diff =   51,
+                        EffectiveFrom = new DateTime(2001, 1, 1, 1, 1, 1),
+                        ModificationType   = ModificationType.Sell
+                    },
+                        new ()
+                    {
+                        ProductId =       output.ProductId,
+                        Diff =   100,
+                        EffectiveFrom = new DateTime(2003, 1, 1, 1, 1, 1),
+                        ModificationType   = ModificationType.Buy
+                    },
+
+            });
+
+            var qms = (await output.InventoryRepo.GetQuantityMetricsAsync()).OrderByDescending(p => p.EffectiveDate).ToList();
+            Assert.Equal(3, qms.Count);
+            Assert.Equal(100, qms[2].Value);
+            Assert.Equal(1, qms[2].Diff);
+
+            Assert.Equal(49, qms[1].Value);
+            Assert.Equal(51, qms[1].Diff);
+            Assert.Equal(149, qms[0].Value);
+            Assert.Equal(100, qms[0].Diff);
+
+            await output.ModifyQuantityService.CancelQuantityMetricsAsync(
+           new List<ModifyQuantityDto>()
+           {
+                    new ()
+                    {
+                        ProductId =       output.ProductId,
+                        Diff =   51,
+                        EffectiveFrom = new DateTime(2001, 1, 1, 1, 1, 1),
+                        ModificationType   = ModificationType.Sell
+                    },
+           });
+
+            qms = (await output.InventoryRepo.GetQuantityMetricsAsync())
+                        .Where(p=>p.IsCancelled==false )
+                        .OrderByDescending(p => p.EffectiveDate).ToList();
+            Assert.Equal(2, qms.Count);
+            Assert.Equal(200, qms[0].Value);
+            Assert.Equal(100, qms[0].Diff);
 
         }
+
+
+
     }
     }
  

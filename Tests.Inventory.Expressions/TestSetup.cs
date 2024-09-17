@@ -5,6 +5,7 @@ using Inventory.Products.Repositories;
 using Inventory.Products.Services;
 using Inventory.Transactions.Dto;
 using Inventory.Transactions.Repositories;
+using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Tests.Inventory.Expressions;
 using Xunit.Abstractions;
 
@@ -27,17 +28,31 @@ namespace Tests.Inventory
         private const string QuantityCode = "QUANTITY";
         private const string PriceCode = "PRICE";
 
-        public static async Task<TestSetup> Setup(ITestOutputHelper _testOutputHelper, TestFixture fixture)
+        public static async Task<TestSetup> ClearDb(ITestOutputHelper _testOutputHelper, TestFixture fixture)
         {
-            TestSetup output = new TestSetup() 
-            { 
-                InventoryRepo = fixture.GetService<IInventoryRepository>(_testOutputHelper)!, 
-                TransactionRepo = fixture.GetService<ITransactionRepository>(_testOutputHelper)!, 
-                ModifyQuantityService = fixture.GetService<IModifyQuantityService>(_testOutputHelper)! 
+            TestSetup output = new TestSetup()
+            {
+                InventoryRepo = fixture.GetService<IInventoryRepository>(_testOutputHelper)!,
+                TransactionRepo = fixture.GetService<ITransactionRepository>(_testOutputHelper)!,
+                ModifyQuantityService = fixture.GetService<IModifyQuantityService>(_testOutputHelper)!
             };
-
             output.InventoryRepo.EmptyDB();
             await output.TransactionRepo.EmptyDB();
+            return output;
+        }
+
+        public static async Task<TestSetup> Setup(ITestOutputHelper _testOutputHelper, TestFixture fixture)
+        {
+
+            TestSetup output = new TestSetup()
+            {
+                InventoryRepo = fixture.GetService<IInventoryRepository>(_testOutputHelper)!,
+                TransactionRepo = fixture.GetService<ITransactionRepository>(_testOutputHelper)!,
+                ModifyQuantityService = fixture.GetService<IModifyQuantityService>(_testOutputHelper)!
+            };
+            output.InventoryRepo.EmptyDB();
+            await output.TransactionRepo.EmptyDB();
+          
             var InventoryId = (await output.InventoryRepo.AddInventoryAsync(new InventoryDto(Guid.NewGuid(), Inventory))).Id;
             var sourceId = (await output.InventoryRepo.AddSourceAsync(new SourceDto(Guid.NewGuid(), SourceName))).Id;
             var metricId = (await output.InventoryRepo.AddMetricAsync(MetricDto.NewMetricDto(sourceId, Constants.QUANTITYCODE))).Id;

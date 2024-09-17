@@ -1,9 +1,7 @@
-﻿using Inventory.Products.Contracts;
-using Inventory.Products.Contracts.Dto;
+﻿using Inventory.Products.Contracts.Dto;
 using Inventory.Products.Dto;
 using Inventory.Products.Entities;
 using Microsoft.EntityFrameworkCore;
-using System.Net;
 
 namespace Inventory.Products.Repositories
 {
@@ -33,10 +31,7 @@ namespace Inventory.Products.Repositories
             _context.ProductMetrics.RemoveRange(_context.ProductMetrics);
             _context.QuantityMetrics.RemoveRange(_context.QuantityMetrics);
             _context.Products.RemoveRange(_context.Products);
-
-
-
-                _context.SaveChanges();
+            _context.SaveChanges();
         }
 
         #region Inventory
@@ -330,8 +325,8 @@ namespace Inventory.Products.Repositories
                 _context.Remove(pc);
             
             var e = _context.Categories
-                                 .Where(p => p.Id == c.Id)
-                                 .Single();
+                    .Where(p => p.Id == c.Id)
+                    .Single();
             _context.Remove(e);
 
             await _context.SaveChangesAsync();
@@ -411,10 +406,6 @@ namespace Inventory.Products.Repositories
                // if metric code is QUANTITY or whatever is used in Constants
                // get it from quantitymetric 
                // need to first translate productCode to productId and use that to query quantity metric 
-
-
-
-
                 ProductCode = ProductCode.ToUpper().Trim();
                 MetricCode = MetricCode.ToUpper().Trim();
 
@@ -444,29 +435,11 @@ namespace Inventory.Products.Repositories
             QuantityMetric qm = new QuantityMetric();
             qm.ProductId = dto.ProductId;
             qm.Value = dto.Value;
+            qm.Diff = dto.Diff;
+            qm.IsCancelled = dto.IsCancelled;
             qm.EffectiveDate = dto.EffectiveDate;
             _context.Add(qm);
-
             await _context.SaveChangesAsync();
-
-            
-            // todo remove dont bind the two tables together 
-            Guid MetricId  = await _context.Metrics.
-                                      Where(i => i.Code == Constants.QUANTITYCODE).
-                                      Select(i=>i.Id).
-                                      FirstOrDefaultAsync();
-
-            
-            await AddOrEditProductMetricAsync(new ProductMetricDto(
-                  dto.ProductId,
-                  MetricId,
-                  dto.Value,
-                  dto.EffectiveDate,
-                  "EUR",// todo handle currency 
-                  Constants.QUANTITYCODE,
-                  dto.ProductCode
-             ));
-
             return await  GetQuantityMetricAsync(qm.ProductId, qm.EffectiveDate);
         }
 
@@ -481,22 +454,6 @@ namespace Inventory.Products.Repositories
             qm.TransactionId = dto.TransactionId;
            
             _context.Add(qm);
-
-            // todo remove dont bind the two tables together 
-            Guid MetricId = _context.Metrics.
-                          Where(i => i.Code == Constants.QUANTITYCODE).
-                          Select(i => i.Id).
-                          FirstOrDefault();
-
-            AddOrEditProductMetric(new ProductMetricDto(
-                  dto.ProductId,
-                  MetricId,
-                  dto.Value,
-                  dto.EffectiveDate,
-                  "EUR",// todo handle currency 
-                  Constants.QUANTITYCODE,
-                  dto.ProductCode
-             ));
         }
 
         public async Task<QuantityMetricDto> GetQuantityMetricAsync(Guid id, DateTime EffectiveDate)
@@ -522,6 +479,5 @@ namespace Inventory.Products.Repositories
         {
             return await _context.SaveChangesAsync();
         }
-
     }
 }

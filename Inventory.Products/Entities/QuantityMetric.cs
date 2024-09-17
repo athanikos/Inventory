@@ -1,4 +1,5 @@
-﻿using Inventory.Products.Contracts.Dto;
+﻿using Inventory.Products.Contracts;
+using Inventory.Products.Contracts.Dto;
 
 namespace Inventory.Products.Entities;
 
@@ -19,19 +20,14 @@ public class QuantityMetric
         this.IsCancelled = IsCancelled; 
     }
 
-
     public Guid TransactionId { get; set; }
-    /// <summary>
-    ///  the value used to add/ subtarct from previous record value that computes Value 
-    /// </summary>
     public decimal Diff { get; set; }
-    public bool IsCancelled { get; set; }   
+    public bool IsCancelled { get; set; }
     public Guid ProductId { get; set; }
-    /// <summary>
-    /// contains previous value + Diff 
-    /// </summary>
-    public decimal  Value { get; set; } 
-    public DateTime EffectiveDate { get;  set; }  = DateTime.MinValue;
+    public decimal Value { get; set; }
+    public DateTime EffectiveDate { get; set; } = DateTime.MinValue;
+    public ModificationType ModificationType { get; set; }  
+
 
     public  static QuantityMetric CreateQuantityMetric(QuantityMetricDto m)
     {

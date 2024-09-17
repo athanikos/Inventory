@@ -9,7 +9,7 @@ using MediatR;
 using Xunit.Abstractions;
 using Xunit.Microsoft.DependencyInjection.Abstracts;
 
-namespace Tests.Inventory.Expressions
+namespace Tests.Inventory
 {
 
 

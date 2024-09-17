@@ -20,6 +20,7 @@ namespace Inventory.Products.Entities
         public decimal Value { get; internal set; }
 
         // represents to the value added / subtracted when (buy/selling/let/unlet )
+        //todo do  ineed this ?
         public decimal AddValue {  get; set; } 
 
         public DateTime EffectiveDate { get; internal set; }= DateTime.MinValue;

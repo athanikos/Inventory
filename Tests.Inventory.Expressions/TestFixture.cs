@@ -12,7 +12,7 @@ using Inventory.Transactions.Repositories;
 using Inventory.Transactions.Repositories.Postgres;
 using Inventory.Transactions;
 
-namespace Tests.Inventory.Expressions
+namespace Tests.Inventory
 {
     /// <summary>
     /// https://umplify.github.io/xunit-dependency-injection/

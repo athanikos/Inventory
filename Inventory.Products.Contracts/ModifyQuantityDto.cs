@@ -1,5 +1,9 @@
 ﻿namespace Inventory.Products.Contracts.Dto
 {
+
+    /// <summary>
+    ///
+    /// </summary>
     public class ModifyQuantityDto
     {
         public Guid ProductId { get; set; }
@@ -7,10 +11,9 @@
         public DateTime EffectiveFrom { get; set; }
         public DateTime EffectiveTo { get; set; }
         public ModificationType ModificationType { get; set; }
-
         public Guid TransactionId { get; set; }
         public decimal Diff { get; set; }
-        public bool IsCancelled { get; set; } = false;  
+        public bool IsCancelled { get; set; } = false;
     }
 
 }

@@ -2,6 +2,7 @@
 using Inventory.Products.Contracts.Dto;
 using Inventory.Products.Entities;
 using Inventory.Products.Repositories;
+using Microsoft.Extensions.Logging;
 
 namespace Inventory.Products.Services
 {
@@ -24,17 +25,20 @@ namespace Inventory.Products.Services
 
         private static void  Validate(List<ModifyQuantityDto> inboundQuantities)
         {
-            if  (inboundQuantities.Where(o=>o.Diff < 0).Any())
+            if  (inboundQuantities.Where(o=>o.Value < 0).Any())
                 throw new InvalidDiffException();
+
+
+            if (inboundQuantities.Where(o => o.Diff < 0  ).Any())
+                throw new InvalidDiffException();
+
         }
 
 
         public async Task CancelQuantityMetricsAsync(List<ModifyQuantityDto> inboundQuantities)
         {
             Validate(inboundQuantities);
-           
-                
-            
+
             await using var transaction = await _repo.Context.Database.BeginTransactionAsync();
             try
             {
@@ -66,7 +70,9 @@ namespace Inventory.Products.Services
                         EffectiveFrom = previousItem.EffectiveDate,
                         EffectiveTo = previousItem.EffectiveDate,
                         Diff = previousItem.Diff,
-                        IsCancelled = previousItem.IsCancelled
+                        IsCancelled = previousItem.IsCancelled,
+                        Value = previousItem.Value, 
+                        ModificationType = previousItem.ModificationType,
                     };
 
                     await ModifyQuantityPostEffectiveDate(qm);
@@ -104,14 +110,37 @@ namespace Inventory.Products.Services
             {
               
                 foreach (var item in inboundQuantities)
+                      await AddWithUpdatedQuantityBasedOnPrevious(item);    
+                await _repo.Context.SaveChangesAsync();
+
+                var DistinctProductIdsWithMinimumEffective = (
+                                                             from prod in inboundQuantities
+                                                             group prod by prod.ProductId into g
+                                                             select new ModifyQuantityDto
+                                                             {
+                                                                 ProductId = g.Key,
+                                                                 EffectiveFrom = g.Min(o => o.EffectiveFrom),
+                                                             }).ToList();
+           
+                List<ModifyQuantityDto> refetchedEntries = [];
+                foreach (var prod in DistinctProductIdsWithMinimumEffective)
                 {
-                    await AddWithUpdatedQuantityBasedOnPrevious(item);
-                    await ModifyQuantityPostEffectiveDate(item);
+                    refetchedEntries.AddRange(
+                               await _repo.GetQuantityMetricsPostEffectiveDate(prod.ProductId, prod.EffectiveFrom)
+                        );
+                }
+
+                foreach (var prod in refetchedEntries)
+                {
+                    await ModifyQuantityPostEffectiveDate(prod);
                     await _repo.Context.SaveChangesAsync();
                 }
+
+
+
                 await transaction.CommitAsync();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 await transaction.RollbackAsync();
                 _repo.Context.ChangeTracker.Clear();
@@ -129,15 +158,23 @@ namespace Inventory.Products.Services
         {
             var previousInStore = await _repo.GetPreviousWithLockAsync(dto);
 
-            if (dto.ModificationType != Contracts.ModificationType.Buy)
+            if (dto.ModificationType != ModificationType.Buy)
                 if (previousInStore == null)
                     throw new ArgumentException($"no previous entry found with less than {dto.EffectiveFrom} ");
 
             var qmStart =  _repo.AddQuantityMetric(dto.ProductId,
-                                    CalculateQuantity(dto, previousInStore),
-                                    dto.EffectiveFrom);
+                                    CalculateQuantity(dto, 
+                                    new ModifyQuantityDto() 
+                                    {
+                                                             Diff = previousInStore == null ? 0 : previousInStore.Diff,
+                                                             Value = previousInStore == null ? 0 : previousInStore.Value, 
+                                                             ModificationType = previousInStore == null ? 0 : previousInStore.ModificationType
 
-            Unlet(dto, qmStart);
+                                    }
+                                    ),
+                                    dto.EffectiveFrom, dto.Diff, dto.ModificationType);
+
+            EndLet(dto, qmStart);
         }
 
 
@@ -147,7 +184,7 @@ namespace Inventory.Products.Services
         /// </summary>
         /// <param name="dto"></param>
         /// <param name="qmStart"></param>
-        private void Unlet(ModifyQuantityDto dto, QuantityMetric qmStart)
+        private void EndLet(ModifyQuantityDto dto, QuantityMetric qmStart)
         {
             if (dto.ModificationType != Contracts.ModificationType.Let)
                 return;
@@ -155,7 +192,8 @@ namespace Inventory.Products.Services
             DateTime effectiveEndDate;
 
             if (_interval == ModifyQuantityInterval.Daily)
-                effectiveEndDate = dto.EffectiveTo.AddDays(1);
+                effectiveEndDate = dto.EffectiveTo.AddDays(1); //todo do  i need this? do i need to increment by a day /hour /minute?
+
             else 
                 throw new NotImplementedException();
 
@@ -163,7 +201,10 @@ namespace Inventory.Products.Services
             {
                 ProductId = dto.ProductId,
                 Value = qmStart.Value + dto.Diff,
-                EffectiveDate = effectiveEndDate
+                Diff = dto.Diff,
+                EffectiveDate = effectiveEndDate,
+                ModificationType = ModificationType.EndLet
+                
             };
             _repo.Context.QuantityMetrics.Add(qmEnd);
         }
@@ -179,28 +220,39 @@ namespace Inventory.Products.Services
             var postEffectiveDateRows = await _repo.GetPostEffectiveDateRowsWithLockAsync(baseItem);
 
             foreach (var postItem in postEffectiveDateRows)
-                 postItem.Value = CalculateQuantity(baseItem, postItem);
+            {
+                postItem.Value = CalculateQuantity(new ModifyQuantityDto()
+                {
+                    Diff = postItem.Diff,
+                    Value = postItem.Value,
+                    ModificationType = postItem.ModificationType
+                }, baseItem);
+
+                // point previous as current for next item to chain update values 
+                baseItem = new ModifyQuantityDto() {  Diff = postItem.Diff, EffectiveFrom = postItem.EffectiveDate,
+                                                      TransactionId = postItem.TransactionId, ProductId = postItem.ProductId,
+                                                      ModificationType = postItem.ModificationType, Value = postItem.Value };
+            }
         }
 
         /// <summary>
         /// given a previous Item and a current item updates currentItem Value based on previousItem 
-        /// when modification type is buy or sell 
         /// </summary>
         /// <param name="currentItem"></param>
         /// <param name="previousItem"></param>
         /// <returns></returns>
-        private static decimal CalculateQuantity(ModifyQuantityDto currentItem, 
-                                                 QuantityMetric previousItem) 
+        private static decimal CalculateQuantity(ModifyQuantityDto currentItem,
+                                                 ModifyQuantityDto previousItem) 
                                                
         {
-            decimal newValue = 0;
-            decimal itemValue = previousItem ==null ? 0 : previousItem.Value;
-
-            if (currentItem.ModificationType == Contracts.ModificationType.Buy)
-                newValue = itemValue + 1 * currentItem.Diff;
-            else if (ModificationTypeHelper.IsBuyOrSell(currentItem.ModificationType))
-                newValue = itemValue - 1 * currentItem.Diff;
-            return newValue;
+            decimal previousItemValue = previousItem == null ? 0 : previousItem.Value;
+           
+            if (currentItem.ModificationType is Contracts.ModificationType.Let
+                or Contracts.ModificationType.Sell
+                )
+                return previousItemValue - 1 * currentItem.Diff;
+            else
+                return previousItemValue + 1 * currentItem.Diff;
         }
 
      

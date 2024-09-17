@@ -1,4 +1,5 @@
-﻿using Inventory.Products.Contracts.Dto;
+﻿using Inventory.Products.Contracts;
+using Inventory.Products.Contracts.Dto;
 using Inventory.Products.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,9 +11,13 @@ namespace Inventory.Products.Repositories
     public  class PostgresModifyQuantityRepository : IModifyQuantityRepository
     {
         private ProductsDbContext _context;
+
         public ProductsDbContext Context { get => _context; set => _context = value; }
-        
-        public PostgresModifyQuantityRepository(ProductsDbContext context) => Context = context;
+
+        public PostgresModifyQuantityRepository(ProductsDbContext context)
+        {
+           _context = context;
+        }
 
         public async Task<QuantityMetric?> GetPreviousWithLockAsync(ModifyQuantityDto dto)
         {
@@ -22,7 +27,7 @@ namespace Inventory.Products.Repositories
                                                  $@"
                                                   SELECT ""ProductId"", 
                                                   ""EffectiveDate"",  ""Value"" , 
-                                                  ""Diff"", ""IsCancelled"", ""TransactionId""
+                                                  ""Diff"", ""IsCancelled"", ""TransactionId"", ""ModificationType""
                                                   FROM ""Products"".""QuantityMetric"" 
                                                   WHERE ""ProductId"" = {dto.ProductId}
                                                   AND ""EffectiveDate""  < {dto.EffectiveFrom}
@@ -46,7 +51,7 @@ namespace Inventory.Products.Repositories
                                                  $@"
                                                   SELECT ""ProductId"", 
                                                   ""EffectiveDate"",  ""Value"" ,
-                                                  ""Diff"", ""IsCancelled"", ""TransactionId""
+                                                  ""Diff"", ""IsCancelled"", ""TransactionId"", ""ModificationType""
                                                   FROM ""Products"".""QuantityMetric"" 
                                                   WHERE ""ProductId"" = {dto.ProductId}
                                                   AND ""EffectiveDate""  > {dto.EffectiveFrom}
@@ -72,7 +77,8 @@ namespace Inventory.Products.Repositories
                                                  $@"
                                                   SELECT ""ProductId"", 
                                                   ""EffectiveDate"",  ""Value"" ,
-                                                  ""Diff"", ""IsCancelled"", ""TransactionId""
+                                                  ""Diff"", ""IsCancelled"", ""TransactionId"", ""ModificationType""
+                                            
                                                   FROM ""Products"".""QuantityMetric"" 
                                                   WHERE ""ProductId"" = {dto.ProductId}
                                                   AND ""EffectiveDate""  < {dto.EffectiveTo}
@@ -94,13 +100,15 @@ namespace Inventory.Products.Repositories
         /// <param name="value"></param>
         /// <param name="effectiveDate"></param>
         /// <returns></returns>
-        public QuantityMetric  AddQuantityMetric(Guid productId, decimal value, DateTime effectiveDate )
+        public QuantityMetric  AddQuantityMetric(Guid productId, decimal value, DateTime effectiveDate , decimal diff, ModificationType type  )
         {
             QuantityMetric qmStart = new QuantityMetric()
             {
                 ProductId = productId,
                 Value = value, 
-                EffectiveDate = effectiveDate
+                EffectiveDate = effectiveDate,
+                Diff = diff,
+                ModificationType = type
             };
              Context.QuantityMetrics.Add(qmStart);
             return qmStart; 
@@ -108,10 +116,32 @@ namespace Inventory.Products.Repositories
 
         public QuantityMetric EditQuantityMetric(Guid productId,  DateTime effectiveDate, bool IsCancelled)
         {
-            QuantityMetric qmStart = new QuantityMetric(productId, effectiveDate, IsCancelled);
-            Context.QuantityMetrics.Attach(qmStart);
-            return qmStart;
+            var qm = _context.QuantityMetrics.Where 
+                (p=>p.ProductId == productId  && p.EffectiveDate == effectiveDate)
+                .FirstOrDefault();
+
+            if (qm == null) throw new ArgumentException();
+              
+            qm.IsCancelled = IsCancelled;    
+
+            return qm;
         }
+
+        public async Task<List<ModifyQuantityDto>> GetQuantityMetricsPostEffectiveDate(Guid productId, DateTime minimumEffectiveDate)
+        {
+          return  await _context.QuantityMetrics.Where
+                (p => p.ProductId == productId && p.EffectiveDate == minimumEffectiveDate).
+                Select (qm=> new ModifyQuantityDto()
+                {
+                   ProductId =  qm.ProductId, Value = qm.Value, EffectiveFrom = qm.EffectiveDate,TransactionId = qm.TransactionId, Diff = qm.Diff,  IsCancelled = qm.IsCancelled
+                }
+                )
+                .ToListAsync();
+
+          
+        }
+
+
 
         public async Task SaveChangesAsync()
         {

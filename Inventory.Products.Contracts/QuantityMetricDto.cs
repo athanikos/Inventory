@@ -25,7 +25,8 @@
                                         DateTime effectiveDate,
                                         Guid transactionId,
                                         decimal diff,
-                                        bool isCancelled)
+                                        bool isCancelled,
+                                        ModificationType modificationType)
         {
             return new QuantityMetricDto(productId, 
                                          value,
@@ -42,6 +43,7 @@
         public Guid TransactionId { get; set; }
         public decimal Diff { get; set; }
         public bool IsCancelled { get; set; }
+        public ModificationType ModificationType { get; set; }
 
 
         public override string ToString()

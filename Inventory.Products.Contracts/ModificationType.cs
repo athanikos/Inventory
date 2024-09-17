@@ -5,7 +5,8 @@
     {
         Buy = 0,
         Sell = 1,
-        Let = 2
+        Let = 2,
+        EndLet =3
     }
 
     public static class ModificationTypeHelper
