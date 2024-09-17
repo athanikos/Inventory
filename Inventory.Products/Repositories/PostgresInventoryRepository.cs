@@ -1,7 +1,10 @@
-﻿using Inventory.Products.Contracts.Dto;
+﻿using Inventory.Products.Contracts;
+using Inventory.Products.Contracts.Dto;
 using Inventory.Products.Dto;
 using Inventory.Products.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using System.Linq;
 
 namespace Inventory.Products.Repositories
 {
@@ -181,6 +184,7 @@ namespace Inventory.Products.Repositories
             productCode = _context.Products.
                                  Where(p => p.Id == ProductId).
                                  Select(i => i.Code).Single();
+
             metricCode = _context.Metrics.
                           Where(p => p.Id == MetricId).
                           Select(i => i.Code).Single();
@@ -401,17 +405,51 @@ namespace Inventory.Products.Repositories
             /// <returns></returns>
         public async Task<ProductMetricDto> GetProductMetricAsync(string ProductCode, string MetricCode)
         {
+            ProductCode = ProductCode.ToUpper().Trim();
+            MetricCode = MetricCode.ToUpper().Trim();
 
-               // todo special case for quantity 
-               // if metric code is QUANTITY or whatever is used in Constants
-               // get it from quantitymetric 
-               // need to first translate productCode to productId and use that to query quantity metric 
-                ProductCode = ProductCode.ToUpper().Trim();
-                MetricCode = MetricCode.ToUpper().Trim();
 
-                return await _context
+            if (MetricCode == Constants.QUANTITYCODE)
+            {
+
+                // todo cache reuse allcodes field add to repo and do lazy loading ? or refresh evry 
+                var productInfo  =await  _context
+                       .Products
+                       .Where(i => i.Code == ProductCode)    
+                       .Select(i => new { i.Id,  i.Code })
+                       .SingleAsync();
+
+                var metricInfo = await _context
+                  .Metrics
+                  .Where(i => i.Code == MetricCode)
+                  .Select(i => new { i.Id, i.Code })
+                  .SingleAsync();
+
+
+                var item =  await _context
+                .QuantityMetrics
+                .Where(u => u.ProductId == productInfo.Id)
+                .OrderByDescending(i => i.EffectiveDate)
+                .Select(i => new ProductMetricDto(i.ProductId,
+                                                  metricInfo.Id,
+                                                  i.Value,
+                                                  i.EffectiveDate,
+                                                  Constants.DEFAULTCURRENCY, //todo fix currency 
+                                                  productInfo.Code,
+                                                  Constants.QUANTITYCODE)).FirstOrDefaultAsync();
+
+
+                if (item != null)
+                    return new ProductMetricDto(item.ProductId,item.MetricId, item.Value,item.EffectiveDate,item.Currency,item.ProductCode,item.MetricCode);
+
+                return new ProductMetricDto(Guid.NewGuid());
+            }
+            else
+            {
+
+                       return await _context
                        .ProductMetrics
-                       .Where(i => i.ProductCode == ProductCode  && i.MetricCode == MetricCode)
+                       .Where(i => i.ProductCode == ProductCode && i.MetricCode == MetricCode)
                        .OrderByDescending(i => i.EffectiveDate)
                        .Select(i => new ProductMetricDto(i.ProductId,
                                                          i.MetricId,
@@ -422,7 +460,7 @@ namespace Inventory.Products.Repositories
                                                          i.MetricCode))
                        .FirstAsync();
 
-         
+            }
 
         }
         /// <summary>

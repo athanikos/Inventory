@@ -9,7 +9,6 @@
             _context = context;
         }  
 
-
         public   List<Entities.PricesParameter> GetParameters(  string _parameterType = "COINGECKO"
           )
         {

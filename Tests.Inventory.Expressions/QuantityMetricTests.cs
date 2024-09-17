@@ -56,14 +56,14 @@ namespace Tests.Inventory.Expressions
             {
                 await output.InventoryRepo.AddQuantityMetricAsync(quantityMetricDto2);
             }
-            catch (Exception) // throws exeeption on unique constraint 
+            catch (Exception) // throws exception on unique constraint 
             {
             }
             var qms = await output.InventoryRepo.GetQuantityMetricsAsync();
             Assert.Single(qms);
 
 
-            // workaround fix to clear db records are kept in next test and cause to fail 
+            // workaround fix to clear db records, records  are kept in next test and cause to fail 
             await TestSetup.ClearDb(_testOutputHelper, this._fixture);
 
 
@@ -73,7 +73,7 @@ namespace Tests.Inventory.Expressions
         public async Task TestTwoIdenticalRecordsAddedToContextNoneIsSaved()
         {
 
-            var output = await TestSetup.Setup(_testOutputHelper, this._fixture);
+            var output = await TestSetup.Setup(_testOutputHelper, _fixture);
        
             var quantityMetricDto = QuantityMetricDto.NewQuantityMetricDto(output.ProductId, 1,
                 new DateTime(1990,1,1,1,1,1), output. TransactionId, 1, false,ModificationType.Buy);

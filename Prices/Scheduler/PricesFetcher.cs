@@ -41,7 +41,6 @@ namespace Prices
 
             public async Task DoScheduledWork(Entities.PricesParameter p)
             {
-
                 try
                 {
                     // Log.Information("DoScheduledWork " + p.Id.ToString());

@@ -5,8 +5,6 @@ using Inventory.Products.Repositories;
 using Inventory.Products.Services;
 using Inventory.Transactions.Dto;
 using Inventory.Transactions.Repositories;
-using Microsoft.VisualStudio.TestPlatform.Utilities;
-using Tests.Inventory.Expressions;
 using Xunit.Abstractions;
 
 namespace Tests.Inventory
@@ -16,6 +14,8 @@ namespace Tests.Inventory
         public Guid ProductId { get; set; }
         public Guid TemplateId { get; set; }
         public Guid TransactionId { get; set; }
+        public Guid QuantityId  { get; set; }   
+
         public required ITransactionRepository TransactionRepo { get; set; }
         public required IInventoryRepository InventoryRepo { get; set; }
         public required IModifyQuantityService ModifyQuantityService { get; set; }
@@ -41,7 +41,7 @@ namespace Tests.Inventory
             return output;
         }
 
-        public static async Task<TestSetup> Setup(ITestOutputHelper _testOutputHelper, TestFixture fixture)
+        public static async Task<TestSetup> Setup(ITestOutputHelper _testOutputHelper, TestFixture fixture, string productCode = RoomProductCode )
         {
 
             TestSetup output = new TestSetup()
@@ -56,11 +56,11 @@ namespace Tests.Inventory
             var InventoryId = (await output.InventoryRepo.AddInventoryAsync(new InventoryDto(Guid.NewGuid(), Inventory))).Id;
             var sourceId = (await output.InventoryRepo.AddSourceAsync(new SourceDto(Guid.NewGuid(), SourceName))).Id;
             var metricId = (await output.InventoryRepo.AddMetricAsync(MetricDto.NewMetricDto(sourceId, Constants.QUANTITYCODE))).Id;
-            ProductDto prodDto = ProductDto.NewProductDto(InventoryId, RoomProductCode);
+            ProductDto prodDto = ProductDto.NewProductDto(InventoryId, productCode);
             output.TemplateId = await output.TransactionRepo.RoomsPrepareAsync();
             output.TransactionId = (await output.TransactionRepo.AddTransactionAsync(new TransactionDto(Guid.NewGuid(), "", DateTime.Now, output.TemplateId, null))).Id;
             output.ProductId = (await output.InventoryRepo.AddProductAsync(prodDto)).Id;
-          
+            output.QuantityId = metricId;
             return output;
         }
     }

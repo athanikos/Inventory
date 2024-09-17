@@ -35,7 +35,7 @@ namespace Expressions
         {
             _expression = expression;
             _inventoryId = inventoryId;
-            GetCodes();
+             GetCodes();
             return await ComputeTokens(BreakExpressionIntoListOfStrings());
         }
 
@@ -115,7 +115,6 @@ namespace Expressions
             _allProductCodes = response.ProductCodes;
             _allMetricCodes = response.MetricCodes;
         }
-
   
         private string ExtractAggregateFunction(string token)
         {
