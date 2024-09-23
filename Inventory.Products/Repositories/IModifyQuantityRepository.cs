@@ -1,6 +1,7 @@
 ﻿using Inventory.Products.Contracts;
 using Inventory.Products.Contracts.Dto;
 using Inventory.Products.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace Inventory.Products.Repositories
 {
@@ -22,5 +23,9 @@ namespace Inventory.Products.Repositories
         public Task<List<ModifyQuantityDto>> GetQuantityMetricsPostEffectiveDate(Guid productId, DateTime minimumEffectiveDate);
 
         public ProductsDbContext Context { get; }
+
+      //  public  Task<List<ModifyQuantityDto>> GetQuantityMetrics(Guid transactionId);
+       
+
     }
 }

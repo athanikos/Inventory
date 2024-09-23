@@ -11,8 +11,9 @@ namespace Inventory.Transactions.Repositories
         Task<TemplateDto> GetTemplateAsync(Guid Id);
 
         Task<TransactionDto> AddTransactionAsync(TransactionDto dto);
-        Task<TransactionDto> EditTransactionAsync(TransactionDto c);
-        Task DeleteTransactionAsync(TransactionDto c);
+        Task<TransactionDto> EditTransactionAsync(TransactionDto dto);
+        Task DeleteTransactionAsync(TransactionDto dto);
+        Task<TransactionDto> GetTransactionAsync(Guid Id);
 
         Task<Guid> RoomsPrepareAsync();
 

@@ -54,8 +54,8 @@ public class ProductsDbContext : DbContext
           .IsUnique();
 
         modelBuilder.Entity<Product>()
-             .HasIndex(u => u.Code)
-             .IsUnique();
+          .HasIndex(u => u.Code)
+          .IsUnique();
 
 
         modelBuilder.Entity<Entities.Product>()

@@ -1,4 +1,6 @@
-﻿namespace Inventory.Transactions.Dto;
+﻿using Inventory.Transactions.Contracts;
+
+namespace Inventory.Transactions.Dto;
 
 public class TransactionDto
 {
@@ -33,6 +35,8 @@ public class TransactionDto
 
     public Guid TemplateId { get; set; }
 
-    public ICollection<TransactionSectionDto> Sections { get; set; } = null;  
+    public ICollection<TransactionSectionDto> Sections { get; set; } = null;
+
+    public TransactionStatus StatusId { get; set; }
 
 }

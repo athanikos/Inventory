@@ -26,6 +26,7 @@ namespace Inventory.Transactions.Repositories.Postgres
             await _context.SaveChangesAsync();
         }
 
+        #region Templates
         public async Task<TemplateDto> GetTemplateAsync(Guid Id)
         {
             var sections = await GetSectionsAsync(Id);
@@ -95,6 +96,7 @@ namespace Inventory.Transactions.Repositories.Postgres
    
             await _context.SaveChangesAsync();
         }
+        #endregion Templates 
 
         #region Sections 
         public async Task<ICollection<SectionDto>> GetSectionsAsync(Guid TemplateId)
@@ -293,6 +295,8 @@ namespace Inventory.Transactions.Repositories.Postgres
         #endregion Values 
 
         #region Transaction 
+
+
 
         public async Task<TransactionDto> AddTransactionAsync(TransactionDto dto)
         {

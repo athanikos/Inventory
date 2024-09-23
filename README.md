@@ -1,23 +1,23 @@
 # Inventory
+A generic Inventory Implementation that allows:
+    - Buy/ Sell / Let or EndLet properties, Those add or subtract from Quantity Metric table.
+    - Template Creation for any type of entity. Currently supported for transactions. 
+    - Dynamic metrics creation via ProductMetric table. Create formulas for any type of metric. 
+    - Notify on threshold 
 
-a generic inventory implementation with dynamic metrics and transaction fields. supports buy / sell / let
 
-use cases 
-
-inventory with products bought keeping track of values in rime 
-
-cryptos / stocks 
-
-rooms to let 
+### Quantity via QuantityMetric    
 
 ### Products module 
-Manage products. Manage Categories and metrics. Products Categories are just labels. Categories support tree like structure where its node keeps track of its father. Each product may have any kind of  metric via the product metric table.  
-Some metric need to have a hard coded type that means something to the system. For example QUANTITY should be incremented decremented by transactions. Perhaps need to insert those predefined metric types. Source represents a system. used to mark a live metric as being updated from some kind of system. 
-For example COINGECKO for crypto values.  
+Manage products. Manage Categories and metrics. 
+Products Categories are just labels. 
+Categories support tree like structure where its node keeps track of its father. Each product may have any kind of  metric via the product metric table.  
+Perhaps need to insert those predefined metric types. Source represents a system. used to mark a live metric as being updated from some kind of system. 
+
 
 #### Product Metrics example 
 One Product has some description. A metric can be acquired value. 
-A product batch was acquired (5 out of toital 20)at 10 euros but some other batch of 5 items was acquired at 9. 
+A product batch was acquired (5 out of toital 20) at 10 euros but some other batch of 5 items was acquired at 9. 
 
     ProductId Description  
     1         5
@@ -137,13 +137,6 @@ let subtracts from quantity - can i do unlet with some effective date ?
 
 ### Transactions 
 
-#### actions 
-buy adds to quantity 
-sell subtracts from quantity
-let subtracts from quantity
-unlet adds to quantity 
-
-let and unlet come in pairs 
 
 #### invoice items 
 

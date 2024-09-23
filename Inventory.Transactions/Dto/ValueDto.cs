@@ -2,9 +2,7 @@
 
 namespace Inventory.Transactions.Dto
 {
-    /// <summary>
-    /// denormalized values with sections and groupvalues 
-    /// </summary>
+
     public class ValueDto
     {
         public Guid Id { get; set; } = Guid.Empty;
@@ -16,7 +14,7 @@ namespace Inventory.Transactions.Dto
 
         //on new  auto gen by db based on group by ( sectionType,  groupvalue)     
         // on edit match by those Ids
-    //    public Guid TransactionSectionId { get; set; } = Guid.Empty;
+       //    public Guid TransactionSectionId { get; set; } = Guid.Empty;
         public Guid TransactionSectionGroupId { get; set; } = Guid.Empty;
     
       

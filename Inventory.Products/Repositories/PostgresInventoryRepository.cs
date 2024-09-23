@@ -3,8 +3,6 @@ using Inventory.Products.Contracts.Dto;
 using Inventory.Products.Dto;
 using Inventory.Products.Entities;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using System.Linq;
 
 namespace Inventory.Products.Repositories
 {
@@ -481,6 +479,25 @@ namespace Inventory.Products.Repositories
             return await  GetQuantityMetricAsync(qm.ProductId, qm.EffectiveDate);
         }
 
+
+      
+
+
+
+        public async Task<QuantityMetricDto> EditQuantityMetricAsync(QuantityMetricDto dto)
+        {
+
+            QuantityMetric qm = new QuantityMetric();
+            qm.ProductId = dto.ProductId;
+            qm.Value = dto.Value;
+            qm.Diff = dto.Diff;
+            qm.IsCancelled = dto.IsCancelled;
+            qm.EffectiveDate = dto.EffectiveDate;
+            _context.Update(qm);
+            await _context.SaveChangesAsync();
+            return await GetQuantityMetricAsync(qm.ProductId, qm.EffectiveDate);
+        }
+
         public void AddQuantityMetric(QuantityMetricDto dto)
         {
             QuantityMetric qm = new QuantityMetric();
@@ -502,18 +519,41 @@ namespace Inventory.Products.Repositories
                                    SingleAsync();
 
         }
-        /// <summary>
-        ///only for testing returns all rows of the table 
-        /// </summary>
-        /// <returns></returns>
+
+        public async Task<List<QuantityMetricDto>> GetQuantityMetricsAsync(Guid TransactionId)
+        {
+            return await _context.QuantityMetrics.
+                                   Where(i => i.TransactionId == TransactionId).
+                                   Select(i => new QuantityMetricDto(i.ProductId, i.Value, i.EffectiveDate, i.TransactionId, i.Diff, i.IsCancelled)).
+                                   ToListAsync();
+
+        }
+
+
+
         public async Task<List<QuantityMetricDto>> GetQuantityMetricsAsync()
         {
             return await _context.QuantityMetrics.
-                                  Select(i => new QuantityMetricDto(i.ProductId, i.Value, i.EffectiveDate, i.TransactionId, i.Diff, i.IsCancelled   )).
-                                  ToListAsync();
+                                    Select(i => new QuantityMetricDto(i.ProductId, i.Value, i.EffectiveDate, i.TransactionId, i.Diff, i.IsCancelled)).
+                                   ToListAsync();
+
         }
 
-        public  async Task<int> SaveChangesAsync()
+
+
+        public async Task<List<QuantityMetricDto>>
+          CancellQuantityMetricsAsync(Guid TransactionId)
+        {
+            var qms = await GetQuantityMetricsAsync(TransactionId);
+            foreach (var item in qms)
+                item.IsCancelled = true;
+
+            await _context.SaveChangesAsync();
+
+            return await GetQuantityMetricsAsync(TransactionId);
+        }
+
+        public async Task<int> SaveChangesAsync()
         {
             return await _context.SaveChangesAsync();
         }

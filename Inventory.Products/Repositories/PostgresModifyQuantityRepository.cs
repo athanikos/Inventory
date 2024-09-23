@@ -94,7 +94,6 @@ namespace Inventory.Products.Repositories
         }
 
         /// <summary>
-        /// todo move to repo 
         /// </summary>
         /// <param name="productId"></param>
         /// <param name="value"></param>
@@ -141,6 +140,22 @@ namespace Inventory.Products.Repositories
           
         }
 
+        public async Task<List<ModifyQuantityDto>> GetQuantityMetrics(Guid transactionId)
+        {
+            return await _context.QuantityMetrics.Where
+                  (p => p.TransactionId == transactionId).
+                  Select(qm => new ModifyQuantityDto()
+                  {
+                      ProductId = qm.ProductId,
+                      Value = qm.Value,
+                      EffectiveFrom = qm.EffectiveDate,
+                      TransactionId = qm.TransactionId,
+                      Diff = qm.Diff,
+                      IsCancelled = qm.IsCancelled
+                  }
+                  )
+                  .ToListAsync();
+        }
 
 
         public async Task SaveChangesAsync()
@@ -148,5 +163,6 @@ namespace Inventory.Products.Repositories
             await _context.SaveChangesAsync();
         }
 
+    
     }
 }

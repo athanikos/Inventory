@@ -140,7 +140,7 @@ namespace Inventory.Products.Services
 
                 await transaction.CommitAsync();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 await transaction.RollbackAsync();
                 _repo.Context.ChangeTracker.Clear();

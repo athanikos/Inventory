@@ -9,6 +9,7 @@
   <ItemGroup>
     <PackageReference Include="FastEndpoints" Version="5.26.0" />
     <PackageReference Include="Hangfire.MemoryStorage" Version="1.8.1.1" />
+    <PackageReference Include="MediatR" Version="12.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.6" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.6" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.6">
@@ -24,6 +25,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj" />
+    <ProjectReference Include="..\Inventory.Products.Contracts\Inventory.Products.Contracts.csproj" />
     <ProjectReference Include="..\Inventory.Transactions.Contracts\Inventory.Transactions.Contracts.csproj" />
   </ItemGroup>
 

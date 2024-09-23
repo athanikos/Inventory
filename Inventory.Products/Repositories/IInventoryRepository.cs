@@ -35,11 +35,19 @@ namespace Inventory.Products.Repositories
 
         Task<ProductMetricDto> GetProductMetricAsync(string ProductCode, string MetricCode);
         Task<QuantityMetricDto> AddQuantityMetricAsync(QuantityMetricDto dto);
+        Task<QuantityMetricDto> EditQuantityMetricAsync(QuantityMetricDto dto);
         Task<QuantityMetricDto> GetQuantityMetricAsync(Guid ProductId, DateTime EffectiveDate);
-        Task<List<QuantityMetricDto>> GetQuantityMetricsAsync();
         void  AddQuantityMetric(QuantityMetricDto dto);
         
         Task<int> SaveChangesAsync();
         void EmptyDB();
+
+        public  Task<List<QuantityMetricDto>>    CancellQuantityMetricsAsync(Guid TransactionId);
+   
+        public Task<List<QuantityMetricDto>>     GetQuantityMetricsAsync(Guid TransactionId);
+
+        public  Task<List<QuantityMetricDto>> GetQuantityMetricsAsync();
+
+
     }
 }
