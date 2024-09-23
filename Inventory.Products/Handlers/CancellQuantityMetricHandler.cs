@@ -19,7 +19,8 @@ namespace Inventory.Products.Handlers
             _repository = repository;
         }
 
-        public async Task<List<QuantityMetricDto>> Handle(CancellQuantityMetricCommand request, CancellationToken cancellationToken)
+        public async Task<List<QuantityMetricDto>> Handle(CancellQuantityMetricCommand
+                     request, CancellationToken cancellationToken)
         {
             try
             {

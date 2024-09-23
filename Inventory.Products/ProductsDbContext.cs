@@ -38,16 +38,15 @@ public class ProductsDbContext : DbContext
 
         modelBuilder.Entity<Entities.Category>().HasKey(e => e.Id);
 
-        modelBuilder.Entity<Entities.QuantityMetric>().ToTable("QuantityMetric");
+        modelBuilder.Entity<QuantityMetric>().ToTable("QuantityMetric");
 
 
-        modelBuilder.Entity<Entities.QuantityMetric>()
+        modelBuilder.Entity<QuantityMetric>()
         .HasKey(p => new { p.ProductId, p.EffectiveDate });
 
-        modelBuilder.Entity<Entities.Product>()
-                                 .HasMany(e => e.Categories)
-                                 .WithMany(e => e.Products)
-                                 .UsingEntity<Entities.ProductCategory>();
+        modelBuilder.Entity<Product>().HasMany(e => e.Categories)
+                                      .WithMany(e => e.Products)
+                                      .UsingEntity<ProductCategory>();
 
         modelBuilder.Entity<Metric>()
           .HasIndex(u => u.Code)
@@ -58,16 +57,16 @@ public class ProductsDbContext : DbContext
           .IsUnique();
 
 
-        modelBuilder.Entity<Entities.Product>()
+        modelBuilder.Entity<Product>()
           .HasMany(e => e.Metrics)
           .WithMany(e => e.Products)
-          .UsingEntity<Entities.ProductMetric>()
+          .UsingEntity<ProductMetric>()
           .HasKey(p => new { p.MetricId, p.ProductId, p.EffectiveDate });
 
         modelBuilder.Entity<Entities.Inventory>()
             .HasMany(e => e.Metrics)
             .WithMany(e => e.Inventories)
-            .UsingEntity<Entities.InventoryMetric>()
+            .UsingEntity<InventoryMetric>()
             .HasKey(p => new { p.MetricId, p.InventoryId, p.EffectiveDate });
 
         modelBuilder.Entity<Entities.Source>()
