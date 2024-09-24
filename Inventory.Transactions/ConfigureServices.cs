@@ -23,8 +23,6 @@ namespace Inventory.Transactions
             .GetValue<string>("Transactions")));
 
             services.AddScoped<ITransactionRepository, PostgresTransactionRepository>();
-         
-
             mediatRAssemblies.Add(typeof(ConfigureServices).Assembly);
             return services;
         }

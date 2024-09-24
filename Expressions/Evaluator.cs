@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using System.Globalization;
+using MediatR;
 using Inventory.Products.Contracts;
 using Hangfire;
 using Microsoft.EntityFrameworkCore;
@@ -31,7 +32,7 @@ namespace Expressions
             _repo = repo;
         }
 
-        public async Task<EvaluatorResult> Execute(Guid inventoryId, string expression)
+        public async Task<EvaluatorResult>   Execute(Guid inventoryId, string expression)
         {
             _expression = expression;
             _inventoryId = inventoryId;
@@ -44,18 +45,18 @@ namespace Expressions
             List<string> resultedList = new List<string>();
             string currentToken = string.Empty;
 
-            for (int i = 0; i < _expression.Length; i++)
+            foreach (var t in _expression)
             {
-                if (_operators.Contains(_expression[i]))
+                if (_operators.Contains(t))
                 {
                     if (currentToken != string.Empty)
                         resultedList.Add(currentToken);
 
                     currentToken = string.Empty;
-                    resultedList.Add(_expression[i].ToString());
+                    resultedList.Add(t.ToString());
                 }
                 else
-                    currentToken += _expression[i].ToString();
+                    currentToken += t.ToString();
             }
 
             if (currentToken != string.Empty)
@@ -81,7 +82,7 @@ namespace Expressions
                 {
 
                     var er2 = (await ComputeSimpleFunction(_inventoryId, token));
-                    resultedExpression += er2.Result.ToString().Trim();
+                     resultedExpression += er2.Result.ToString().Trim();
                 }
             }
 
@@ -93,8 +94,8 @@ namespace Expressions
             {
 
                 // Log.Information("NCalc.Evaluate:" + resultedExpression);
-                var value = new NCalc.Expression(resultedExpression).Evaluate().ToString();
-                return EvaluatorResult.NewEvaluatorResult(value.ToString());
+                var value = new NCalc.Expression(resultedExpression.ToString()).Evaluate().ToString();
+                return EvaluatorResult.NewEvaluatorResult(value?.ToString());
 
             }
             catch (Exception ex)
@@ -118,7 +119,7 @@ namespace Expressions
   
         private string ExtractAggregateFunction(string token)
         {
-            int indexOfParenthesis = token.IndexOf(OpenParenthesis);
+            int indexOfParenthesis = token.IndexOf(OpenParenthesis, StringComparison.Ordinal);
             return token.Substring(0, indexOfParenthesis);
         }
 
@@ -135,8 +136,8 @@ namespace Expressions
             string aggregateFunction)
         {
             DateTime upperboundDate = DateTime.MaxValue;
-            List<string> productCodes = new List<string>();
-            string metricCode = string.Empty;
+            List<string> productCodes;
+            string metricCode;
           
             try
             {
@@ -163,8 +164,8 @@ namespace Expressions
                                                                               upperboundDate)));
                     
                         result += result != string.Empty  ? 
-                                          "+" + dto.Value : 
-                                          string.Empty + dto.Value;
+                                          "+" + dto.Value.ToString("F2", CultureInfo.InvariantCulture) : 
+                                          string.Empty +dto.Value.ToString("F2",CultureInfo.InvariantCulture);
                     }
                     catch (Exception e)
                     {
@@ -200,8 +201,8 @@ namespace Expressions
 
         private static string ExtractProducts(string token)
         {
-            int startIndexOfProducts = token.IndexOf(OpenBracket) + 1;
-            int endIndexOfProducts = token.IndexOf(ClosingBracket) - 1;
+            int startIndexOfProducts = token.IndexOf(OpenBracket, StringComparison.Ordinal) + 1;
+            int endIndexOfProducts = token.IndexOf(ClosingBracket, StringComparison.Ordinal) - 1;
             var length = endIndexOfProducts - startIndexOfProducts;
             string products = token.Substring(startIndexOfProducts, length + 1);
             return products;
@@ -214,7 +215,7 @@ namespace Expressions
         ///     returns the value in product metric table 
         /// </summary>
         /// <param name="token"></param>
-        private async Task<EvaluatorResult> ComputeSimpleFunction(Guid InventoryId, string token)
+        private async Task<EvaluatorResult> ComputeSimpleFunction(Guid inventoryId, string token)
         {
             string productCode = string.Empty;
             string metricCode = string.Empty;
@@ -230,8 +231,8 @@ namespace Expressions
             try
             {
                 string result =  ( await _mediator.Send(
-                                                   new GetProductMetricQuery(InventoryId,productCode,
-                                                   metricCode, upperboundDate))).Value.ToString();
+                                                   new GetProductMetricQuery(inventoryId,productCode,
+                                                   metricCode, upperboundDate))).Value.ToString( "F2", CultureInfo.InvariantCulture  );
 
                 return EvaluatorResult.NewEvaluatorResult(result);
 
@@ -244,13 +245,13 @@ namespace Expressions
             }
         }
 
-        private expressionType _type = expressionType.undefined;
+        private ExpressionType _type = ExpressionType.Undefined;
 
-        public enum expressionType
+        private enum ExpressionType
         {
-            undefined = -1,
-            productBased = 0,
-            inventoryBased = 1
+            Undefined = -1,
+            ProductBased = 0,
+            InventoryBased = 1
         }
 
         #region token identify  
@@ -258,17 +259,17 @@ namespace Expressions
         {
 
             if (IsInventoryBasedFormula(token))
-                _type = expressionType.inventoryBased;
+                _type = ExpressionType.InventoryBased;
 
             foreach (var item in _allProductCodes)
                 if (token.Contains(item))
-                    _type = expressionType.productBased;
+                    _type = ExpressionType.ProductBased;
 
             foreach (var item in _allMetricCodes)
                 if (token.Contains(item))
-                    _type = expressionType.productBased;
+                    _type = ExpressionType.ProductBased;
 
-            return expressionType.productBased == _type;
+            return ExpressionType.ProductBased == _type;
         }
 
         private bool IsOperator(string token)
@@ -286,24 +287,24 @@ namespace Expressions
             foreach (var item in aggregateFunctions)
                 if (token.Contains(item))
                 {
-                    _type = expressionType.inventoryBased;
-                    return expressionType.inventoryBased == _type;
+                    _type = ExpressionType.InventoryBased;
+                    return ExpressionType.InventoryBased == _type;
                 }
 
             if (token.Contains(ALLSpecifier))
             {
-                _type = expressionType.inventoryBased;
-                return expressionType.inventoryBased == _type;
+                _type = ExpressionType.InventoryBased;
+                return ExpressionType.InventoryBased == _type;
             }
             var numberOfProducts = 0;
             foreach (var item in _allProductCodes)
                 if (token.Contains(item))
                     numberOfProducts++;
             if (numberOfProducts > 1 )
-                _type = expressionType.inventoryBased;
+                _type = ExpressionType.InventoryBased;
 
 
-            return expressionType.inventoryBased == _type;
+            return ExpressionType.InventoryBased == _type;
         }
         #endregion
 
@@ -372,10 +373,10 @@ namespace Expressions
 
             var result = await Execute(p.TargetInventoryId, p.Expression);
 
-            if (_type == expressionType.undefined)
+            if (_type == ExpressionType.Undefined)
                 throw new ArgumentException(_type.ToString());
 
-            if (_type == expressionType.inventoryBased)
+            if (_type == ExpressionType.InventoryBased)
             {
 
                 // Log.Information("AddInventoryMetricCommand");
@@ -398,13 +399,13 @@ namespace Expressions
         {
             var result = await Execute(p.InventoryId, p.Expression);
 
-            if (_type == expressionType.undefined)
+            if (_type == ExpressionType.Undefined)
                 throw new ArgumentException(_type.ToString());
 
             if (result.Type == EvaluatorResult.EvaluatorResultType.undefined)
                 return;
 
-            if (_type == expressionType.productBased)
+            if (_type == ExpressionType.ProductBased)
             {
                 // Log.Information("AddProductMetricCommand");
                 var command = new AddProductMetricCommand(p.TargetProductId,
@@ -422,13 +423,13 @@ namespace Expressions
             // Log.Information("DoScheduledWorkAsync with BooleanExpression");
             var result = await Execute(p.InventoryId, p.Expression);
 
-            if (_type == expressionType.undefined)
+            if (_type == ExpressionType.Undefined)
                 throw new ArgumentException(_type.ToString());
 
             if (result.Type == EvaluatorResult.EvaluatorResultType.undefined)
                 return;
 
-            if (_type == expressionType.productBased)
+            if (_type == ExpressionType.ProductBased)
             {
                 // Log.Information("UpdateNotificationExpressionValueCommand");
                 var command = new UpdateNotificationExpressionValueCommand()

@@ -113,6 +113,9 @@ namespace Inventory.Products.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Code")
+                        .IsUnique();
+
                     b.HasIndex("SourceId");
 
                     b.ToTable("Metrics", "Products");
@@ -136,6 +139,9 @@ namespace Inventory.Products.Data.Migrations
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Code")
+                        .IsUnique();
 
                     b.HasIndex("InventoryId");
 

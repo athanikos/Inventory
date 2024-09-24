@@ -107,6 +107,9 @@ namespace Inventory.Transactions.Data.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<int>("StatusId")
+                        .HasColumnType("integer");
+
                     b.Property<Guid>("TemplateId")
                         .HasColumnType("uuid");
 

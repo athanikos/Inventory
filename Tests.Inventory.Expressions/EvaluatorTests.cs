@@ -74,9 +74,9 @@ namespace Tests.Inventory
             var output = await TestSetup.Setup(_testOutputHelper, _fixture, "ADA");
 
 
-            var _mediator = _fixture.GetService<IMediator>(_testOutputHelper)!;
+            var mediator = _fixture.GetService<IMediator>(_testOutputHelper)!;
             var _repo = _fixture.GetService<IInventoryRepository>(_testOutputHelper)!;
-            var _expressionsRepo = _fixture.GetService<IExpressionRepository>(_testOutputHelper)!;
+            var expressionsRepo = _fixture.GetService<IExpressionRepository>(_testOutputHelper)!;
            
             Guid InventoryId, sourceId;
             var tuple = (await SetupInventoryAndSource(_repo));
@@ -94,23 +94,23 @@ namespace Tests.Inventory
             await _repo.AddOrEditProductMetricAsync(ProductMetricDto.NewProductMetricDto(priceId, output.ProductId, 5, Currency, 
                 ADAProductCode, PriceCode));
 
-            Evaluator instance = new (_mediator, _expressionsRepo);
+            Evaluator instance = new (mediator, expressionsRepo);
             var result = await instance.Execute(InventoryId, expression);
             Assert.Equal(25, decimal.Parse(result.Result));
         }
 
         private static async Task<Tuple<Guid,Guid>> SetupInventoryAndSource(IInventoryRepository _repo)
         {
-            var InventoryId = (await _repo.AddInventoryAsync(new InventoryDto(Guid.NewGuid(), Crypto))).Id;
+            var inventoryId = (await _repo.AddInventoryAsync(new InventoryDto(Guid.NewGuid(), Crypto))).Id;
             var sourceId = (await _repo.AddSourceAsync(new SourceDto(Guid.NewGuid(),SourceName))).Id;
-            return new Tuple<Guid, Guid>(InventoryId, sourceId);    
+            return new Tuple<Guid, Guid>(inventoryId, sourceId);    
         }
 
         [Fact]
         public async Task TestEvaluatorComplexSingleProduct()
         {
             string expression = "SUM(VALUE([ADA],LATEST))";
-            var _mediator = _fixture.GetService<IMediator>(_testOutputHelper)!;
+            var mediator = _fixture.GetService<IMediator>(_testOutputHelper)!;
             var _repo = _fixture.GetService<IInventoryRepository>(_testOutputHelper)!;
             var _expressionsRepo = _fixture.GetService<IExpressionRepository>(_testOutputHelper)!;
 
@@ -131,7 +131,7 @@ namespace Tests.Inventory
             await _repo.AddOrEditProductMetricAsync(ProductMetricDto.NewProductMetricDto(valueId, productId, 10, Currency, ADAProductCode,ValueCode));
       
 
-            Evaluator instance = new (_mediator, _expressionsRepo);
+            Evaluator instance = new (mediator, _expressionsRepo);
             var result = await instance.Execute(InventoryId,expression);
             Assert.Equal(10, decimal.Parse(result.Result));
         }
@@ -147,22 +147,21 @@ namespace Tests.Inventory
             var _expressionsRepo = _fixture.GetService<IExpressionRepository>(_testOutputHelper)!;
 
             _repo.EmptyDB();
-            Guid InventoryId, sourceId;
             var tuple = (await SetupInventoryAndSource(_repo));
-            InventoryId = tuple.Item1;
-            sourceId = tuple.Item2;
+            var inventoryId = tuple.Item1;
+            var sourceId = tuple.Item2;
             var valueId = (await _repo.AddMetricAsync(MetricDto.NewMetricDto(sourceId, ValueCode))).Id;
 
-            ProductDto prodDto = ProductDto.NewProductDto(InventoryId, ADAProductCode);
+            ProductDto prodDto = ProductDto.NewProductDto(inventoryId, ADAProductCode);
             var productId = (await _repo.AddProductAsync(prodDto)).Id;
             await _repo.AddOrEditProductMetricAsync(ProductMetricDto.NewProductMetricDto(valueId, productId, 10, Currency, ADAProductCode, ValueCode));
 
-            prodDto = ProductDto.NewProductDto(InventoryId, XRPProductCode);
+            prodDto = ProductDto.NewProductDto(inventoryId, XRPProductCode);
             productId = (await _repo.AddProductAsync(prodDto)).Id;
             await _repo.AddOrEditProductMetricAsync(ProductMetricDto.NewProductMetricDto(valueId, productId, 100, Currency, XRPProductCode, ValueCode));
 
             Evaluator instance = new Evaluator(_mediator, _expressionsRepo);
-            var result = await instance.Execute(InventoryId,expression);
+            var result = await instance.Execute(inventoryId,expression);
             Assert.Equal(110, decimal.Parse(result.Result));
         }
 
@@ -171,32 +170,31 @@ namespace Tests.Inventory
         {
             string expression = "SUM(VALUE([ADA,XRP],LATEST))";
 
-            var _mediator = _fixture.GetService<IMediator>(_testOutputHelper)!;
-            var _repo = _fixture.GetService<IInventoryRepository>(_testOutputHelper)!;
-            var _expressionsRepo = _fixture.GetService<IExpressionRepository>(_testOutputHelper)!;
+            var mediator = _fixture.GetService<IMediator>(_testOutputHelper)!;
+            var repo = _fixture.GetService<IInventoryRepository>(_testOutputHelper)!;
+            var expressionsRepo = _fixture.GetService<IExpressionRepository>(_testOutputHelper)!;
 
 
-            var _expressionDbContext = _fixture.GetService<ExpressionsDbContext>(_testOutputHelper)!;
-            _repo.EmptyDB();
-            Guid InventoryId, sourceId;
-            var tuple = (await SetupInventoryAndSource(_repo));
-            InventoryId = tuple.Item1;
-            sourceId = tuple.Item2;
+            _ = _fixture.GetService<ExpressionsDbContext>(_testOutputHelper)!;
+            repo.EmptyDB();
+            var tuple = (await SetupInventoryAndSource(repo));
+            var inventoryId = tuple.Item1;
+            var sourceId = tuple.Item2;
 
-            var valueId = (await _repo.AddMetricAsync(MetricDto.NewMetricDto(sourceId, ValueCode))).Id;
-
-
-            ProductDto prodDto = ProductDto.NewProductDto(InventoryId,ADAProductCode);
-            var productId = (await _repo.AddProductAsync(prodDto)).Id;
-            await _repo.AddOrEditProductMetricAsync(ProductMetricDto.NewProductMetricDto(valueId, productId, 10, Currency, ADAProductCode, ValueCode));
-
-            prodDto = ProductDto.NewProductDto(InventoryId, XRPProductCode);
-            productId = (await _repo.AddProductAsync(prodDto)).Id;
-            await _repo.AddOrEditProductMetricAsync(ProductMetricDto.NewProductMetricDto(valueId, productId, 11, Currency, XRPProductCode, ValueCode));
+            var valueId = (await repo.AddMetricAsync(MetricDto.NewMetricDto(sourceId, ValueCode))).Id;
 
 
-            Evaluator instance = new (_mediator, _expressionsRepo);
-            var result = await instance.Execute(InventoryId, expression);
+            ProductDto prodDto = ProductDto.NewProductDto(inventoryId,ADAProductCode);
+            var productId = (await repo.AddProductAsync(prodDto)).Id;
+            await repo.AddOrEditProductMetricAsync(ProductMetricDto.NewProductMetricDto(valueId, productId, 10, Currency, ADAProductCode, ValueCode));
+
+            prodDto = ProductDto.NewProductDto(inventoryId, XRPProductCode);
+            productId = (await repo.AddProductAsync(prodDto)).Id;
+            await repo.AddOrEditProductMetricAsync(ProductMetricDto.NewProductMetricDto(valueId, productId, 11, Currency, XRPProductCode, ValueCode));
+
+
+            Evaluator instance = new (mediator, expressionsRepo);
+            var result = await instance.Execute(inventoryId, expression);
             Assert.Equal(21, decimal.Parse(result.Result));
         }
 
@@ -308,18 +306,16 @@ namespace Tests.Inventory
             string expression = "PRICE([ADA]) > 1 ";
 
 
-            var _mediator = _fixture.GetService<IMediator>(_testOutputHelper)!;
-            var _repo = _fixture.GetService<IInventoryRepository>(_testOutputHelper)!;
-            var _expressionsRepo = _fixture.GetService<IExpressionRepository>(_testOutputHelper)!;
+            var mediator = _fixture.GetService<IMediator>(_testOutputHelper)!;
+            IInventoryRepository repo = _fixture.GetService<IInventoryRepository>(_testOutputHelper)!;
+            var expressionsRepo = _fixture.GetService<IExpressionRepository>(_testOutputHelper)!;
 
-            _repo.EmptyDB();
-            Guid InventoryId, sourceId;
-            var tuple = (await SetupInventoryAndSource(_repo));
-            InventoryId = tuple.Item1;
-            sourceId = tuple.Item2;
+            repo.EmptyDB();
+            var tuple = (await SetupInventoryAndSource(repo));
+            var inventoryId = tuple.Item1;
 
-            Evaluator instance = new (_mediator, _expressionsRepo);
-            var result = await instance.Execute(InventoryId, expression);
+            Evaluator instance = new (mediator, expressionsRepo);
+            var result = await instance.Execute(inventoryId, expression);
             Assert.Equal(EvaluatorResult.EvaluatorResultType.undefined, result.Type);
         }
 
@@ -330,28 +326,27 @@ namespace Tests.Inventory
             string expression = "PRICE([ADA]) > 0.35 ";
 
 
-            var _mediator = _fixture.GetService<IMediator>(_testOutputHelper)!;
-            var _repo = _fixture.GetService<IInventoryRepository>(_testOutputHelper)!;
-            var _expressionsRepo = _fixture.GetService<IExpressionRepository>(_testOutputHelper)!;
+            var mediator = _fixture.GetService<IMediator>(_testOutputHelper)!;
+            var repo = _fixture.GetService<IInventoryRepository>(_testOutputHelper)!;
+            var expressionsRepo = _fixture.GetService<IExpressionRepository>(_testOutputHelper)!;
 
             //  todo extract string to const
             // todo extract preparation steps , services and empty db 
 
-            _repo.EmptyDB();
-            Guid InventoryId, sourceId;
-            var tuple = (await SetupInventoryAndSource(_repo));
-            InventoryId = tuple.Item1;
-            sourceId = tuple.Item2;
+            repo.EmptyDB();
+            var tuple = (await SetupInventoryAndSource(repo));
+            var inventoryId = tuple.Item1;
+            var sourceId = tuple.Item2;
 
-            var priceId = (await _repo.AddMetricAsync(MetricDto.NewMetricDto(sourceId, PriceCode))).Id;
-            ProductDto prodDto = ProductDto.NewProductDto(InventoryId, ADAProductCode);
-            var productId = (await _repo.AddProductAsync(prodDto)).Id;
-            await _repo.AddOrEditProductMetricAsync(ProductMetricDto.NewProductMetricDto(priceId, productId, 1, Currency, ADAProductCode, PriceCode));
-
+            var priceId = (await repo.AddMetricAsync(MetricDto.NewMetricDto(sourceId, PriceCode))).Id;
+            ProductDto prodDto = ProductDto.NewProductDto(inventoryId, ADAProductCode);
+            var productId = (await repo.AddProductAsync(prodDto)).Id;
+            await repo.AddOrEditProductMetricAsync(ProductMetricDto.NewProductMetricDto(priceId, productId, 1, Currency, ADAProductCode, PriceCode));
 
 
-            Evaluator instance = new (_mediator, _expressionsRepo);
-            var result = await instance.Execute(InventoryId, expression);
+
+            Evaluator instance = new (mediator, expressionsRepo);
+            var result = await instance.Execute(inventoryId, expression);
           
             Assert.Equal(EvaluatorResult.EvaluatorResultType.boolean, result.Type);
             Assert.Equal("True", result.Result);

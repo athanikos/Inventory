@@ -1,11 +1,5 @@
-﻿--CREATE FUNCTION dailyLetProduct() RETURNS void AS '
---    DELETE FROM "Products"."QuantityMetrics";
-   
---' LANGUAGE SQL;
-
-ALTER TABLE "Products"."QuantityMetrics" DROP CONSTRAINT quantitymetrics_check;
+﻿
 
 
-
-ALTER TABLE "Products"."QuantityMetrics" 
+ALTER TABLE "Products"."QuantityMetric" 
 ADD CONSTRAINT quantitymetrics_check CHECK ("Value" >= 0);
