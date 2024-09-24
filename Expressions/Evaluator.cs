@@ -158,10 +158,8 @@ namespace Expressions
                     try
                     {
                         var dto = (await _mediator.Send(
-                                                   new GetProductMetricQuery(_inventoryId, 
-                                                                              productCode,
-                                                                              metricCode,
-                                                                              upperboundDate)));
+                                                   new GetProductMetricQuery(productCode,
+                                                                              metricCode)));
                     
                         result += result != string.Empty  ? 
                                           "+" + dto.Value.ToString("F2", CultureInfo.InvariantCulture) : 
@@ -231,8 +229,8 @@ namespace Expressions
             try
             {
                 string result =  ( await _mediator.Send(
-                                                   new GetProductMetricQuery(inventoryId,productCode,
-                                                   metricCode, upperboundDate))).Value.ToString( "F2", CultureInfo.InvariantCulture  );
+                                                   new GetProductMetricQuery(productCode,
+                                                   metricCode))).Value.ToString( "F2", CultureInfo.InvariantCulture  );
 
                 return EvaluatorResult.NewEvaluatorResult(result);
 

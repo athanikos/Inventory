@@ -1,4 +1,5 @@
-﻿using Inventory.Transactions.Dto;
+﻿using Inventory.Transactions.Contracts;
+using Inventory.Transactions.Dto;
 using Inventory.Transactions.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,7 +13,7 @@ namespace Inventory.Transactions.Repositories.Postgres
         public PostgresTransactionRepository(TransactionsDbContext context)
         { _context = context; }
 
-        public async Task EmptyDB()
+        public async Task EmptyDb()
         {
             _context.Values.RemoveRange(_context.Values);
             _context.Fields.RemoveRange(_context.Fields);

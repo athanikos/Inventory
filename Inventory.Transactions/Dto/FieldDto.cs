@@ -1,5 +1,6 @@
 ﻿using Inventory.Transactions.Entities;
 using System.Text.Json.Serialization;
+using Inventory.Transactions.Contracts;
 
 namespace Inventory.Transactions.Dto
 {

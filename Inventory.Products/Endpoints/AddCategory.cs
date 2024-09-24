@@ -58,7 +58,7 @@ namespace Category.Products.Endpoints
     }
 
 
-    public record AddCategoryRequest(Guid FatherId, string Description);
+    public abstract record AddCategoryRequest(Guid FatherId, string Description);
 
  
   

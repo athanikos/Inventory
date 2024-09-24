@@ -15,7 +15,7 @@ namespace Inventory.Products.Entities
 
         public string ProductCode { get; set; } = string.Empty;
 
-        public  string MetricCode { get; set; } = Constants.QUANTITYCODE;
+        public  string MetricCode { get; set; } = Constants.Quantitycode;
 
         public decimal Value { get; internal set; }
 

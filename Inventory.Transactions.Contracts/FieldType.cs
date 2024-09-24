@@ -1,4 +1,6 @@
-﻿/// <summary>
+﻿namespace Inventory.Transactions.Contracts;
+
+/// <summary>
 ///  the type the field describes
 ///  
 /// </summary>
@@ -11,5 +13,3 @@ public enum FieldType
     String = 4,
     Boolean = 5,
 }
-
-

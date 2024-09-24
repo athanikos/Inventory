@@ -1,27 +1,17 @@
 ﻿namespace Inventory.Transactions.Services
 {
     using Inventory.Products.Contracts;
-    using Inventory.Transactions.Dto;
-    using Inventory.Transactions.Repositories;
+    using Dto;
+    using Repositories;
     using MediatR;
-
-
-    public class TransactionsService : ITransactionService
+    public class TransactionsService(
+        ITransactionRepository repository,
+        IMediator mediator)
+        : ITransactionService
     {
-        private readonly ITransactionRepository _transactionRepository;
-        private IMediator _mediator;
-
-
-        public TransactionsService(ITransactionRepository repository,
-                                   IMediator mediator)
-        {
-            _transactionRepository = repository;
-            _mediator = mediator;   
-        }
-
         public async Task<TransactionDto> GetValuesForNewTransaction(Guid templateId)
         {
-            var template = await _transactionRepository.GetTemplateAsync(templateId);
+            var template = await repository.GetTemplateAsync(templateId);
             TransactionDto trans = new TransactionDto(Guid.NewGuid());
 
             var transactionSections = template.
@@ -63,26 +53,22 @@
 
             return trans;
         }
-
-
+        
         public async Task<TransactionDto> UpdateOrInsertTransaction(TransactionDto transaction)
         {
             if (transaction.Id == Guid.Empty)
-                return await _transactionRepository.AddTransactionAsync(transaction);
-            else
-                return await _transactionRepository.EditTransactionAsync(transaction);
+                return await repository.AddTransactionAsync(transaction);
+            return await repository.EditTransactionAsync(transaction);
         }
-
-
-
-        public async Task<TransactionDto> CancellTransaction(TransactionDto transaction)
+        
+        public async Task<TransactionDto> CancelTransaction(TransactionDto transaction)
         {
-            var t = await _transactionRepository.GetTransactionAsync(transaction.Id);
+            var t = await repository.GetTransactionAsync(transaction.Id);
             t.StatusId = Contracts.TransactionStatus.Cancelled;
-            await _transactionRepository.EditTransactionAsync(t);
-            var command = new CancellQuantityMetricCommand(transaction.Id);
-            await _mediator.Send(command);
-            return await _transactionRepository.GetTransactionAsync(t.Id);
+            await repository.EditTransactionAsync(t);
+            var command = new CancelQuantityMetricCommand(transaction.Id);
+            await mediator.Send(command);
+            return await repository.GetTransactionAsync(t.Id);
 
         }
     }

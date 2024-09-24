@@ -25,11 +25,11 @@ namespace Inventory.Products.Services
 
         private static void  Validate(List<ModifyQuantityDto> inboundQuantities)
         {
-            if  (inboundQuantities.Where(o=>o.Value < 0).Any())
+            if  (inboundQuantities.Any(o => o.Value < 0))
                 throw new InvalidDiffException();
 
 
-            if (inboundQuantities.Where(o => o.Diff < 0  ).Any())
+            if (inboundQuantities.Any(o => o.Diff < 0))
                 throw new InvalidDiffException();
 
         }
@@ -49,7 +49,7 @@ namespace Inventory.Products.Services
 
                 // group by productId 
                 var groupedInboundQuantities = from i in inboundQuantities
-                                               where ModificationTypeHelper.IsBuyOrSell( i.ModificationType)
+                                               where i.ModificationType.IsBuyOrSell()
                                                group i by i.ProductId into g
                                                select new ModifyQuantityDto
                                                             { ProductId = g.Key, 

@@ -4,30 +4,20 @@ using MediatR;
 
 namespace Inventory.Products.Contracts
 {
-    public  class  AddQuantityMetricCommand 
+    public abstract class AddQuantityMetricCommand(
+        Guid productId,
+        decimal value,
+        DateTime effectiveDate,
+        Guid transactionId,
+        decimal diff,
+        bool isCancelled)
         : IRequest<QuantityMetricDto>
     {
-        public Guid ProductId { get; set; }
-        public decimal Value { get; set; }
-        public DateTime EffectiveDate { get; set; }        = DateTime.MinValue;
-        public Guid TransactionId { get; set; }
-        public decimal Diff { get; set; }
-        public bool IsCancelled { get; set; }
-
-
-        public AddQuantityMetricCommand(Guid ProductId, decimal Value,
-                                       DateTime EffectiveDate, Guid TransactionId,
-                                       decimal Diff, bool IsCancelled)
-        {
-            this.ProductId = ProductId;
-            this.Value = Value;
-            this.EffectiveDate = EffectiveDate; 
-            this.TransactionId = TransactionId; 
-            this.Diff = Diff;   
-            this.IsCancelled = IsCancelled;     
-
-        }
-
- 
+        public Guid ProductId { get; set; } = productId;
+        public decimal Value { get; set; } = value;
+        public DateTime EffectiveDate { get; set; } = effectiveDate;
+        public Guid TransactionId { get; set; } = transactionId;
+        public decimal Diff { get; set; } = diff;
+        public bool IsCancelled { get; set; } = isCancelled;
     }
 }

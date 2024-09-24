@@ -25,7 +25,7 @@ namespace Transaction.Transactions.Endpoints
         public override async Task<Results<Ok, NotFound, ProblemDetails>>
             HandleAsync(EmptyDBRequest edbr, CancellationToken ct)
         {
-            await _repo.EmptyDB();
+            await _repo.EmptyDb();
             return TypedResults.Ok();
         }
     }

@@ -1,41 +1,28 @@
-﻿namespace Inventory.Products.Contracts.Dto
+﻿namespace Inventory.Products.Contracts
 {
 
-    public class InventoryMetricDto
+    public class InventoryMetricDto(
+        Guid inventoryId,
+        Guid metricId,
+        decimal value,
+        DateTime effectiveDate,
+        string currency,
+        string inventoryCode,
+        string metricCode)
     {
-        public InventoryMetricDto(
-            Guid inventoryId,
-            Guid metricId,
-            decimal value,
-            DateTime effectiveDate,
-            string currency,
-            string inventoryCode,
-            string metricCode
-            )
-        {
-            InventoryId = inventoryId;
-            MetricId = metricId;
-            Value = value;
-            EffectiveDate = effectiveDate;
-            Currency = currency;
-            InventoryCode = inventoryCode;
-            MetricCode = metricCode;
-        }
+        public Guid InventoryId { get; } = inventoryId;
 
-        public Guid InventoryId { get; set; }
+        public Guid MetricId { get; } = metricId;
 
-        public Guid MetricId { get; set; }
+        public string InventoryCode { get; set; } = inventoryCode;
 
-        public string InventoryCode { get; set; } = string.Empty;
+        public string MetricCode { get; set; } = metricCode;
 
-        public string MetricCode { get; set; } = string.Empty;
+        public decimal Value { get; } = value;
 
-        public decimal Value { get; set; }
+        public DateTime EffectiveDate { get; } = effectiveDate;
 
-        public DateTime EffectiveDate { get; set; }
-        = DateTime.MinValue;
-
-        public string Currency { get; set; } = string.Empty;
+        public string Currency { get; } = currency;
 
         public Guid SourceId { get; set; }
 

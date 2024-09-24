@@ -1,4 +1,5 @@
-﻿using Inventory.Products.Contracts.Dto;
+﻿using Inventory.Products.Contracts;
+using Inventory.Products.Contracts.Dto;
 
 namespace Inventory.Products.Entities
 {

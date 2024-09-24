@@ -3,7 +3,7 @@ using Inventory.Products.Contracts.Dto;
 using Xunit.Abstractions;
 using Xunit.Microsoft.DependencyInjection.Abstracts;
 
-namespace Tests.Inventory.Expressions
+namespace Tests.Inventory
 {
 
 
@@ -13,10 +13,7 @@ namespace Tests.Inventory.Expressions
     [Collection("Our Test Collection #1")]
     public class QuantityMetricTests(ITestOutputHelper testOutputHelper, TestFixture fixture) : TestBed<TestFixture>(testOutputHelper, fixture)
     {
- 
-       
 
-  
         [Fact]
         public async Task TestUniqueConstraintOnMinutesDifferenceTwoRecordsAreInserted()
         {

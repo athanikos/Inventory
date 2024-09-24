@@ -7,30 +7,22 @@ using Serilog;
 namespace Inventory.Products.Handlers
 {
 
-    public class CancellQuantityMetricHandler :
-    IRequestHandler<CancellQuantityMetricCommand,
-        List<QuantityMetricDto>>
+    public class CancellQuantityMetricHandler(IInventoryRepository repository) :
+        IRequestHandler<CancelQuantityMetricCommand,
+            List<QuantityMetricDto>>
     {
-        private IInventoryRepository _repository;
-
-        public CancellQuantityMetricHandler(
-            IInventoryRepository repository)
-        {
-            _repository = repository;
-        }
-
-        public async Task<List<QuantityMetricDto>> Handle(CancellQuantityMetricCommand
+        public async Task<List<QuantityMetricDto>> Handle(CancelQuantityMetricCommand
                      request, CancellationToken cancellationToken)
         {
             try
             {
-                await _repository.CancellQuantityMetricsAsync(request.TransactionId);
+                await repository.CancellQuantityMetricsAsync(request.TransactionId);
             }
             catch (Exception ex)
             {
                 Log.Error(ex.ToString());
             }
-            return await _repository.GetQuantityMetricsAsync(request.TransactionId);
+            return await repository.GetQuantityMetricsAsync(request.TransactionId);
         }
     }
 

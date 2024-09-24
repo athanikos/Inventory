@@ -7,20 +7,18 @@ using Xunit.Microsoft.DependencyInjection.Abstracts;
 namespace Tests.Inventory
 {
     [Collection("Our Test Collection #1")]
-    public class CancellationQuantityMetricTests : TestBed<TestFixture>
+    public class CancellationQuantityMetricTests(ITestOutputHelper testOutputHelper,  
+        TestFixture fixture)
+        : TestBed<TestFixture>(testOutputHelper, fixture)
     {
-
-        public CancellationQuantityMetricTests(ITestOutputHelper testOutputHelper, TestFixture fixture) :
-                          base(testOutputHelper, fixture)
-        { }
-
-
         [Fact]
         public async Task TestOnCancellationAllRecordsAreCancelled()
         {
-            var output = await TestSetup.Setup(_testOutputHelper, this._fixture);
+            var output = await TestSetup.Setup(_testOutputHelper, 
+                _fixture);
 
-            var firstDate = new DateTime(2021, 1, 1, 1, 1, 1);
+            var firstDate = new DateTime(2021, 1, 1,
+                1, 1, 1);
             var quantityMetricDto = QuantityMetricDto.NewQuantityMetricDto(output.ProductId, 10, firstDate, output.TransactionId, 1, false, ModificationType.Buy);
             var qm = await output.InventoryRepo.AddQuantityMetricAsync(quantityMetricDto);
 

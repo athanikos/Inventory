@@ -4,29 +4,22 @@ using MediatR;
 
 namespace Inventory.Products.Contracts
 {
-    public  class  AddProductMetricCommand 
+    public class AddProductMetricCommand(
+        Guid productId,
+        Guid metricId,
+        decimal value,
+        DateTime effectiveDate,
+        string currency)
         : IRequest<ProductMetricDto>
     {
-        public Guid ProductId { get; set; }
+        public Guid ProductId { get; set; } = productId;
 
-        public Guid MetricId { get; set; }
+        public Guid MetricId { get; set; } = metricId;
 
-        public decimal Value { get; set; }
+        public decimal Value { get; set; } = value;
 
-        public DateTime EffectiveDate { get; set; }        = DateTime.MinValue;
+        public DateTime EffectiveDate { get; set; } = effectiveDate;
 
-        public string Currency { get; set; } = string.Empty;
-
-        public AddProductMetricCommand(Guid ProductId, Guid MetricId, decimal Value,
-                                       DateTime EffectiveDate, string Curtrency)
-        {
-            this.ProductId = ProductId;
-            this.MetricId = MetricId;
-            this.Value = Value;
-            this.EffectiveDate = EffectiveDate; 
-            this.Currency = Curtrency;
-        }
-
- 
+        public string Currency { get; set; } = currency;
     }
 }

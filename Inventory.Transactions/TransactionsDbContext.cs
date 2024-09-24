@@ -2,12 +2,10 @@
 using System.Reflection.Metadata;
 namespace Inventory.Transactions;
 
-public class TransactionsDbContext : DbContext
+public class TransactionsDbContext(
+    DbContextOptions
+        <TransactionsDbContext> options) : DbContext(options)
 {
-    public TransactionsDbContext(DbContextOptions
-        <TransactionsDbContext> options) :
-        base(options) { }
-
     public DbSet<Entities.Transaction> Transactions { get; set; }
 
     public DbSet<Entities.TransactionSectionGroup> TransactionSectionGroups { get; set; }

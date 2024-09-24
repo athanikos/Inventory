@@ -37,7 +37,7 @@ namespace Tests.Inventory
                 ModifyQuantityService = fixture.GetService<IModifyQuantityService>(_testOutputHelper)!
             };
             output.InventoryRepo.EmptyDB();
-            await output.TransactionRepo.EmptyDB();
+            await output.TransactionRepo.EmptyDb();
             return output;
         }
 
@@ -51,11 +51,11 @@ namespace Tests.Inventory
                 ModifyQuantityService = fixture.GetService<IModifyQuantityService>(_testOutputHelper)!
             };
             output.InventoryRepo.EmptyDB();
-            await output.TransactionRepo.EmptyDB();
+            await output.TransactionRepo.EmptyDb();
           
             var InventoryId = (await output.InventoryRepo.AddInventoryAsync(new InventoryDto(Guid.NewGuid(), Inventory))).Id;
             var sourceId = (await output.InventoryRepo.AddSourceAsync(new SourceDto(Guid.NewGuid(), SourceName))).Id;
-            var metricId = (await output.InventoryRepo.AddMetricAsync(MetricDto.NewMetricDto(sourceId, Constants.QUANTITYCODE))).Id;
+            var metricId = (await output.InventoryRepo.AddMetricAsync(MetricDto.NewMetricDto(sourceId, Constants.Quantitycode))).Id;
             ProductDto prodDto = ProductDto.NewProductDto(InventoryId, productCode);
             output.TemplateId = await output.TransactionRepo.RoomsPrepareAsync();
             output.TransactionId = (await output.TransactionRepo.AddTransactionAsync(new TransactionDto(Guid.NewGuid(), "", DateTime.Now, output.TemplateId, null))).Id;

@@ -407,7 +407,7 @@ namespace Inventory.Products.Repositories
             MetricCode = MetricCode.ToUpper().Trim();
 
 
-            if (MetricCode == Constants.QUANTITYCODE)
+            if (MetricCode == Constants.Quantitycode)
             {
 
                 // todo cache reuse allcodes field add to repo and do lazy loading ? or refresh evry 
@@ -432,9 +432,9 @@ namespace Inventory.Products.Repositories
                                                   metricInfo.Id,
                                                   i.Value,
                                                   i.EffectiveDate,
-                                                  Constants.DEFAULTCURRENCY, //todo fix currency 
+                                                  Constants.Defaultcurrency, //todo fix currency 
                                                   productInfo.Code,
-                                                  Constants.QUANTITYCODE)).FirstOrDefaultAsync();
+                                                  Constants.Quantitycode)).FirstOrDefaultAsync();
 
 
                 if (item != null)
@@ -542,15 +542,15 @@ namespace Inventory.Products.Repositories
 
 
         public async Task<List<QuantityMetricDto>>
-          CancellQuantityMetricsAsync(Guid TransactionId)
+          CancellQuantityMetricsAsync(Guid transactionId)
         {
-            var qms = await GetQuantityMetricsAsync(TransactionId);
+            var qms = await GetQuantityMetricsAsync(transactionId);
             foreach (var item in qms)
                 item.IsCancelled = true;
 
             await _context.SaveChangesAsync();
 
-            return await GetQuantityMetricsAsync(TransactionId);
+            return await GetQuantityMetricsAsync(transactionId);
         }
 
         public async Task<int> SaveChangesAsync()

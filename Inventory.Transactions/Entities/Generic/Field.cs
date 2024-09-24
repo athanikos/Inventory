@@ -1,4 +1,6 @@
-﻿namespace Inventory.Transactions.Entities
+﻿using Inventory.Transactions.Contracts;
+
+namespace Inventory.Transactions.Entities
 {
 
 

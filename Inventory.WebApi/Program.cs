@@ -1,9 +1,6 @@
 using FastEndpoints;
-//using Microsoft.AspNetCore.Authentication.JwtBearer;
-//using Microsoft.AspNetCore.Identity;
 using Serilog;
 using System.Reflection;
-using System.Security.Cryptography;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Identity.Web;

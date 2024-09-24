@@ -6,7 +6,7 @@ namespace Inventory.Transactions.Services
     {
         Task<TransactionDto> GetValuesForNewTransaction(Guid templateId);
         Task<TransactionDto> UpdateOrInsertTransaction(TransactionDto transaction);
-        Task<TransactionDto> CancellTransaction(TransactionDto transaction);
+        Task<TransactionDto> CancelTransaction(TransactionDto transaction);
 
 
 

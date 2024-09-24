@@ -27,14 +27,19 @@ namespace Tests.Inventory
             cfg.RegisterServicesFromAssemblies(mediatRAssemblies.ToArray()));
 
             services.AddDbContext<ExpressionsDbContext>(options =>
-            options.UseNpgsql(configuration.
-            GetConnectionString("Expressions")));
+            {
+                if (configuration != null) options.UseNpgsql(configuration.GetConnectionString("Expressions"));
+            });
             services.AddDbContext<TransactionsDbContext>(options =>
-             options.UseNpgsql(configuration
-             .GetValue<string>("Transactions")));
+            {
+                if (configuration != null)
+                    options.UseNpgsql(configuration
+                        .GetValue<string>("Transactions"));
+            });
             services.AddDbContext<ProductsDbContext>(options =>
-            options.UseNpgsql(configuration.
-            GetConnectionString("Products")));
+            {
+                if (configuration != null) options.UseNpgsql(configuration.GetConnectionString("Products"));
+            });
 
 
             AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
