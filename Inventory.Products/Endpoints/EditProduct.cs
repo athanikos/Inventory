@@ -1,4 +1,6 @@
 ﻿
+using Inventory.Products.Contracts;
+
 namespace Inventory.Products.Endpoints
 {
     using FastEndpoints;
@@ -10,16 +12,9 @@ namespace Inventory.Products.Endpoints
     using Inventory.Products.Repositories;
     using Inventory.Products.Contracts.Dto;
 
-    public class EditProduct :
+    public class EditProduct(IInventoryRepository repo) :
         Endpoint<EditProductRequest>
     {
-        private readonly IInventoryRepository _repo;
-
-        public  EditProduct(IInventoryRepository repo)
-        {
-            _repo = repo;
-        }
-
         public override void Configure()
         {
             Put("/product");
@@ -33,7 +28,7 @@ namespace Inventory.Products.Endpoints
                         CancellationToken ct)
         {
             var dto = new ProductDto(req.id, req.Description, req.Code, req.InventoryId, req.Metrics    );
-            if (!_repo.InventoryIdExists(req.InventoryId))
+            if (!repo.InventoryIdExists(req.InventoryId))
             {
                 AddError("Inventory Id does not exist ");
                 ThrowIfAnyErrors(); // If there are errors, execution shouldn't go beyond this point
@@ -47,7 +42,7 @@ namespace Inventory.Products.Endpoints
             //    return new ProblemDetails(ValidationFailures);
             //}
 
-            dto =   await _repo.EditProductAsync(dto);
+            dto =   await repo.EditProductAsync(dto);
             return TypedResults.Ok<ProductDto>(dto);
         }
     }

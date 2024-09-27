@@ -1,5 +1,6 @@
 ﻿
 using Expressions;
+using Inventory.Expressions.Services;
 using Microsoft.Extensions.DependencyInjection;
 
 
@@ -13,7 +14,7 @@ namespace Inventory.Expressions
             )
         {
             var serviceProvider = services.BuildServiceProvider();
-            var service = serviceProvider.GetRequiredService<IEvaluator>();
+            var service = serviceProvider.GetRequiredService<IEvaluatorService>();
             
             service?.ScheduleJobs(serviceProvider);
         }

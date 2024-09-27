@@ -8,16 +8,9 @@ namespace Inventory.Products.Endpoints
     using System.Threading;
     using System.Threading.Tasks;
 
-    public class DeleteInventory :
+    public class DeleteInventory(IInventoryRepository repo) :
         Endpoint<DeleteInventoryRequest>
     {
-        private readonly IInventoryRepository _repo;
-
-        public  DeleteInventory(IInventoryRepository repo)
-        {
-            _repo = repo;
-        }
-
         public override void Configure()
         {
             Delete("/inventory");
@@ -30,7 +23,7 @@ namespace Inventory.Products.Endpoints
                         CancellationToken ct)
         {
 
-            await _repo.DeleteInventoryAsync(new Dto.InventoryDto(req.Id, string.Empty));
+            await repo.DeleteInventoryAsync(new Dto.InventoryDto(req.Id, string.Empty));
             return TypedResults.Ok(); //todo fix 
         }
     }

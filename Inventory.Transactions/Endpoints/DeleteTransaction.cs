@@ -1,25 +1,14 @@
-﻿
-namespace Transaction.Transactions.Endpoints
+﻿using FastEndpoints;
+using Inventory.Transactions.Dto;
+using Inventory.Transactions.Services;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
+
+namespace Inventory.Transactions.Endpoints
 {
-    using FastEndpoints;
-    using Inventory.Transactions.Dto;
-    using Inventory.Transactions.Repositories;
-    using Microsoft.AspNetCore.Http;
-    using Microsoft.AspNetCore.Http.HttpResults;
-    using System.Threading;
-    using System.Threading.Tasks;
-
-
-    public class EditTransaction :
+    public class DeleteTransaction(ITransactionService service) :
         Endpoint<DeleteTransactionRequest>
     {
-        private readonly ITransactionRepository _repo;
-
-        public  EditTransaction(ITransactionRepository repo)
-        {
-            _repo = repo;
-        }
-
         public override void Configure()
         {
             Delete("/transaction");
@@ -32,7 +21,7 @@ namespace Transaction.Transactions.Endpoints
                         CancellationToken ct)
         {
             //todo fix optional parameters , just id contructor?
-            await _repo.DeleteTransactionAsync(new TransactionDto(req.Id));
+            await service.DeleteTransactionAsync(new TransactionDto(req.Id));
             return TypedResults.Ok();
         }
     }

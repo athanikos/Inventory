@@ -9,16 +9,9 @@ namespace Inventory.Products.Endpoints
     using System.Threading;
     using System.Threading.Tasks;
 
-    public class AddQuantityMetric :
+    public class AddQuantityMetric(IInventoryRepository repo) :
         Endpoint<AddQuantityMetricRequest>
     {
-        private readonly IInventoryRepository _repo;
-
-        public AddQuantityMetric(IInventoryRepository repo)
-        {
-            _repo = repo;
-        }
-
         public override void Configure()
         {
             Post("/quantitymetric");
@@ -31,7 +24,7 @@ namespace Inventory.Products.Endpoints
             HandleAsync(AddQuantityMetricRequest req,
                         CancellationToken ct)
         {
-            var dto = await _repo.AddQuantityMetricAsync(
+            var dto = await repo.AddQuantityMetricAsync(
                                   new QuantityMetricDto(req.ProductId, req.Value,
                                                        req.EffectiveDate, req.transactionId, req.diff, req.isCancelled));
             return TypedResults.Ok(dto);

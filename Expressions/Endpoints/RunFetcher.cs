@@ -1,4 +1,6 @@
 ﻿
+using Inventory.Expressions.Services;
+
 namespace Inventory.Products.Endpoints
 {
     using FastEndpoints;
@@ -12,11 +14,11 @@ namespace Inventory.Products.Endpoints
         : Endpoint <RunEvaluatorRequest>
     {
 
-        private readonly IEvaluator _evaluator; 
+        private readonly IEvaluatorService _evaluatorService; 
 
-        public RunEvaluator(IEvaluator evaluator)
+        public RunEvaluator(IEvaluatorService evaluatorService)
         {
-            _evaluator = evaluator; 
+            _evaluatorService = evaluatorService; 
         }
 
         public override void Configure()
@@ -30,7 +32,7 @@ namespace Inventory.Products.Endpoints
             HandleAsync(RunEvaluatorRequest req,
                         CancellationToken ct)
         {
-            _evaluator.DoScheduledWork();
+            _evaluatorService.DoScheduledWork();
             await Task.CompletedTask;
             return TypedResults.Ok();
         }

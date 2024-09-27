@@ -21,7 +21,7 @@ namespace Tests.Inventory
     {
         protected override void AddServices(IServiceCollection services, IConfiguration? configuration)
         {
-            List<Assembly> mediatRAssemblies = [typeof(EvaluatorTests).Assembly];
+            List<Assembly> mediatRAssemblies = [typeof(EvaluatorServiceTests).Assembly];
             mediatRAssemblies.Add(typeof(Products.ConfigureServices).Assembly);
             services.AddMediatR(cfg =>
             cfg.RegisterServicesFromAssemblies(mediatRAssemblies.ToArray()));
@@ -47,6 +47,8 @@ namespace Tests.Inventory
             services.AddScoped<IInventoryRepository, PostgresInventoryRepository>();
             services.AddScoped<IModifyQuantityRepository, PostgresModifyQuantityRepository>();
             services.AddScoped<IModifyQuantityService, ModifyQuantityService>();
+            services.AddScoped<IInventoryService, InventoryService>();
+
         }
 
         protected override ValueTask DisposeAsyncCore()

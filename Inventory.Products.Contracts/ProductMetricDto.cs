@@ -1,4 +1,6 @@
-﻿namespace Inventory.Products.Contracts.Dto
+﻿using MediatR;
+
+namespace Inventory.Products.Contracts.Dto
 {
 
     public class ProductMetricDto
@@ -15,24 +17,27 @@
             Guid metricId,
             decimal value, 
             DateTime effectiveDate, 
-            string currency,
+        
             string productCode,
-            string metricCode
+            string metricCode,
+            Guid     unitOfMeasurementId
             )
         {
             ProductId = productId;
             MetricId = metricId;    
             Value = value;
-            EffectiveDate = effectiveDate;
-            Currency = currency;
+            EffectiveDate = effectiveDate; 
             ProductCode = productCode;
-            MetricCode = metricCode;    
+            MetricCode = metricCode;
+            UnitOfMeasurementId = unitOfMeasurementId;
         }
 
         public  static ProductMetricDto NewProductMetricDto(Guid metricId, Guid productId,
-         int quantity, string currency, string productCode, string metricCode)
+            int quantity, string productCode, string metricCode, Guid unitOfMeasurementId)
         {
-            return new ProductMetricDto(productId, metricId, quantity, DateTime.MinValue, currency, productCode, metricCode);
+            return new ProductMetricDto(productId, metricId, quantity, 
+                DateTime.MinValue,
+                 productCode, metricCode, unitOfMeasurementId);
         }
 
 
@@ -53,7 +58,8 @@
 
         public Guid SourceId { get; set; }
 
-
+        public Guid UnitOfMeasurementId { get; set; }
+        
         public override string ToString()
         {
             return "ProductId" +

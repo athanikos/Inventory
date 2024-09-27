@@ -1,9 +1,9 @@
 ﻿
 using Expressions.Entities;
 
-namespace Expressions
+namespace Inventory.Expressions.Services
 {
-    public interface IEvaluator
+    public interface IEvaluatorService
     {
         void DoScheduledWork();
         void  DoScheduledWork(ProductExpression p);

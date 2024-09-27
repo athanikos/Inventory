@@ -9,6 +9,29 @@
         IMediator mediator)
         : ITransactionService
     {
+        public async Task DeleteTransactionAsync(TransactionDto c)
+        {
+            throw new NotImplementedException();
+            await Task.CompletedTask;
+        }
+
+        public async Task<TemplateDto> EditTemplateAsync(TemplateDto inboundTemplate)
+        {
+             return await   repository.EditTemplateAsync(inboundTemplate);
+        }
+
+        public async Task EmptyDb()
+        {
+           await  repository.EmptyDb();
+        }
+
+        public async Task<Guid> RoomsPrepareAsync()
+        {
+            return await  repository. RoomsPrepareAsync();
+        }
+
+        
+        
         public async Task<TransactionDto> GetValuesForNewTransaction(Guid templateId)
         {
             var template = await repository.GetTemplateAsync(templateId);
@@ -70,6 +93,16 @@
             await mediator.Send(command);
             return await repository.GetTransactionAsync(t.Id);
 
+        }
+
+        public async  Task<TemplateDto> AddTemplateAsync(TemplateDto templateDto)
+        {
+            return await repository.AddTemplateAsync(templateDto);
+        }
+
+        public async Task DeleteTemplateAsync(TemplateDto c)
+        {
+            await repository.DeleteTemplateAsync(c);
         }
     }
 }

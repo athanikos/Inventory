@@ -1,6 +1,6 @@
 ﻿using Inventory.Transactions.Contracts;
 
-namespace Inventory.Transactions.Entities
+namespace Inventory.Transactions.Entities.Generic
 {
     public  class Section
     {

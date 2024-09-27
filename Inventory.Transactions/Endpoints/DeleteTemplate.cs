@@ -1,25 +1,13 @@
-﻿
-namespace Transaction.Transactions.Endpoints
+﻿using FastEndpoints;
+using Inventory.Transactions.Services;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
+
+namespace Inventory.Transactions.Endpoints
 {
-    using FastEndpoints;
-    using Inventory.Transactions.Dto;
-    using Inventory.Transactions.Repositories;
-    using Microsoft.AspNetCore.Http;
-    using Microsoft.AspNetCore.Http.HttpResults;
-    using System.Threading;
-    using System.Threading.Tasks;
-
-
-    public class DeleteTemplate :
+    public class DeleteTemplate(ITransactionService service) :
         Endpoint<DeleteTemplateRequest>
     {
-        private readonly ITransactionRepository _repo;
-
-        public DeleteTemplate(ITransactionRepository repo)
-        {
-            _repo = repo;
-        }
-
         public override void Configure()
         {
             Delete("/template");
@@ -32,7 +20,7 @@ namespace Transaction.Transactions.Endpoints
             HandleAsync(DeleteTemplateRequest req,
                         CancellationToken ct)
         {
-            await _repo.DeleteTemplateAsync(new TemplateDto(req.Id));
+            await service.DeleteTemplateAsync(new TemplateDto(req.Id));
             return TypedResults.Ok();
         }
     }

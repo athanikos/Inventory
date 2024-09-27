@@ -8,20 +8,7 @@ namespace Inventory.Products.Entities;
 /// </summary>
 public class ProductMetric
 {
-    public Guid ProductId { get; set; }
-
-    public Guid MetricId { get; set; }
-
-    public string ProductCode { get; set; } = string.Empty;
-
-    public string MetricCode { get; set;  } = string.Empty;
-
-    public decimal Value { get; internal set; }
-
-    public string Currency { get; set; } = string.Empty;
-
-    public DateTime EffectiveDate { get; internal set; }  = DateTime.MinValue;
-
+    
     public static ProductMetric CreateProductMetric(ProductMetricDto m)
     {
         return new ProductMetric()
@@ -30,11 +17,28 @@ public class ProductMetric
             EffectiveDate = m.EffectiveDate,
             ProductId = m.ProductId,
             Value = m.Value,
-            Currency = m.Currency,
+            //    Currency = m.Currency,
             ProductCode = m.ProductCode,
             MetricCode = m.MetricCode
         };
     }
+    
+    public Guid ProductId { get; set; }
+
+    public Guid MetricId { get; set; }
+
+    public string ProductCode { get; set; } 
+
+    public  string MetricCode { get; set;  } 
+
+    public decimal Value { get; internal set; }
+
+ 
+    public Guid UnitOfMeasurementId { get; set; }
+  
+   public DateTime EffectiveDate { get; internal set; } 
+
+  
 
 }
 

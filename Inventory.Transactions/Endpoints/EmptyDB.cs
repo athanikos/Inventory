@@ -1,19 +1,13 @@
-﻿
-namespace Transaction.Transactions.Endpoints
-{
-    using FastEndpoints;
-    using Microsoft.AspNetCore.Http.HttpResults;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using Inventory.Transactions.Repositories;
-    using Microsoft.AspNetCore.Http;
+﻿using FastEndpoints;
+using Inventory.Transactions.Services;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 
-    public class EmptyDB :
+namespace Inventory.Transactions.Endpoints
+{
+    public class EmptyDb(ITransactionService service ) :
         Endpoint<EmptyDBRequest>
     {
-        private readonly ITransactionRepository _repo;
-        public EmptyDB(ITransactionRepository repo)  {  _repo = repo;  }
-
         public override void Configure()
         {
             Post("/transactionsEmptyDB");
@@ -25,7 +19,7 @@ namespace Transaction.Transactions.Endpoints
         public override async Task<Results<Ok, NotFound, ProblemDetails>>
             HandleAsync(EmptyDBRequest edbr, CancellationToken ct)
         {
-            await _repo.EmptyDb();
+            await service.EmptyDb();
             return TypedResults.Ok();
         }
     }

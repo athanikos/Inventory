@@ -39,9 +39,6 @@ namespace Inventory.Notifications.Handlers
                 // Log.Information("UpdateNotificationExpressionValue  _context.SaveChangesAsync");
 
                 try
-
-
-
                 {
                     await _context.SaveChangesAsync();
                 }

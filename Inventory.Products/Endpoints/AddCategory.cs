@@ -1,37 +1,22 @@
-﻿
-
-using Microsoft.AspNetCore.Authorization;
+﻿using FastEndpoints;
+using Inventory.Products.Dto;
+using Inventory.Products.Services;
+using MediatR;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.Identity.Web.Resource;
 
-namespace Category.Products.Endpoints
+namespace Inventory.Products.Endpoints
 {
-    using FastEndpoints;
-    using MediatR;
-    using Microsoft.AspNetCore.Http;
-    using Microsoft.AspNetCore.Http.HttpResults;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using Inventory.Products.Dto;
-    using System;
-    using Inventory.Products.Repositories;
-
     [RequiredScope("products.read")]
 
-    public class AddCategory :
+    public class AddCategory(IMediator mediator, IInventoryService service) :
         Endpoint<AddCategoryRequest>
     {
-        private readonly IMediator _mediator;
-        private readonly IInventoryRepository _repository;
-
-        public  AddCategory(IMediator mediator, IInventoryRepository categoryRepository)
-        {
-            _mediator = mediator;
-            _repository = categoryRepository;    
-        }
+        private readonly IMediator _mediator = mediator;
 
         public override void Configure()
         {
-            
             Post("/Category");
             // to do claims this is per CategoryId claim
             //  something like Admin_<CategoryId>
@@ -42,18 +27,19 @@ namespace Category.Products.Endpoints
                         CancellationToken ct)
         {
 
-            if (await _repository.CategoryIdExistsAsync(req.FatherId))
+            try
             {
-                var categoryDto = await _repository.AddCategoryAsync(new CategoryDto(Guid.NewGuid(), req.Description, req.FatherId));
-                return TypedResults.Ok(categoryDto);
+                  var categoryDto =  await service.AddCategoryAsync(new CategoryDto(Guid.NewGuid(), req.Description, req.FatherId));
+                  return TypedResults.Ok(categoryDto);
             }
-            else
+            catch (Exception ex)
             {
-                AddError("FatherId does not exist ");
+                AddError(ex.Message);
                 ThrowIfAnyErrors(); // If there are errors, execution shouldn't go beyond this point
                 return new FastEndpoints.ProblemDetails(ValidationFailures);
 
             }
+
         }
     }
 

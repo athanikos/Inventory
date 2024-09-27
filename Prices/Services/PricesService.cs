@@ -1,36 +1,25 @@
 ﻿using Hangfire;
-using Inventory.Prices;
-using RestSharp;
-using Entities = Inventory.Prices.Entities;
-using Newtonsoft.Json.Linq;
+using Inventory.Prices.Repositories;
 using Inventory.Products.Contracts;
 using MediatR;
+using Newtonsoft.Json.Linq;
+using RestSharp;
 using Serilog;
-using Inventory.Prices.Repositories;
 
 
-namespace Prices
+namespace Inventory.Prices.Services
 {
     namespace Inventory.Prices
     {
-        public class PricesFetcher : IPricesFetcher
+        public class PricesService(IFetcherRepository repository, IMediator mediator) : IPricesService
         {
             private string _parameterType = "COINGECKO";
-           
-            private readonly IFetcherRepository _repository;
-            private readonly IMediator _mediator;
 
-            private List<Entities.PricesParameter> Parameters { get; set; } =   new List<Entities.PricesParameter>();
+            private List<Entities.PricesParameter> Parameters { get; set; } =   new();
 
-            public PricesFetcher(IFetcherRepository repository, IMediator mediator)
+            public void ScheduleJobs(IServiceProvider serviceProvider)
             {
-                _repository = repository;
-                _mediator = mediator;
-            }
-            
-            public void ScedhuleJobs(IServiceProvider serviceProvider)
-            {
-                Parameters = _repository.GetParameters();
+                Parameters = repository.GetParameters();
 
                 if (string.IsNullOrEmpty(_parameterType))
                     throw new ArgumentNullException(nameof(_parameterType));
@@ -56,11 +45,11 @@ namespace Prices
                     JObject o = JObject.Parse(response.Content);
                     var value = decimal.Parse(o.SelectToken(p.TargetPathForProductCode).ToString());
                     var command = new AddProductMetricCommand(p.ProductId, p.MetricId,
-                        value, DateTime.Now, p.TargetCurrency);
+                        value, DateTime.Now, Constants.CurrencyUnityOfMeasurementId);
 
                     // Log.Information("AddProductMetricCommand  _mediator.Send " + p.ProductId + " " + p.MetricId);
 
-                   await  _mediator.Send(command);
+                   await  mediator.Send(command);
                     
                     // Log.Information("After mediator.send ");
 
@@ -74,10 +63,10 @@ namespace Prices
             }
 
 
-            public async Task  DoScedhuledWork()
+            public async Task  DoScheduledWork()
             {
 
-                var items = _repository.    GetParameters();
+                var items = repository.    GetParameters();
                 foreach (var p in items)
                   await  DoScheduledWork(p);
             }

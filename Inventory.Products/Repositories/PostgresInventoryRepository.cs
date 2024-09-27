@@ -36,16 +36,25 @@ namespace Inventory.Products.Repositories
         }
 
         #region Inventory
-        public bool InventoryIdExists(Guid Id)
+        public bool InventoryIdExists(Guid id)
         {
-            return _context.Inventories.Where(p => p.Id == Id).Any();
+            return _context.Inventories.Any(p => p.Id == id);
         }
 
+        public async Task<InventoryDto> GetInventoryAsync(Guid inventoryId)
+        {
+            return await _context
+                .Inventories.Where(o => o.Id == inventoryId)
+                .Select(i=>new InventoryDto(i.Id,i.Description))
+                .SingleAsync();
+        }
+        
         public async Task<InventoryDto> AddInventoryAsync(InventoryDto c)
         {
-            _context.Inventories.Add(new Entities.Inventory() {Id= c.Id, Description = c.Description });
+            var e = new Entities.Inventory() { Id = c.Id, Description = c.Description };
+            _context.Inventories.Add(e);
             await _context.SaveChangesAsync();
-            return new  InventoryDto(c.Id, c.Description);
+            return await GetInventoryAsync(e.Id);
         }
 
         public async Task<InventoryDto> EditInventoryAsync(InventoryDto c)
@@ -72,38 +81,40 @@ namespace Inventory.Products.Repositories
 
              await _context.SaveChangesAsync();           
         }
-        #endregion 
+        #endregion
 
         public async Task<ProductDto> AddProductAsync(ProductDto c)
         {
-            _context.Products.Add(new Entities.Product()
-            { Description = c.Description, Id = c.Id, Code = c.Code, InventoryId = c.InventoryId });
+            var p = new Product() { Description = c.Description, 
+                Id = c.Id, Code = c.Code, InventoryId = c.InventoryId };
+            
+            _context.Products.Add(p);
 
-            if (c.Metrics!= null)   
             foreach (var m in c.Metrics)
                 DecideNewOrEdit(m);
-            
+
 
             await _context.SaveChangesAsync();
-            return new ProductDto(c.Id, c.Description,c.Code, c.InventoryId, c.Metrics);
+
+            return await GetProductAsync(p.Id);
         }
 
         public async Task<ProductDto> EditProductAsync(ProductDto c)
         {
-            Product e = new Product()
+            Product p = new Product()
             { Description = c.Description, Id = c.Id, Code = c.Code, InventoryId = c.InventoryId };
-            _context.Update(e);
+            _context.Update(p);
 
             foreach (var m in c.Metrics)
                 DecideNewOrEdit(m);
             
             await _context.SaveChangesAsync();
-            return new ProductDto(c.Id, c.Description,c.Code, c.InventoryId, c.Metrics);
+            return await GetProductAsync(p.Id);
         }
 
-        public async  Task<ProductDto> GetProductAsync(Guid Id)
+        private async  Task<ProductDto> GetProductAsync(Guid id)
         {
-            var entity = await  _context.Products.Where(p => p.Id == Id).Select(i => i).SingleAsync();
+            var entity = await  _context.Products.Where(p => p.Id == id).Select(i => i).SingleAsync();
             return new ProductDto(entity.Id,
                                    entity.Description,
                                    entity.Code,
@@ -112,7 +123,7 @@ namespace Inventory.Products.Repositories
                                    );
         }
 
-        public List<string> GetDistinctProductCodes(Guid InventoryId)
+        public List<string> GetDistinctProductCodes(Guid inventoryId)
         {
             if (!_context.Products.Any())
                 return [];
@@ -150,11 +161,11 @@ namespace Inventory.Products.Repositories
         public async Task<ProductMetricDto> GetProductMetricAsync(string productCode, string metricCode, DateTime effectivedate )
         {
            return  await _context.ProductMetrics
-                                 .Where(p=>p.MetricCode== metricCode && p.ProductCode == productCode
+               .Where(p=>p.MetricCode== metricCode && p.ProductCode == productCode
                                         && p.EffectiveDate == effectivedate)
-                                 .Select ( i=> new ProductMetricDto(i.ProductId,i.MetricId, i.Value, i.EffectiveDate, 
-                                                                 i.Currency, i.ProductCode, i.MetricCode))
-                                 .SingleAsync();
+               .Select ( i=> new ProductMetricDto(i.ProductId,i.MetricId, i.Value, 
+                   i.EffectiveDate, i.ProductCode, i.MetricCode,i.UnitOfMeasurementId))
+               .SingleAsync();
         }
 
         public async Task<ProductMetricDto> GetProductMetricAsync(Guid productId, DateTime effectivedate)
@@ -163,7 +174,7 @@ namespace Inventory.Products.Repositories
                                   .Where(p => p.ProductId == productId
                                          && p.EffectiveDate == effectivedate)
                                   .Select(i => new ProductMetricDto(i.ProductId, i.MetricId, i.Value, i.EffectiveDate,
-                                                                  i.Currency, i.ProductCode, i.MetricCode))
+                                                                i.ProductCode, i.MetricCode, i.UnitOfMeasurementId))
                                   .SingleAsync();
         }
 
@@ -177,33 +188,29 @@ namespace Inventory.Products.Repositories
 
         }
                 
-        private void UpdateMetricCodes(Guid ProductId, Guid MetricId, out string productCode, out string metricCode)
+        private void UpdateMetricCodes(Guid productId, Guid metricId, out string productCode, out string metricCode)
         {
             productCode = _context.Products.
-                                 Where(p => p.Id == ProductId).
+                                 Where(p => p.Id == productId).
                                  Select(i => i.Code).Single();
 
             metricCode = _context.Metrics.
-                          Where(p => p.Id == MetricId).
+                          Where(p => p.Id == metricId).
                           Select(i => i.Code).Single();
         }
 
         public void DecideNewOrEdit(ProductMetricDto m)
         {
-            var pm = _context.ProductMetrics.Where
-                (
-                    p => p.MetricId == m.MetricId
-                         && p.ProductId == m.ProductId
-                         && p.EffectiveDate == m.EffectiveDate
-                ).FirstOrDefault(); // needed tolist ? https://stackoverflow.com/questions/61052687/a-command-is-already-in-progress
+            var pm = _context.ProductMetrics.FirstOrDefault(p => p.MetricId == m.MetricId
+                                                                 && p.ProductId == m.ProductId
+                                                                 && p.EffectiveDate == m.EffectiveDate); // needed tolist ? https://stackoverflow.com/questions/61052687/a-command-is-already-in-progress
 
             if (pm != null)
             {
                 pm.ProductId = m.ProductId;
                 pm.Value = m.Value;
-                pm.Currency = m.Currency;
                 pm.ProductCode = m.ProductCode;
-                pm.Currency = m.Currency;
+                pm.UnitOfMeasurementId = m.UnitOfMeasurementId;
                 pm.EffectiveDate = m.EffectiveDate;
                 pm.MetricCode = m.MetricCode;
                 pm.MetricId = m.MetricId;
@@ -215,11 +222,8 @@ namespace Inventory.Products.Repositories
 
         public void DecideNewOrEdit(QuantityMetricDto m)
         {
-            var qm = _context.QuantityMetrics.Where
-                (
-                    p => p.ProductId == m.ProductId
-                         && p.EffectiveDate == m.EffectiveDate
-                ).FirstOrDefault(); // needed tolist ? https://stackoverflow.com/questions/61052687/a-command-is-already-in-progress
+            var qm = _context.QuantityMetrics.FirstOrDefault(p => p.ProductId == m.ProductId
+                                                                  && p.EffectiveDate == m.EffectiveDate); // needed tolist ? https://stackoverflow.com/questions/61052687/a-command-is-already-in-progress
 
             if (qm!=null) 
             {
@@ -241,7 +245,7 @@ namespace Inventory.Products.Repositories
 
         public void UpdateInventoryMetricCodes(InventoryMetricDto m)
         {
-            string InventoryCode = _context.Inventories.
+            string inventoryCode = _context.Inventories.
                                  Where(p => p.Id == m.InventoryId).
                                  Select(i => i.Code).Single();
 
@@ -249,7 +253,7 @@ namespace Inventory.Products.Repositories
                           Where(p => p.Id == m.MetricId).
                           Select(i => i.Code).Single();
 
-            m.InventoryCode = InventoryCode;
+            m.InventoryCode = inventoryCode;
             m.MetricCode = metricCode;
 
         }
@@ -257,10 +261,9 @@ namespace Inventory.Products.Repositories
         public void DecideNewOrEdit(InventoryMetricDto m)
         {
             var metricExists = _context.InventoryMetrics
-                               .Where(  p => p.MetricId == m.MetricId
-                                     && p.InventoryId == m.InventoryId
-                                     && p.EffectiveDate == m.EffectiveDate)
-                               .Any();
+                .Any(p => p.MetricId == m.MetricId
+                          && p.InventoryId == m.InventoryId
+                          && p.EffectiveDate == m.EffectiveDate);
 
             if (metricExists)
                 _context.Update(m);
@@ -283,8 +286,7 @@ namespace Inventory.Products.Repositories
                 _context.Remove(pm);
 
             var p = _context.Products.
-                             Where(p => p.Id == c.Id).
-                             Single();
+                Single(p => p.Id == c.Id);
             _context.Remove(p);
 
             await _context.SaveChangesAsync();
@@ -306,7 +308,7 @@ namespace Inventory.Products.Repositories
 
         public async Task<CategoryDto> AddCategoryAsync(CategoryDto c)
         {
-            _context.Categories.Add(new Entities.Category() { FatherId = c.FatherId, Name = c.Description });
+            _context.Categories.Add(new Category() { FatherId = c.FatherId, Name = c.Description });
             await _context.SaveChangesAsync();
             return new CategoryDto(c.Id, c.Description, c.FatherId);
         }
@@ -327,8 +329,7 @@ namespace Inventory.Products.Repositories
                 _context.Remove(pc);
             
             var e = _context.Categories
-                    .Where(p => p.Id == c.Id)
-                    .Single();
+                .Single(p => p.Id == c.Id);
             _context.Remove(e);
 
             await _context.SaveChangesAsync();
@@ -369,8 +370,7 @@ namespace Inventory.Products.Repositories
                 _context.Remove(pc);
 
             Metric e = _context.Metrics
-                       .Where(p => p.Id == c.Id)
-                       .Single();
+                .Single(p => p.Id == c.Id);
             
             _context.Remove(e);
             await _context.SaveChangesAsync();
@@ -398,12 +398,12 @@ namespace Inventory.Products.Repositories
             /// <summary>
             /// returns the latest by effective date product metric row 
             /// </summary>
-            /// <param name="ProductCode"></param>
+            /// <param name="productCode"></param>
             /// <param name="MetricCode"></param>
             /// <returns></returns>
-        public async Task<ProductMetricDto> GetProductMetricAsync(string ProductCode, string MetricCode)
+        public async Task<ProductMetricDto> GetProductMetricAsync(string productCode, string MetricCode)
         {
-            ProductCode = ProductCode.ToUpper().Trim();
+            productCode = productCode.ToUpper().Trim();
             MetricCode = MetricCode.ToUpper().Trim();
 
 
@@ -413,7 +413,7 @@ namespace Inventory.Products.Repositories
                 // todo cache reuse allcodes field add to repo and do lazy loading ? or refresh evry 
                 var productInfo  =await  _context
                        .Products
-                       .Where(i => i.Code == ProductCode)    
+                       .Where(i => i.Code == productCode)    
                        .Select(i => new { i.Id,  i.Code })
                        .SingleAsync();
 
@@ -432,13 +432,16 @@ namespace Inventory.Products.Repositories
                                                   metricInfo.Id,
                                                   i.Value,
                                                   i.EffectiveDate,
-                                                  Constants.Defaultcurrency, //todo fix currency 
                                                   productInfo.Code,
-                                                  Constants.Quantitycode)).FirstOrDefaultAsync();
+                                                  Constants.Quantitycode,
+                                                  Constants.EmptyUnityOfMeasurementId
+                                                  )).FirstOrDefaultAsync();
 
 
                 if (item != null)
-                    return new ProductMetricDto(item.ProductId,item.MetricId, item.Value,item.EffectiveDate,item.Currency,item.ProductCode,item.MetricCode);
+                    return new ProductMetricDto(item.ProductId,item.MetricId, item.Value,item.EffectiveDate,item.Currency,item.ProductCode
+                        
+                        ,item.UnitOfMeasurementId);
 
                 return new ProductMetricDto(Guid.NewGuid());
             }
@@ -447,15 +450,16 @@ namespace Inventory.Products.Repositories
 
                        return await _context
                        .ProductMetrics
-                       .Where(i => i.ProductCode == ProductCode && i.MetricCode == MetricCode)
+                       .Where(i => i.ProductCode == productCode && i.MetricCode == MetricCode)
                        .OrderByDescending(i => i.EffectiveDate)
                        .Select(i => new ProductMetricDto(i.ProductId,
                                                          i.MetricId,
                                                          i.Value,
                                                          i.EffectiveDate,
-                                                         i.Currency,
+                                                    
                                                          i.ProductCode,
-                                                         i.MetricCode))
+                                                         i.MetricCode,
+                                                         i.UnitOfMeasurementId))
                        .FirstAsync();
 
             }

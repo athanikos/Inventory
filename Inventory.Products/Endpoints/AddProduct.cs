@@ -1,4 +1,6 @@
 ﻿
+using Inventory.Products.Contracts;
+
 namespace Inventory.Products.Endpoints
 {
     using FastEndpoints;
@@ -10,16 +12,8 @@ namespace Inventory.Products.Endpoints
     using System.Threading;
     using System.Threading.Tasks;
 
-    public  class AddProduct 
-        : Endpoint<AddProductRequest>
+    public class AddProduct(IInventoryRepository repo) : Endpoint<AddProductRequest>
     {
-        private readonly IInventoryRepository _repo;
-
-        public  AddProduct(IInventoryRepository repo)
-        {
-            _repo = repo;
-        }
-
         public override void Configure()
         {
             Post("/product");
@@ -35,28 +29,25 @@ namespace Inventory.Products.Endpoints
         {
             var dto = new ProductDto(req.ProductId, req.Description,req.Code, req.InventoryId,req.Metrics);
 
-            if (!_repo.InventoryIdExists(req.InventoryId))
+            if (!repo.InventoryIdExists(req.InventoryId))
             {
                 AddError("Inventory Id does not exist ");
                 ThrowIfAnyErrors(); // If there are errors, execution shouldn't go beyond this point
                 return new ProblemDetails(ValidationFailures);
             }
 
-            if (await _repo.ProductDescriptionOrCategoryIsUsedAsync(dto))
+            if (await repo.ProductDescriptionOrCategoryIsUsedAsync(dto))
             {
                 AddError("Product code or descr is used  ");
                 ThrowIfAnyErrors(); // If there are errors, execution shouldn't go beyond this point
                 return new ProblemDetails(ValidationFailures);
             }
 
-            dto = await _repo.AddProductAsync(dto);
+            dto = await repo.AddProductAsync(dto);
             return TypedResults.Ok(dto);
-           
-
-         
         }
     }
-    public record AddProductRequest
+    public abstract record AddProductRequest
     (Guid ProductId, string Description,string Code, Guid InventoryId, List<ProductMetricDto> Metrics);
 
     

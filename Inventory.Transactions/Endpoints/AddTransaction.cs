@@ -1,24 +1,15 @@
-﻿
-namespace Transaction.Transactions.Endpoints
-{
-    using FastEndpoints;
-    using Microsoft.AspNetCore.Http.HttpResults;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using Inventory.Transactions.Dto;
-    using Inventory.Transactions.Repositories;
-    using Microsoft.AspNetCore.Http;
+﻿using FastEndpoints;
+using Inventory.Transactions.Dto;
+using Inventory.Transactions.Repositories;
+using Inventory.Transactions.Services;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 
-    public class AddTransaction :
+namespace Inventory.Transactions.Endpoints
+{
+    public class AddTransaction(ITransactionService service) :
         Endpoint<AddTransactionRequest>
     {
-        private readonly ITransactionRepository _repo;
-
-        public  AddTransaction(ITransactionRepository repo)
-        {
-            _repo = repo;
-        }
-
         public override void Configure()
         {
             Post("/transaction");
@@ -31,9 +22,7 @@ namespace Transaction.Transactions.Endpoints
             HandleAsync(AddTransactionRequest req,
                         CancellationToken ct)
         {
-
-
-            var dto = await _repo.AddTransactionAsync(
+            var dto = await service.UpdateOrInsertTransaction(
                 new TransactionDto(req.TransactionId,
                                    req.Description,
                                    DateTime.Now,

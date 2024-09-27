@@ -9,16 +9,9 @@ namespace Inventory.Products.Endpoints
     using System.Threading;
     using System.Threading.Tasks;
 
-    public class EditInventory :
+    public class EditInventory(IInventoryRepository repo) :
         Endpoint<EditInventoryRequest>
     {
-        private readonly IInventoryRepository _repo;
-
-        public  EditInventory(IInventoryRepository repo)
-        {
-            _repo = repo;
-        }
-
         public override void Configure()
         {
             Put("/inventory");
@@ -30,7 +23,7 @@ namespace Inventory.Products.Endpoints
             HandleAsync(EditInventoryRequest req,
                         CancellationToken ct)
         {
-            var dto =  await _repo.EditInventoryAsync(new InventoryDto( req.Id , req.Description));
+            var dto =  await repo.EditInventoryAsync(new InventoryDto( req.Id , req.Description));
             return TypedResults.Ok(dto);
         }
     }

@@ -1,25 +1,16 @@
 ﻿
-namespace Transaction.Transactions.Endpoints
-{
-    using FastEndpoints;
-    using Microsoft.AspNetCore.Http.HttpResults;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using Inventory.Transactions.Dto;
-    using Inventory.Transactions.Repositories;
-    using Microsoft.AspNetCore.Http;
-    using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
+using FastEndpoints;
+using Inventory.Transactions.Dto;
+using Inventory.Transactions.Services;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 
-    public class AddTemplate :
+namespace Inventory.Transactions.Endpoints
+{
+    public class AddTemplate(ITransactionService service) :
         Endpoint<AddTemplateRequest>
     {
-        private readonly ITransactionRepository _repo;
-
-        public AddTemplate(ITransactionRepository repo)
-        {
-            _repo = repo;
-        }
-
         public override void Configure()
         {
             Post("/template");
@@ -32,30 +23,27 @@ namespace Transaction.Transactions.Endpoints
             HandleAsync(AddTemplateRequest req,
                         CancellationToken ct)
         {
-            var dto = await _repo.AddTemplateAsync(
+            var dto = await service.AddTemplateAsync(
                 new TemplateDto(Guid.Empty, req.Name, req.Type, DateTime.UtcNow, req.Sections));
                 
             return TypedResults.Ok(dto);
         }
     }
 
-    public class AddTemplateRequest
+    public class AddTemplateRequest(
+        Guid id,
+        string name,
+        TemplateType type,
+        DateTime created,
+        ICollection<SectionDto> sections)
     {
-        public AddTemplateRequest(Guid Id, string Name, TemplateType Type, DateTime Created, ICollection<SectionDto> Sections)
-        {
-            this.Id = Id;
-            this.Name = Name;
-            this.Type = Type;
-            this.Created = Created;
-            this.Sections = Sections;
-        }
+        public Guid Id { get; set; } = id;
+        public string Name { get; set; } = name;
 
-        public Guid Id { get; set; }
-        public string Name { get; set; }
         [JsonConverter(typeof(JsonStringEnumConverter))]
-        public TemplateType Type { get; set; }
-        public DateTime Created { get; set; }
-        public ICollection<SectionDto> Sections { get; set; }
+        public TemplateType Type { get; set; } = type;
 
+        public DateTime Created { get; set; } = created;
+        public ICollection<SectionDto> Sections { get; set; } = sections;
     }
 }

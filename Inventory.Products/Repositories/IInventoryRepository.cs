@@ -7,7 +7,10 @@ namespace Inventory.Products.Repositories
     public interface IInventoryRepository
     {
         Task<InventoryDto> AddInventoryAsync(InventoryDto dto);
-        bool InventoryIdExists(Guid Id);
+
+        Task<InventoryDto> GetInventoryAsync(Guid inventoryId);
+        
+        bool InventoryIdExists(Guid id);
         Task<InventoryDto> EditInventoryAsync(InventoryDto c);
         Task DeleteInventoryAsync(InventoryDto c);
 

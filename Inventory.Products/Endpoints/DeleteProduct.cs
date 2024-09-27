@@ -1,4 +1,6 @@
 ﻿
+using Inventory.Products.Contracts;
+
 namespace Inventory.Products.Endpoints
 {
     using FastEndpoints;
@@ -10,16 +12,8 @@ namespace Inventory.Products.Endpoints
     using System.Threading;
     using System.Threading.Tasks;
 
-    public  class DeleteProduct 
-        : Endpoint<DeleteProductRequest>
+    public class DeleteProduct(IInventoryRepository repo) : Endpoint<DeleteProductRequest>
     {
-        private readonly IInventoryRepository _repo;
-
-        public  DeleteProduct(IInventoryRepository repo)
-        {
-            _repo = repo;
-        }
-
         public override void Configure()
         {
             Delete("/product");
@@ -32,7 +26,7 @@ namespace Inventory.Products.Endpoints
             HandleAsync(DeleteProductRequest req,
                         CancellationToken ct)
         {
-            await _repo.DeleteProductAsync(new ProductDto(req.Id, string.Empty,string.Empty, Guid.Empty, new List<ProductMetricDto>()));
+            await repo.DeleteProductAsync(new ProductDto(req.Id, string.Empty,string.Empty, Guid.Empty, new List<ProductMetricDto>()));
             return TypedResults.Ok(); //todo fix 
             
         }

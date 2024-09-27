@@ -1,5 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Prices.Inventory.Prices;
+﻿using Inventory.Prices.Services;
+using Microsoft.Extensions.DependencyInjection;
 
 
 namespace Inventory.Prices
@@ -12,9 +12,9 @@ namespace Inventory.Prices
         {
             var serviceProvider = services.BuildServiceProvider();
             var service = serviceProvider.
-                GetRequiredService<IPricesFetcher>();
+                GetRequiredService<IPricesService>();
 
-            service.ScedhuleJobs(serviceProvider);
+            service.ScheduleJobs(serviceProvider);
         }
 
 

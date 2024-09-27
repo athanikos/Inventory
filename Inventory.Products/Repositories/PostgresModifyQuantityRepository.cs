@@ -8,16 +8,9 @@ namespace Inventory.Products.Repositories
     /// <summary>
     /// todo move buinsess code to service this does not seem to be repo code
     /// </summary>
-    public  class PostgresModifyQuantityRepository : IModifyQuantityRepository
+    public class PostgresModifyQuantityRepository(ProductsDbContext context) : IModifyQuantityRepository
     {
-        private ProductsDbContext _context;
-
-        public ProductsDbContext Context { get => _context; set => _context = value; }
-
-        public PostgresModifyQuantityRepository(ProductsDbContext context)
-        {
-           _context = context;
-        }
+        public ProductsDbContext Context { get => context; set => context = value; }
 
         public async Task<QuantityMetric?> GetPreviousWithLockAsync(ModifyQuantityDto dto)
         {
@@ -115,7 +108,7 @@ namespace Inventory.Products.Repositories
 
         public QuantityMetric EditQuantityMetric(Guid productId,  DateTime effectiveDate, bool IsCancelled)
         {
-            var qm = _context.QuantityMetrics.Where 
+            var qm = context.QuantityMetrics.Where 
                 (p=>p.ProductId == productId  && p.EffectiveDate == effectiveDate)
                 .FirstOrDefault();
 
@@ -128,7 +121,7 @@ namespace Inventory.Products.Repositories
 
         public async Task<List<ModifyQuantityDto>> GetQuantityMetricsPostEffectiveDate(Guid productId, DateTime minimumEffectiveDate)
         {
-          return  await _context.QuantityMetrics.Where
+          return  await context.QuantityMetrics.Where
                 (p => p.ProductId == productId && p.EffectiveDate == minimumEffectiveDate).
                 Select (qm=> new ModifyQuantityDto()
                 {
@@ -142,7 +135,7 @@ namespace Inventory.Products.Repositories
 
         public async Task<List<ModifyQuantityDto>> GetQuantityMetrics(Guid transactionId)
         {
-            return await _context.QuantityMetrics.Where
+            return await context.QuantityMetrics.Where
                   (p => p.TransactionId == transactionId).
                   Select(qm => new ModifyQuantityDto()
                   {
@@ -160,7 +153,7 @@ namespace Inventory.Products.Repositories
 
         public async Task SaveChangesAsync()
         {
-            await _context.SaveChangesAsync();
+            await context.SaveChangesAsync();
         }
 
     

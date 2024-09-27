@@ -1,14 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
-using Prices.Inventory.Prices;
 using Hangfire;
-using Serilog;
 using MediatR;
 using Hangfire.MemoryStorage;
-using Hangfire.SqlServer;
 using Inventory.Prices.Repositories;
-
+using Inventory.Prices.Services;
+using Inventory.Prices.Services.Inventory.Prices;
 
 
 namespace Inventory.Prices
@@ -46,10 +44,10 @@ namespace Inventory.Prices
             //.WriteTo.File("logs/Net6Tester.txt", rollingInterval: RollingInterval.Day)
             //.CreateLogger();
 
-            services.AddScoped<IPricesFetcher, PricesFetcher>(
+            services.AddScoped<IPricesService, PricesService>(
             sp =>
             {   
-                return new PricesFetcher(sp.GetRequiredService<IFetcherRepository>(), 
+                return new PricesService(sp.GetRequiredService<IFetcherRepository>(), 
                                           sp.GetRequiredService<IMediator>()
                                           );
             }

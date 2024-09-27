@@ -1,4 +1,4 @@
-﻿namespace Inventory.Transactions.Entities
+﻿namespace Inventory.Transactions.Entities.Generic
 {
     /// <summary>
     /// configuration holder for transacationItems depedning on 

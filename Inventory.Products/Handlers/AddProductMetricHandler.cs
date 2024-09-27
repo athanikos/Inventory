@@ -6,30 +6,23 @@ using Serilog;
 
 namespace Inventory.Products.Handlers
 {
-    public class AddProductMetricHandler :
+    public class AddProductMetricHandler(
+        IInventoryRepository
+            repository) :
         IRequestHandler<AddProductMetricCommand, dto.ProductMetricDto>
     {
-        private readonly IInventoryRepository _repository;
-
-        public AddProductMetricHandler(IInventoryRepository
-            repository) => _repository = repository;
-
-       
         public async Task<dto.ProductMetricDto> Handle(AddProductMetricCommand request,
             CancellationToken cancellationToken)
         {
 
             var dto = new dto.ProductMetricDto(request.ProductId,
-                                                   request.MetricId,
-                                                   request.Value,
-                                                   request.EffectiveDate,
-                                                   request.Currency,
-                                                   string.Empty,
-                                                   string.Empty
+                request.MetricId,request.Value,
+                request.EffectiveDate,string.Empty,
+                string.Empty, request.UnitOfMeasurementId
                              );
             try
             {
-                await _repository.AddOrEditProductMetricAsync(dto);
+                await repository.AddOrEditProductMetricAsync(dto);
             }
             catch (Exception ex)
             {

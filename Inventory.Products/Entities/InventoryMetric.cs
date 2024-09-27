@@ -1,5 +1,4 @@
 ﻿using Inventory.Products.Contracts;
-using Inventory.Products.Contracts.Dto;
 
 namespace Inventory.Products.Entities
 {
@@ -15,7 +14,7 @@ namespace Inventory.Products.Entities
 
         public decimal Value { get; internal set; }
 
-        public string Currency { get; set; } = string.Empty;
+        public Guid UnitOfMeasurementId { get; set; }
 
         public DateTime EffectiveDate { get; internal set; }
         = DateTime.MinValue;
@@ -27,10 +26,11 @@ namespace Inventory.Products.Entities
                 MetricId = m.MetricId,
                 EffectiveDate = m.EffectiveDate,
                 InventoryId = m.InventoryId,
-                Value = m.Value,
-                Currency = m.Currency,
+                Value = m.Value, 
                 InventoryCode = m.InventoryCode,
-                MetricCode = m.MetricCode
+                MetricCode = m.MetricCode,
+                UnitOfMeasurementId = m.UnitOfMeasurementId
+ 
             };
         }
 

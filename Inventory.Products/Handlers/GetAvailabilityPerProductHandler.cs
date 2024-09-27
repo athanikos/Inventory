@@ -8,6 +8,7 @@ public class GetAvailabilityPerProductHandler(IInventoryRepository repository) :
     IRequestHandler<GetAvailabilityPerProductCommand,
         List<ModifyQuantityDto>>
 {
+    private readonly IInventoryRepository _repository = repository;
 
     public Task<List<ModifyQuantityDto>> Handle(GetAvailabilityPerProductCommand request, CancellationToken cancellationToken)
     {

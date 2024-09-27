@@ -5,6 +5,44 @@ A generic Inventory Implementation that allows:
     - Dynamic metrics creation via ProductMetric table. Create formulas for any type of metric. 
     - Notify on threshold 
 
+### Transactions Service 
+
+Inserts, Updates Transactions. Gets Default new Transaction from template.
+
+### QuantityModifyService
+Supports Add/Subtract through buy/sell and let through quantity metric table. 
+Supports cancelling entries.
+Chain updates quantity post effective date. 
+
+
+### Expressions Service
+Product Based Formula
+Inventory Based Formula 
+Boolean Formulas 
+
+### Notifications Service 
+
+TBD 
+
+
+#### LivePricesService
+
+TBD 
+
+
+
+
+
+
+### Availability Service 
+
+
+### Rates Service 
+
+
+
+
+
 
 ### Quantity via QuantityMetric    
 
@@ -57,11 +95,7 @@ Evaluates three types of expressions:
     Product Expressions ie these are expressions that compute some attribute for a product . example PRICE([ADA]) * VALUE([ADA]) 
     Inventory Expressions. computes some attribute per inventory . Example SUM(VALUE([ALL])) 
 
-### Tests Module 
 
-Runs end to end testing . Currently tests the evaluator componenent. 
-
-    
 ### Authorization rules 
     
 Authorization rules are applied per user per inventory.
@@ -118,10 +152,11 @@ ClaimType = CLIENTINVENTORY claimValue = <InventoryId>
 #### Read Invoices module (extract text and insert) 
 
 #### Notify on threshold 
-       Set a threshold and notify
+
+Set a threshold and notify
         
 #### Compute total portofolio value & display   
-    Sum all balances 
+Sum all balances 
 
 #### any product pricing through ebay ?
 
@@ -129,20 +164,29 @@ ClaimType = CLIENTINVENTORY claimValue = <InventoryId>
 
 ### Rooms to let 
 
-eaxh room is a product 
-a price per day can be done via prosuct metric 
-a let action can happen via transaction 
-let is similar to sell having an end date inclusive - need to check schema 
-let subtracts from quantity - can i do unlet with some effective date ?
+Stores Room as product.
+Update Rooms quantity via Transaction. 
+Allows Let via Transaction.
 
-### Transactions 
+
+
+Room management 
+
+Each room is a product. Rooms are added via product management.
+All rooms are created under an inventoryId.
+To add quantity an init transaction that buys a room should be created.
+
+
+Rates 
+
+A let price per day is added via Product Metric table.
+A let action can happen via transactions service. 
 
 
 #### invoice items 
 
 dynamic fields 
 for rooms it has line items :
-
 
 quantity - entered and validated (days)
 price per day - computed by product metrics 

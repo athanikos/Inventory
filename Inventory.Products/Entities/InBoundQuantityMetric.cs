@@ -1,6 +1,7 @@
 ﻿namespace Inventory.Products.Entities
 {
-
+   // todo remove ?
+   
     public class InBoundQuantityMetric : QuantityMetric
     {
         public RecordSource Source { get; set; }

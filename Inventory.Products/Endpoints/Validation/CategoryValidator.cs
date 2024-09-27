@@ -1,5 +1,4 @@
-﻿using Category.Products.Endpoints;
-using FastEndpoints;
+﻿using FastEndpoints;
 using FluentValidation;
 
 

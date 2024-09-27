@@ -8,6 +8,17 @@ namespace Inventory.Transactions.Services
         Task<TransactionDto> UpdateOrInsertTransaction(TransactionDto transaction);
         Task<TransactionDto> CancelTransaction(TransactionDto transaction);
 
+        Task DeleteTransactionAsync(TransactionDto c);
+        
+        Task DeleteTemplateAsync(TemplateDto c);
+        Task<TemplateDto> AddTemplateAsync(TemplateDto templateDto);
+
+         Task<TemplateDto> EditTemplateAsync(TemplateDto inboundTemplate);
+
+
+         Task EmptyDb();
+         
+         Task<Guid> RoomsPrepareAsync();
 
 
     }

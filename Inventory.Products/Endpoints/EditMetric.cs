@@ -9,16 +9,9 @@ namespace Inventory.Products.Endpoints
     using Inventory.Products.Repositories;
     using Inventory.Products.Contracts.Dto;
 
-    public class EditMetric :
+    public class EditMetric(IInventoryRepository repo) :
         Endpoint<EditMetricRequest>
     {
-        private readonly IInventoryRepository _repo;
-
-        public EditMetric(IInventoryRepository repo)
-        {
-            _repo = repo;
-        }
-
         public override void Configure()
         {
             Put("/metric");
@@ -31,7 +24,7 @@ namespace Inventory.Products.Endpoints
                         CancellationToken ct)
         {
         
-            var dto =  await _repo.EditMetricAsync(new MetricDto(
+            var dto =  await repo.EditMetricAsync(new MetricDto(
                 req.Id, req.Description, req.Code, req.SourceId));
 
             return TypedResults.Ok(dto);

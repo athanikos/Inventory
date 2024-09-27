@@ -11,16 +11,9 @@ namespace Source.Products.Endpoints
     using System;
     using Inventory.Products.Repositories;
 
-    public class AddSource :
+    public class AddSource(IInventoryRepository repository) :
         Endpoint<AddSourceRequest>
     {
-        private readonly IInventoryRepository _repository;
-
-        public  AddSource(IInventoryRepository repository)
-        {
-            _repository = repository;    
-        }
-
         public override void Configure()
         {
             Post("/Source");
@@ -34,7 +27,7 @@ namespace Source.Products.Endpoints
                         CancellationToken ct)
         {
                 var dto = new SourceDto(Guid.NewGuid(), req.Description);
-                await _repository.AddSourceAsync(dto);
+                await repository.AddSourceAsync(dto);
                 return TypedResults.Ok(dto);
         }
     }

@@ -13,12 +13,12 @@ namespace Tests.Inventory
     {
         public Guid ProductId { get; set; }
         public Guid TemplateId { get; set; }
-        public Guid TransactionId { get; set; }
-        public Guid QuantityId  { get; set; }   
+        public Guid TransactionId { get; private set; }
+        public Guid QuantityId  { get; private set; }   
 
-        public required ITransactionRepository TransactionRepo { get; set; }
-        public required IInventoryRepository InventoryRepo { get; set; }
-        public required IModifyQuantityService ModifyQuantityService { get; set; }
+        public required ITransactionRepository TransactionRepo { get; init; }
+        public required IInventoryRepository InventoryRepo { get; init; }
+        public required IModifyQuantityService ModifyQuantityService { get; init; }
 
         private const string RoomProductCode = "Room1";
         private const string Inventory = "ROOMS";
@@ -28,37 +28,41 @@ namespace Tests.Inventory
         private const string QuantityCode = "QUANTITY";
         private const string PriceCode = "PRICE";
 
-        public static async Task<TestSetup> ClearDb(ITestOutputHelper _testOutputHelper, TestFixture fixture)
+        public static async Task<TestSetup> ClearDb(ITestOutputHelper testOutputHelper, TestFixture fixture)
         {
             TestSetup output = new TestSetup()
             {
-                InventoryRepo = fixture.GetService<IInventoryRepository>(_testOutputHelper)!,
-                TransactionRepo = fixture.GetService<ITransactionRepository>(_testOutputHelper)!,
-                ModifyQuantityService = fixture.GetService<IModifyQuantityService>(_testOutputHelper)!
+                InventoryRepo = fixture.GetService<IInventoryRepository>(testOutputHelper)!,
+                TransactionRepo = fixture.GetService<ITransactionRepository>(testOutputHelper)!,
+                ModifyQuantityService = fixture.GetService<IModifyQuantityService>(testOutputHelper)!
             };
             output.InventoryRepo.EmptyDB();
             await output.TransactionRepo.EmptyDb();
             return output;
         }
 
-        public static async Task<TestSetup> Setup(ITestOutputHelper _testOutputHelper, TestFixture fixture, string productCode = RoomProductCode )
+        public static async Task<TestSetup> Setup(ITestOutputHelper testOutputHelper, TestFixture fixture, string productCode = RoomProductCode )
         {
 
             TestSetup output = new TestSetup()
             {
-                InventoryRepo = fixture.GetService<IInventoryRepository>(_testOutputHelper)!,
-                TransactionRepo = fixture.GetService<ITransactionRepository>(_testOutputHelper)!,
-                ModifyQuantityService = fixture.GetService<IModifyQuantityService>(_testOutputHelper)!
+                InventoryRepo = fixture.GetService<IInventoryRepository>(testOutputHelper)!,
+                TransactionRepo = fixture.GetService<ITransactionRepository>(testOutputHelper)!,
+                ModifyQuantityService = fixture.GetService<IModifyQuantityService>(testOutputHelper)!
             };
             output.InventoryRepo.EmptyDB();
             await output.TransactionRepo.EmptyDb();
           
-            var InventoryId = (await output.InventoryRepo.AddInventoryAsync(new InventoryDto(Guid.NewGuid(), Inventory))).Id;
-            var sourceId = (await output.InventoryRepo.AddSourceAsync(new SourceDto(Guid.NewGuid(), SourceName))).Id;
-            var metricId = (await output.InventoryRepo.AddMetricAsync(MetricDto.NewMetricDto(sourceId, Constants.Quantitycode))).Id;
-            ProductDto prodDto = ProductDto.NewProductDto(InventoryId, productCode);
+            var inventoryId = (await output.InventoryRepo.AddInventoryAsync(new InventoryDto(Guid.NewGuid(), 
+                Inventory))).Id;
+            var sourceId = (await output.InventoryRepo.AddSourceAsync(new SourceDto(Guid.NewGuid(), 
+                SourceName))).Id;
+            var metricId = (await output.InventoryRepo.AddMetricAsync(MetricDto.NewMetricDto(sourceId, 
+                Constants.Quantitycode))).Id;
+            ProductDto prodDto = ProductDto.NewProductDto(inventoryId, productCode);
             output.TemplateId = await output.TransactionRepo.RoomsPrepareAsync();
-            output.TransactionId = (await output.TransactionRepo.AddTransactionAsync(new TransactionDto(Guid.NewGuid(), "", DateTime.Now, output.TemplateId, null))).Id;
+            output.TransactionId = (await output.TransactionRepo.AddTransactionAsync(new TransactionDto(Guid.NewGuid(),
+                "", DateTime.Now, output.TemplateId, null))).Id;
             output.ProductId = (await output.InventoryRepo.AddProductAsync(prodDto)).Id;
             output.QuantityId = metricId;
             return output;

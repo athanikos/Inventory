@@ -3,13 +3,11 @@ using System.Reflection;
 
 namespace Inventory.Prices;
 
-public  class PricesDbContext : DbContext
+public class PricesDbContext(
+    DbContextOptions<PricesDbContext>
+        options) : DbContext(options)
 {
-        public PricesDbContext(DbContextOptions<PricesDbContext>
-            options) :
-            base(options)  { }
-           
-        public     DbSet<Entities.PricesParameter> Parameters { get; set; }
+    public     DbSet<Entities.PricesParameter> Parameters { get; set; }
      
          protected override void OnModelCreating
          (ModelBuilder modelBuilder)

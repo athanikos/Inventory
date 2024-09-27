@@ -1,38 +1,34 @@
 ﻿using Inventory.Transactions.Contracts;
 using Inventory.Transactions.Dto;
 using Inventory.Transactions.Entities;
+using Inventory.Transactions.Entities.Generic;
 using Microsoft.EntityFrameworkCore;
 
 namespace Inventory.Transactions.Repositories.Postgres
 {
-    public class PostgresTransactionRepository :
+    public class PostgresTransactionRepository(TransactionsDbContext context) :
         ITransactionRepository
     {
-        private readonly TransactionsDbContext _context;
-
-        public PostgresTransactionRepository(TransactionsDbContext context)
-        { _context = context; }
-
         public async Task EmptyDb()
         {
-            _context.Values.RemoveRange(_context.Values);
-            _context.Fields.RemoveRange(_context.Fields);
-            _context.Sections.RemoveRange(_context.Sections);
+            context.Values.RemoveRange(context.Values);
+            context.Fields.RemoveRange(context.Fields);
+            context.Sections.RemoveRange(context.Sections);
        
-            _context.TransactionSectionGroups.RemoveRange(_context.TransactionSectionGroups);
-            _context.TransactionSections.RemoveRange(_context.TransactionSections);
-            _context.Transactions.RemoveRange(_context.Transactions);
-            _context.Templates.RemoveRange(_context.Templates);
+            context.TransactionSectionGroups.RemoveRange(context.TransactionSectionGroups);
+            context.TransactionSections.RemoveRange(context.TransactionSections);
+            context.Transactions.RemoveRange(context.Transactions);
+            context.Templates.RemoveRange(context.Templates);
 
-            await _context.SaveChangesAsync();
+            await context.SaveChangesAsync();
         }
 
         #region Templates
-        public async Task<TemplateDto> GetTemplateAsync(Guid Id)
+        public async Task<TemplateDto> GetTemplateAsync(Guid id)
         {
-            var sections = await GetSectionsAsync(Id);
+            var sections = await GetSectionsAsync(id);
 
-            return await _context.Templates.Where(o => o.Id == Id)
+            return await context.Templates.Where(o => o.Id == id)
                                            .Select(i => new TemplateDto(i.Id, i.Name, i.Type, i.Created, sections))
                                            .SingleAsync();
 
@@ -46,16 +42,14 @@ namespace Inventory.Transactions.Repositories.Postgres
                                         Name = dto.Name,
                                          Type = dto.Type 
                                     };
-            _context.Templates.Add(t);
-            await _context.SaveChangesAsync(); //todo do work in context avoid saving per level 
+            context.Templates.Add(t);
+            await context.SaveChangesAsync(); //todo do work in context avoid saving per level 
 
-
-            if (dto.Sections != null)
-                foreach (var s in dto.Sections)
-                {
-                    s.TemplateId = t.Id;
-                    await AddSection(s);
-                }
+            foreach (var s in dto.Sections)
+            {
+                s.TemplateId = t.Id;
+                await AddSection(s);
+            }
 
 
             return await GetTemplateAsync(t.Id);
@@ -67,7 +61,7 @@ namespace Inventory.Transactions.Repositories.Postgres
 
             foreach (var sec in inboundTemplate.Sections)
             {
-                if (inStoreTemplate.Sections.Where(t => sec.TemplateId == t.Id).Any())
+                if (inStoreTemplate.Sections.Any(t => sec.TemplateId == t.Id))
                     EditSection(sec);
                 else
                     await AddSection(sec);
@@ -75,34 +69,29 @@ namespace Inventory.Transactions.Repositories.Postgres
 
             foreach (var storedSection in inStoreTemplate.Sections)
             {
-                if (inboundTemplate.Sections.Where(t => storedSection.TemplateId == t.Id).Any() == false)
+                if (inboundTemplate.Sections.Any(t => storedSection.TemplateId == t.Id) == false)
                     DeleteSection(storedSection);
             }
 
-            await _context.SaveChangesAsync();
+            await context.SaveChangesAsync();
             return await GetTemplateAsync(inStoreTemplate.Id);
         }
 
         public async Task DeleteTemplateAsync(TemplateDto c)
         {
-            Template t = _context.Templates.Where(p => p.Id == c.Id).Single();
-            if (t != null)
-                foreach (var item in t.Sections)
-                    DeleteSection(new SectionDto(t.Id));
+            Template t = context.Templates.Include(template => template.Sections).Single(p => p.Id == c.Id);
+            foreach (var item in t.Sections)
+                DeleteSection(new SectionDto(t.Id));
 
-            _context.Remove(t);
-
-
-
-   
-            await _context.SaveChangesAsync();
+            context.Remove(t);
+            await context.SaveChangesAsync();
         }
         #endregion Templates 
 
         #region Sections 
-        public async Task<ICollection<SectionDto>> GetSectionsAsync(Guid TemplateId)
+        public async Task<ICollection<SectionDto>> GetSectionsAsync(Guid templateId)
         {
-            return await _context.Sections.Where(o => o.TemplateId == TemplateId)
+            return await context.Sections.Where(o => o.TemplateId == templateId)
                            .Select(i => new SectionDto()
                            {
                                Id = i.Id,
@@ -112,7 +101,7 @@ namespace Inventory.Transactions.Repositories.Postgres
                            }).ToListAsync();
         }
 
-        public async Task AddSection(SectionDto c)
+        private async Task AddSection(SectionDto c)
         {
             List<Field> fields = [];
             Section s = new Section()
@@ -124,8 +113,8 @@ namespace Inventory.Transactions.Repositories.Postgres
                 SectionType = c.SectionType
 
             };
-            _context.Sections.Add(s);
-            await _context.SaveChangesAsync();
+            context.Sections.Add(s);
+            await context.SaveChangesAsync();
 
             foreach (var f in c.Fields)
                 fields.Add(new Field()
@@ -137,14 +126,14 @@ namespace Inventory.Transactions.Repositories.Postgres
                      Type = f.Type,
                 });
 
-            await _context.SaveChangesAsync();
+            await context.SaveChangesAsync();
 
         }
 
-        public void EditSection(SectionDto inboundSection)
+        private void EditSection(SectionDto inboundSection)
         {
 
-            var inStoreSection = _context.Sections.Where(i => i.Id == inboundSection.Id).Single();
+            var inStoreSection = context.Sections.Include(section => section.Fields).Single(i => i.Id == inboundSection.Id);
 
             Section f = new ()
             { Id = inboundSection.Id, Name = inboundSection.Name, TemplateId = inboundSection.TemplateId, SectionType = inboundSection.SectionType };
@@ -158,47 +147,47 @@ namespace Inventory.Transactions.Repositories.Postgres
             
             foreach (var storedField in inStoreSection.Fields)
             {
-                if (inboundSection.Fields.Where(t => storedField.SectionId == t.SectionId).Any() == false)
+                if (inboundSection.Fields.Any(t => storedField.SectionId == t.SectionId) == false)
                     DeleteField(new FieldDto(storedField.Id));
             }
-            _context.Update(f);
+            context.Update(f);
         }
 
         public void DeleteSection(SectionDto dto)
         {
-            Section s = _context.Sections.Where(p => p.Id == dto.Id).Single();
-            _context.Remove(s);
+            Section s = context.Sections.Include(section => section.Fields).Single(p => p.Id == dto.Id);
+            context.Remove(s);
 
             foreach (Field f in s.Fields)
-                _context.Remove(f);
+                context.Remove(f);
 
         }
 
         #endregion 
 
         #region Fields 
-        public async Task<ICollection<FieldDto>> GetFieldsAsync(Guid TemplateId)
+        public async Task<ICollection<FieldDto>> GetFieldsAsync(Guid templateId)
         {
-            var SectionId = await _context.Sections
-                            .Where(o => o.TemplateId == TemplateId)
+            var SectionId = await context.Sections
+                            .Where(o => o.TemplateId == templateId)
                             .Select(i=>i.Id).SingleOrDefaultAsync();  
 
 
-            return await _context.Fields.Where(o => o.SectionId == SectionId)
+            return await context.Fields.Where(o => o.SectionId == SectionId)
                            .Select(i => new FieldDto()
                            {
                                Id = i.Id,
                                Expression = i.Expression,
                                Name = i.Name,
                                Type = i.Type,
-                               TemplateId = TemplateId,
+                               TemplateId = templateId,
                                SectionId = i.SectionId,
                            }).ToListAsync();
         }
 
-        public void AddField(FieldDto c)
+        private void AddField(FieldDto c)
         {
-            _context.Fields.Add(new Field()
+            context.Fields.Add(new Field()
             {
                 Id = c.Id,
                 Expression = c.Expression,
@@ -208,7 +197,7 @@ namespace Inventory.Transactions.Repositories.Postgres
             });
         }
 
-        public void EditField(FieldDto dto)
+        private void EditField(FieldDto dto)
         {
             Field f = new Field()
             {
@@ -218,26 +207,27 @@ namespace Inventory.Transactions.Repositories.Postgres
                 Type = dto.Type,
                 SectionId = dto.SectionId
             };
-            _context.Update(f);
+            context.Update(f);
         }
 
         public void DeleteField(FieldDto dto)
         {
-            Field f = _context.Fields.Where(p => p.Id == dto.Id).Single();
-            _context.Remove(f);
+            Field f = context.Fields.Single(p => p.Id == dto.Id);
+            context.Remove(f);
         }
         #endregion Fields 
 
         #region Values
 
-        public async Task<ICollection<ValueDto>> GetTransactionValuesAsync(Guid TransactionId)
+        public async Task<ICollection<ValueDto>>
+            GetTransactionValuesAsync(Guid transactionId)
         {
 
-            var query = from value in _context.Values
-                        where value.TransactionId == TransactionId
-                        join sectionGroup in _context.TransactionSectionGroups
+            var query = from value in context.Values
+                        where value.TransactionId == transactionId
+                        join sectionGroup in context.TransactionSectionGroups
                         on value.TransactionSectionGroupId equals sectionGroup.Id
-                        join section in _context.TransactionSections
+                        join section in context.TransactionSections
                         on sectionGroup.Id equals section.Id
                         select new ValueDto()
                         {
@@ -245,7 +235,7 @@ namespace Inventory.Transactions.Repositories.Postgres
                             FieldId = value.FieldId,
                             GroupValue = sectionGroup.GroupValue,
                             Text = value.Text,
-                            TransactionId = TransactionId,
+                            TransactionId = transactionId,
                             TransactionSectionGroupId = value.TransactionSectionGroupId,
                             TransactionSectionType = section.TransactionSectionType
                         };
@@ -255,7 +245,7 @@ namespace Inventory.Transactions.Repositories.Postgres
 
         }
 
-        public void AddValue(ValueDto dto, TransactionSectionGroup tsg)
+        private void AddValue(ValueDto dto, TransactionSectionGroup tsg)
         { //todo use mapper
             tsg.Values.Add(
 
@@ -272,7 +262,7 @@ namespace Inventory.Transactions.Repositories.Postgres
 
         }
 
-        public void EditValue(ValueDto dto, TransactionSectionGroup tsg)
+        private void EditValue(ValueDto dto, TransactionSectionGroup tsg)
         {
             var v = new Value()
             {
@@ -284,13 +274,13 @@ namespace Inventory.Transactions.Repositories.Postgres
             };
 
             tsg.Values.Add(v);
-            _context.Entry(v).State = EntityState.Modified;
+            context.Entry(v).State = EntityState.Modified;
         }
 
         public void DeleteValue(ValueDto dto)
         {
-            Value f = _context.Values.Where(p => p.Id == dto.Id).Single();
-            _context.Remove(f);
+            Value f = context.Values.Single(p => p.Id == dto.Id);
+            context.Remove(f);
         }
 
         #endregion Values 
@@ -310,22 +300,21 @@ namespace Inventory.Transactions.Repositories.Postgres
                 TemplateId = dto.TemplateId
 
             };
-            _context.Transactions.Add(t);
+            context.Transactions.Add(t);
             
-            if (dto.Sections!=null)
-                foreach (var ts in dto.Sections)
-                    AddTransactionSection(
-                                   t
-                                   , new TransactionSectionDto()
-                                   {
-                                       Id = ts.Id,
-                                       TransactionId = t.Id,
-                                       TransactionSectionType = ts.TransactionSectionType,
-                                       SectionGroups = ts.SectionGroups,
-                                   }
-                   );
+            foreach (var ts in dto.Sections)
+                AddTransactionSection(
+                    t
+                    , new TransactionSectionDto()
+                    {
+                        Id = ts.Id,
+                        TransactionId = t.Id,
+                        TransactionSectionType = ts.TransactionSectionType,
+                        SectionGroups = ts.SectionGroups,
+                    }
+                );
 
-            await _context.SaveChangesAsync();
+            await context.SaveChangesAsync();
             return await GetTransactionAsync(t.Id);
         }
 
@@ -333,7 +322,7 @@ namespace Inventory.Transactions.Repositories.Postgres
         {
             var transactionSections = await GetTransactionSectionsAsync(Id);
 
-            return await _context.Transactions.Where(o => o.Id == Id)
+            return await context.Transactions.Where(o => o.Id == Id)
                                            .Select(i =>
                                                         new TransactionDto(
                                                         i.Id,
@@ -348,7 +337,8 @@ namespace Inventory.Transactions.Repositories.Postgres
 
         public async Task<TransactionDto> EditTransactionAsync(TransactionDto inboundTransaction)
         {
-            Entities.Transaction inStoreTransaction = await _context.Transactions.Where(p => p.Id == inboundTransaction.Id).SingleAsync();
+            var inStoreTransaction = await context.Transactions
+                .Where(p => p.Id == inboundTransaction.Id).Include(transaction => transaction.TransactionSections).SingleAsync();
 
             foreach (var sec in inboundTransaction.Sections)
             {
@@ -362,12 +352,11 @@ namespace Inventory.Transactions.Repositories.Postgres
             foreach (var storedSection in inStoreTransaction.TransactionSections)
             {
                 if (inboundTransaction.Sections
-                                      .Where(s => storedSection.TransactionId == s.TransactionId)
-                                      .Any() == false)
+                        .Any(s => storedSection.TransactionId == s.TransactionId) == false)
                     DeleteTransactionSection(storedSection);
             }
 
-            await _context.SaveChangesAsync();
+            await context.SaveChangesAsync();
             return await GetTransactionAsync(inStoreTransaction.Id);
         }
 
@@ -382,7 +371,7 @@ namespace Inventory.Transactions.Repositories.Postgres
         #region TransactionSection 
         public async Task<ICollection<TransactionSectionDto>> GetTransactionSectionsAsync(Guid TransactionId)
         {
-            var query = from ts in _context.TransactionSections
+            var query = from ts in context.TransactionSections
                         where ts.TransactionId == TransactionId
                         select new TransactionSectionDto()
                         {
@@ -432,7 +421,7 @@ namespace Inventory.Transactions.Repositories.Postgres
                 TransactionSectionType = dto.TransactionSectionType,
             };
 
-            _context.Attach(ts); //test 
+            context.Attach(ts); //test 
      
             
             foreach (var sg in dto.SectionGroups)
@@ -445,8 +434,8 @@ namespace Inventory.Transactions.Repositories.Postgres
         private void  DeleteTransactionSection(Entities.TransactionSection ts  )
         {
             foreach (var sg in ts.SectionGroups)
-               _context.Remove(sg);
-            _context.Remove(ts);
+               context.Remove(sg);
+            context.Remove(ts);
          }
 
         #endregion
@@ -463,8 +452,8 @@ namespace Inventory.Transactions.Repositories.Postgres
                 TransactionSection = null
             };
 
-            _context.Add(tsg);
-            await _context.SaveChangesAsync();
+            context.Add(tsg);
+            await context.SaveChangesAsync();
 
             foreach (var v in dto.Values)
             {
@@ -475,7 +464,7 @@ namespace Inventory.Transactions.Repositories.Postgres
                     EditValue(v,tsg);
             }
 
-            await _context.SaveChangesAsync();
+            await context.SaveChangesAsync();
         }
 
         private void AddTransactionSectionGroup(TransactionSectionGroupDto dto, 
@@ -510,7 +499,7 @@ namespace Inventory.Transactions.Repositories.Postgres
                 TransactionSectionId = dto.TransactionSectionId,
                 TransactionSection  = ts 
             };
-            _context.Update(tsg);
+            context.Update(tsg);
             foreach (var v in dto.Values)
             {
                 v.TransactionSectionGroupId = tsg.Id;
@@ -529,14 +518,12 @@ namespace Inventory.Transactions.Repositories.Postgres
         public async Task<Guid> RoomsPrepareAsync()
         {
             return await AddRoomsLetTemplate();
-
         }
 
 
-
-        public async Task<Guid> AddRoomsLetTemplate()
+        private async Task<Guid> AddRoomsLetTemplate()
         {
-            var t = new Entities.Template()
+            var t = new Template()
             {
                 Id = Guid.NewGuid(),
                 Name = "Rooms To Let Template",
@@ -549,11 +536,11 @@ namespace Inventory.Transactions.Repositories.Postgres
 
             };
 
-            _context.Add(
+            context.Add(
                t
             );
 
-            await _context.SaveChangesAsync();
+            await context.SaveChangesAsync();
             return t.Id;
         }
 

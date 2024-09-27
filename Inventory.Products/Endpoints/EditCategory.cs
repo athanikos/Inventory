@@ -6,16 +6,9 @@ using Inventory.Products.Repositories;
 
 namespace Inventory.Products.Endpoints
 {
-    public class EditCategory :
+    public class EditCategory(IInventoryRepository repo) :
         Endpoint<EditCategoryRequest>
     {
-        private readonly IInventoryRepository _repo;
-
-        public  EditCategory(IInventoryRepository repo)
-        {
-            _repo = repo;
-        }
-
         public override void Configure()
         {
             Put("/Category");
@@ -28,7 +21,7 @@ namespace Inventory.Products.Endpoints
                         CancellationToken ct)
         {
 
-            var dto = await _repo.AddCategoryAsync(new CategoryDto(req.Id, req.Description,req.FatherId) );
+            var dto = await repo.AddCategoryAsync(new CategoryDto(req.Id, req.Description,req.FatherId) );
 
             return TypedResults.Ok(dto);
         }

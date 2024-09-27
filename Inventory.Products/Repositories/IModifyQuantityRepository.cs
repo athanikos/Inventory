@@ -14,7 +14,7 @@ namespace Inventory.Products.Repositories
 
         public QuantityMetric AddQuantityMetric(Guid productId, decimal value, DateTime effectiveDate, decimal diff, ModificationType type  );
 
-        public QuantityMetric EditQuantityMetric(Guid productId, DateTime effectiveDate, bool IsCancelled);
+        public QuantityMetric EditQuantityMetric(Guid productId, DateTime effectiveDate, bool isCancelled);
 
         public Task SaveChangesAsync();
 

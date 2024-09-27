@@ -10,16 +10,8 @@ namespace Inventory.Metrics.Endpoints
     using System.Threading;
     using System.Threading.Tasks;
 
-    public  class DeleteMetric 
-        : Endpoint<DeleteMetricRequest>
+    public class DeleteMetric(IInventoryRepository repo) : Endpoint<DeleteMetricRequest>
     {
-        private readonly IInventoryRepository _repo;
-
-        public  DeleteMetric(IInventoryRepository repo)
-        {
-            _repo = repo;
-        }
-
         public override void Configure()
         {
             Delete("/metric");
@@ -32,7 +24,7 @@ namespace Inventory.Metrics.Endpoints
             HandleAsync(DeleteMetricRequest req,
                         CancellationToken ct)
         {
-            await _repo.DeleteMetricAsync(new MetricDto(req.Id));
+            await repo.DeleteMetricAsync(new MetricDto(req.Id));
             return TypedResults.Ok();
         }
     }

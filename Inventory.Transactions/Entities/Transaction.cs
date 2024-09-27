@@ -1,4 +1,5 @@
 ﻿using Inventory.Transactions.Contracts;
+using Inventory.Transactions.Entities.Generic;
 
 namespace Inventory.Transactions.Entities
 {

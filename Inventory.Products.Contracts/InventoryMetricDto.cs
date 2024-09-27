@@ -6,7 +6,6 @@
         Guid metricId,
         decimal value,
         DateTime effectiveDate,
-        string currency,
         string inventoryCode,
         string metricCode)
     {
@@ -22,8 +21,10 @@
 
         public DateTime EffectiveDate { get; } = effectiveDate;
 
-        public string Currency { get; } = currency;
+     
+        public Guid UnitOfMeasurementId { get; set; }
 
+        
         public Guid SourceId { get; set; }
 
     }

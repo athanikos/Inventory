@@ -1,8 +1,9 @@
 ﻿
+using Inventory.Prices.Services;
+
 namespace Inventory.Products.Endpoints
 {
     using FastEndpoints;
-    using global::Prices.Inventory.Prices;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Http.HttpResults;
     using System.Threading;
@@ -12,11 +13,11 @@ namespace Inventory.Products.Endpoints
         : Endpoint <RunFetcherRequest>
     {
 
-        private readonly IPricesFetcher _fetcher; 
+        private readonly IPricesService _service; 
 
-        public RunFetcher(IPricesFetcher fetcher)
+        public RunFetcher(IPricesService service)
         {
-            _fetcher = fetcher; 
+            _service = service; 
         }
 
         public override void Configure()
@@ -30,7 +31,7 @@ namespace Inventory.Products.Endpoints
             HandleAsync(RunFetcherRequest req,
                         CancellationToken ct)
         {
-            await _fetcher.DoScedhuledWork();
+            await _service.DoScheduledWork();
             return TypedResults.Ok();
         }
 

@@ -6,31 +6,24 @@ using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Inventory.Notifications.Contracts;
 using Inventory.Expressions.Repositories;
+using Inventory.Expressions.Services;
 
 namespace Expressions
 {
-    public class Evaluator : IEvaluator
+    public class EvaluatorService(IMediator mediator, IExpressionRepository repo) : IEvaluatorService
     {
         private const string OpenBracket = "[";
         private const string ClosingBracket = "]";
         private const char Comma = ',';
         private const string OpenParenthesis = "(";
-        private const string SUM = "SUM";
-        private char[] _operators = ['*', '/', '+', '-', '>', '<' ];
-        private string[] aggregateFunctions = ["SUM", "AVG"];
-        private string ALLSpecifier = "[ALL]";
+        private const string Sum = "SUM";
+        private readonly char[] _operators = ['*', '/', '+', '-', '>', '<' ];
+        private readonly string[] _aggregateFunctions = ["SUM", "AVG"];
+        private readonly string _allSpecifier = "[ALL]";
         private string _expression = string.Empty;
-        private readonly IMediator _mediator;
-        private readonly IExpressionRepository _repo;
-        private List<string> _allProductCodes= new List<string>();
-        private List<string> _allMetricCodes= new List<string>();
+        private List<string> _allProductCodes= new();
+        private List<string> _allMetricCodes= new();
         private Guid _inventoryId;
-
-        public Evaluator(IMediator mediator, IExpressionRepository repo)
-        {
-            _mediator = mediator;
-            _repo = repo;
-        }
 
         public async Task<EvaluatorResult>   Execute(Guid inventoryId, string expression)
         {
@@ -109,7 +102,7 @@ namespace Expressions
 
         private async void GetCodes()
         {
-            var response = await _mediator.Send(new CodesQuery(_inventoryId));
+            var response = await mediator.Send(new CodesQuery(_inventoryId));
             if (response == null)
                 throw new ArgumentNullException();
 
@@ -153,11 +146,11 @@ namespace Expressions
             string result = string.Empty;
             foreach (var productCode in productCodes)
             {
-                if (aggregateFunction == SUM)
+                if (aggregateFunction == Sum)
                 {
                     try
                     {
-                        var dto = (await _mediator.Send(
+                        var dto = (await mediator.Send(
                                                    new GetProductMetricQuery(productCode,
                                                                               metricCode)));
                     
@@ -190,7 +183,7 @@ namespace Expressions
         private List<string> ExtractProductCodes(string token)
         {
             List<string> items = new List<string>();
-            if (token.Contains(ALLSpecifier))
+            if (token.Contains(_allSpecifier))
                 items.AddRange(_allProductCodes);
             else
                 items.AddRange(ExtractProducts(token).Split(Comma));
@@ -228,7 +221,7 @@ namespace Expressions
                     metricCode = item;
             try
             {
-                string result =  ( await _mediator.Send(
+                string result =  ( await mediator.Send(
                                                    new GetProductMetricQuery(productCode,
                                                    metricCode))).Value.ToString( "F2", CultureInfo.InvariantCulture  );
 
@@ -282,14 +275,14 @@ namespace Expressions
          
         private bool IsInventoryBasedFormula(string token)
         {
-            foreach (var item in aggregateFunctions)
+            foreach (var item in _aggregateFunctions)
                 if (token.Contains(item))
                 {
                     _type = ExpressionType.InventoryBased;
                     return ExpressionType.InventoryBased == _type;
                 }
 
-            if (token.Contains(ALLSpecifier))
+            if (token.Contains(_allSpecifier))
             {
                 _type = ExpressionType.InventoryBased;
                 return ExpressionType.InventoryBased == _type;
@@ -311,17 +304,17 @@ namespace Expressions
 
         public void ScheduleJobs(IServiceProvider serviceProvider)
         {
-            var productExpressions = _repo.GetProductExpressions();
+            var productExpressions = repo.GetProductExpressions();
             foreach (var p in productExpressions)
                 RecurringJob.AddOrUpdate(p.Id.ToString(), 
                     () => DoScheduledWork(p), Cron.Minutely);
 
-            var inventoryExpressions = _repo.GetInventoryExpressions();
+            var inventoryExpressions = repo.GetInventoryExpressions();
             foreach (var i in inventoryExpressions)
                 RecurringJob.AddOrUpdate(i.Id.ToString(), 
                     () => DoScheduledWork(i), Cron.Minutely);
 
-            var booleanExpressions = _repo. GetBooleanExpressions();
+            var booleanExpressions = repo. GetBooleanExpressions();
             foreach (var i in booleanExpressions)
                 RecurringJob.AddOrUpdate(i.Id.ToString(), 
                     () => DoScheduledWork(i), Cron.Minutely);
@@ -382,11 +375,11 @@ namespace Expressions
                 var command = new AddInventoryMetricCommand(p.TargetInventoryId,
                                                     p.TargetMetricId,
                                                    decimal.Parse(result.Result),
-                                                    DateTime.Now, "EUR"); //todo get from product 
+                                                    DateTime.Now);
 
                 // Log.Information("_mediator.Send(command)");
 
-                await _mediator.Send(command);
+                await mediator.Send(command);
 
 
             }
@@ -409,9 +402,10 @@ namespace Expressions
                 var command = new AddProductMetricCommand(p.TargetProductId,
                                                           p.TargetMetricId,
                                                           decimal.Parse(result.Result),
-                                                          DateTime.Now, 
-                                                          "EUR"); //todo get from product 
-                await _mediator.Send(command);
+                                                          DateTime.Now,
+                                                          Constants.EmptyUnityOfMeasurementId 
+                                                         ); 
+                await mediator.Send(command);
             }
         }
 
@@ -437,7 +431,7 @@ namespace Expressions
                 };
                 // Log.Information(" _mediator.Send(command);");
 
-                await _mediator.Send(command);
+                await mediator.Send(command);
             }
         }
 
@@ -445,13 +439,13 @@ namespace Expressions
         {
             try
             {
-                foreach (var p in _repo.GetProductExpressions())
+                foreach (var p in repo.GetProductExpressions())
                     DoScheduledWork(p);
 
-                foreach (var i in _repo.GetInventoryExpressions())
+                foreach (var i in repo.GetInventoryExpressions())
                     DoScheduledWork(i);
 
-                foreach (var b in _repo.GetBooleanExpressions())
+                foreach (var b in repo.GetBooleanExpressions())
                     DoScheduledWork(b);
 
             }

@@ -7,8 +7,8 @@ namespace Inventory.Products.Contracts
         Guid inventoryId,
         Guid metricId,
         decimal value,
-        DateTime effectiveDate,
-        string currency)
+        DateTime effectiveDate
+      )
         : IRequest<InventoryMetricDto>
     {
         public Guid InventoryId { get; set; } = inventoryId;
@@ -19,6 +19,5 @@ namespace Inventory.Products.Contracts
 
         public DateTime EffectiveDate { get; set; } = effectiveDate;
 
-        public string Currency { get; set; } = currency;
     }
 }

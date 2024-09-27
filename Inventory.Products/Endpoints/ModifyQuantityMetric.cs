@@ -3,23 +3,15 @@ namespace Inventory.Products.Endpoints
 {
     using FastEndpoints;
     using Inventory.Products.Contracts.Dto;
-    using Inventory.Products.Repositories;
-    using Inventory.Products.Services;
+    using Services;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Http.HttpResults;
     using System.Threading;
     using System.Threading.Tasks;
 
-    public class ModifyQuantityMetric :
+    public class ModifyQuantityMetric(IModifyQuantityService service) :
         Endpoint<ModifyQuantityMetricListRequest>
     {
-        private readonly IModifyQuantityService _service;
-
-        public ModifyQuantityMetric(IModifyQuantityService service)
-        {
-            _service = service ;
-        }
-
         public override void Configure()
         {
             Post("/quantity");
@@ -46,17 +38,17 @@ namespace Inventory.Products.Endpoints
                                            .ToList();
 
 
-            await  _service.ModifyQuantityMetricsAsync( items ); 
+            await  service.ModifyQuantityMetricsAsync( items ); 
             return TypedResults.Ok();
         }  
     }
 
-    public record ModifyQuantityMetricListRequest(
+    public abstract record ModifyQuantityMetricListRequest(
         List<ModifyQuantityMetricRequest> Items 
         );
 
 
-    public record ModifyQuantityMetricRequest(Guid ProductId, 
+    public abstract record ModifyQuantityMetricRequest(Guid ProductId, 
          decimal Diff , DateTime EffectiveDate );
 
 

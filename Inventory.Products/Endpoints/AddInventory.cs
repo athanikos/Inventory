@@ -1,5 +1,7 @@
 ﻿
 
+using Inventory.Products.Services;
+
 namespace Inventory.Products.Endpoints
 {
     using FastEndpoints;
@@ -10,15 +12,10 @@ namespace Inventory.Products.Endpoints
     using System.Threading;
     using System.Threading.Tasks;
 
-    public class AddInventory :
+    public class AddInventory(IInventoryService service) :
         Endpoint<AddInventoryRequest>
     {
-        private readonly IInventoryRepository _repo;
-
-        public  AddInventory(IInventoryRepository repo)
-        {
-            _repo = repo;
-        }
+        private readonly IInventoryService _service = service;
 
         public override void Configure()
         {
@@ -32,9 +29,8 @@ namespace Inventory.Products.Endpoints
             HandleAsync(AddInventoryRequest req,
                         CancellationToken ct)
         {
-            var dto =  await _repo.AddInventoryAsync(
-            new InventoryDto(req.InventoryId, req.Description));
-            return TypedResults.Ok( dto    );
+          var dto = await _service.AddInventoryAsync(new InventoryDto(req.InventoryId, req.Description));
+          return TypedResults.Ok( dto    );
         }
     }
 

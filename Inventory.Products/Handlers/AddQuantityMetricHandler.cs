@@ -7,17 +7,11 @@ using Inventory.Products.Contracts.Dto;
 namespace Inventory.Products.Handlers
 {
 
-    public class AddQuantityMetricHandler :
-    IRequestHandler<AddQuantityMetricCommand, QuantityMetricDto>
+    public class AddQuantityMetricHandler(
+        IInventoryRepository
+            repository) :
+        IRequestHandler<AddQuantityMetricCommand, QuantityMetricDto>
     {
-        private IInventoryRepository _repository;
-
-        public AddQuantityMetricHandler(IInventoryRepository
-            repository)
-        {
-            _repository = repository;
-        }
-
         public async Task<QuantityMetricDto> Handle(AddQuantityMetricCommand request,
                                                     CancellationToken cancellationToken)
         {
@@ -30,7 +24,7 @@ namespace Inventory.Products.Handlers
                                                );
             try
             {
-                await _repository.AddQuantityMetricAsync(dto);
+                await repository.AddQuantityMetricAsync(dto);
             }
             catch (Exception ex)
             {

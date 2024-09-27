@@ -1,30 +1,44 @@
 ﻿
-namespace Inventory.Products.Contracts.Dto;
+using Inventory.Products.Contracts.Dto;
+
+namespace Inventory.Products.Contracts;
 
 public class ProductDto
+   
 {
 
-    public ProductDto(Guid Id, string Description, string Code, Guid InventoryId,
-        List<ProductMetricDto> Metrics)
+   public  ProductDto(Guid id,
+    string description,
+    string code, 
+    Guid inventoryId,
+    List<ProductMetricDto> metrics)
     {
-        this.Id = Id;   
-        this.Description = Description;
-        this.Code = Code;
-        this.InventoryId = InventoryId;
-        this.Metrics = Metrics;
+        Id = id;
+        Description = description;
+        Code = code;
+        InventoryId = inventoryId;
+        Metrics = metrics;
     }
 
-    public Guid Id { get; private set; }
-    public string Description { get; private set; }
-    public string Code { get; private set; }
-    public Guid InventoryId { get; private set; }
-    public List<ProductMetricDto> Metrics { get; private set; }
+    public  ProductDto(Guid id)
+    {
+        Id = id;
+   
 
-    public  static ProductDto NewProductDto(Guid InventoryId, string productCode)
+    }
+
+
+    public Guid Id { get; private set; } 
+    public string Description { get; private set; } 
+    public string Code { get; private set; } 
+    public Guid InventoryId { get; private set; } 
+    public List<ProductMetricDto> Metrics { get; private set; } 
+
+    public  static ProductDto NewProductDto(Guid inventoryId, string productCode)
     {
         return new ProductDto(Guid.NewGuid(),"",
                                      productCode,
-                                        InventoryId,
+                                        inventoryId,
                                      new List<ProductMetricDto>());
     }
 }

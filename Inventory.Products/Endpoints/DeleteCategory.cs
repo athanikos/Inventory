@@ -1,24 +1,14 @@
-﻿
-namespace Category.Products.Endpoints
-{
-    using FastEndpoints;
-    using Inventory.Products.Dto;
-    using Inventory.Products.Repositories;
-    using Microsoft.AspNetCore.Http;
-    using Microsoft.AspNetCore.Http.HttpResults;
-    using System.Threading;
-    using System.Threading.Tasks;
+﻿using FastEndpoints;
+using Inventory.Products.Dto;
+using Inventory.Products.Repositories;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 
-    public class DeleteCategory :
+namespace Inventory.Products.Endpoints
+{
+    public class DeleteCategory(IInventoryRepository repo) :
         Endpoint<DeleteCategoryRequest>
     {
-        private readonly IInventoryRepository _repo;
-
-        public  DeleteCategory(IInventoryRepository repo)
-        {
-            _repo = repo;
-        }
-
         public override void Configure()
         {
             Delete("/category");
@@ -30,7 +20,7 @@ namespace Category.Products.Endpoints
             HandleAsync(DeleteCategoryRequest req,
                         CancellationToken ct)
         {
-             await  _repo.DeleteCategoryAsync(new CategoryDto(req.Id, string.Empty, Guid.Empty));
+             await  repo.DeleteCategoryAsync(new CategoryDto(req.Id, string.Empty, Guid.Empty));
             return TypedResults.Ok();
         }
     }

@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Reflection.Metadata;
+using Inventory.Transactions.Entities.Generic;
+
 namespace Inventory.Transactions;
 
 public class TransactionsDbContext(
@@ -12,9 +14,9 @@ public class TransactionsDbContext(
     public DbSet<Entities.TransactionSection> TransactionSections { get; set; }
 
 
-    public DbSet<Entities.Template> Templates { get; set; }
-    public DbSet<Entities.Section> Sections { get; set; }
-    public DbSet<Entities.Field> Fields { get; set; }
+    public DbSet<Template> Templates { get; set; }
+    public DbSet<Section> Sections { get; set; }
+    public DbSet<Field> Fields { get; set; }
     public DbSet<Entities.Value> Values { get; set; }
 
     protected override void OnModelCreating
@@ -28,21 +30,21 @@ public class TransactionsDbContext(
         modelBuilder.Entity<Entities.TransactionSectionGroup>().ToTable("TransactionSectionGroup");
 
         modelBuilder.Entity<Entities.Value>().ToTable("Value");
-        modelBuilder.Entity<Entities.Template>().ToTable("Template");
-        modelBuilder.Entity<Entities.Section>().ToTable("Section");
-        modelBuilder.Entity<Entities.Field>().ToTable("Field");
+        modelBuilder.Entity<Template>().ToTable("Template");
+        modelBuilder.Entity<Section>().ToTable("Section");
+        modelBuilder.Entity<Field>().ToTable("Field");
         
-        modelBuilder.Entity<Entities.Template>()
+        modelBuilder.Entity<Template>()
         .HasMany(e => e.Sections);
-        modelBuilder.Entity<Entities.Section>()
+        modelBuilder.Entity<Section>()
         .HasMany(e => e.Fields);
-        modelBuilder.Entity<Entities.Section>().HasKey(e => e.Id);
-        modelBuilder.Entity<Entities.Template>().HasKey(e => e.Id);
+        modelBuilder.Entity<Section>().HasKey(e => e.Id);
+        modelBuilder.Entity<Template>().HasKey(e => e.Id);
         modelBuilder.Entity<Entities.TransactionSection>().HasKey(e => e.Id);
 
-        modelBuilder.Entity<Entities.Field>().HasMany(e => e.Values);
+        modelBuilder.Entity<Field>().HasMany(e => e.Values);
 
-        modelBuilder.Entity<Entities.Field>().HasKey(e => e.Id);
+        modelBuilder.Entity<Field>().HasKey(e => e.Id);
         modelBuilder.Entity < Entities.Value>().HasKey(e => e.Id);
 
         modelBuilder.Entity<Entities.TransactionSection>().HasKey(e => e.Id);

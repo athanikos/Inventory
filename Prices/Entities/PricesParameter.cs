@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-
-namespace Inventory.Prices.Entities
+﻿namespace Inventory.Prices.Entities
 {
  
     public  class PricesParameter

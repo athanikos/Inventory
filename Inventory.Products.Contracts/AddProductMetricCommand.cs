@@ -9,7 +9,7 @@ namespace Inventory.Products.Contracts
         Guid metricId,
         decimal value,
         DateTime effectiveDate,
-        string currency)
+        Guid unitOfMeasurementId)
         : IRequest<ProductMetricDto>
     {
         public Guid ProductId { get; set; } = productId;
@@ -20,6 +20,7 @@ namespace Inventory.Products.Contracts
 
         public DateTime EffectiveDate { get; set; } = effectiveDate;
 
-        public string Currency { get; set; } = currency;
+     
+        public Guid UnitOfMeasurementId { get; set; } = unitOfMeasurementId;
     }
 }

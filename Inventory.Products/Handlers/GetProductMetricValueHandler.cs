@@ -5,21 +5,13 @@ using MediatR;
 
 namespace Inventory.Products.Handlers
 {
-    public class GetProductMetricValueHandler : 
+    public class GetProductMetricValueHandler(IInventoryRepository repo) :
         IRequestHandler<GetProductMetricQuery, ProductMetricDto>
     {
-
-        private readonly IInventoryRepository _repo;
-
-        public GetProductMetricValueHandler(IInventoryRepository repo)
-        {
-            _repo = repo;
-        }
-
         public async  Task<ProductMetricDto> Handle(GetProductMetricQuery request, 
             CancellationToken cancellationToken)
         {
-            return await  _repo.GetProductMetricAsync(request.ProductCode,request.MetricCode);
+            return await  repo.GetProductMetricAsync(request.ProductCode,request.MetricCode);
         }
 
        

@@ -8,18 +8,9 @@ using Microsoft.AspNetCore.Http;
 
 namespace Inventory.Notifications.Endpoints
 {
-    public class GetNotifications :
+    public class GetNotifications(IMediator mediator, NotifierDbContext context) :
         Endpoint<GetNotificationsRequest>
     {
-        private readonly IMediator _mediator;
-        private readonly NotifierDbContext _context;
-
-        public GetNotifications(IMediator mediator, NotifierDbContext context)
-        {
-            _mediator = mediator;
-            _context = context;
-        }
-
         public override void Configure()
         {
             Get("/Notification"); 
@@ -35,12 +26,12 @@ namespace Inventory.Notifications.Endpoints
 
        
            var booleanExpressions =    await           
-                _mediator.Send(new GetBooleanExpressionsQuery());
+                mediator.Send(new GetBooleanExpressionsQuery());
 
-            var Notifications = await _context.Notifications.
+            var notifications = await context.Notifications.
                                       ToListAsync();
 
-            await SendAsync(Notifications.Join(
+            await SendAsync(notifications.Join(
                 booleanExpressions,
                 n => n.BooleanExpressionId, be => be.Id,
                 (n, be) =>
@@ -64,5 +55,5 @@ namespace Inventory.Notifications.Endpoints
 
 
 
-    public record GetNotificationsRequest(bool isActive);
+    public abstract record GetNotificationsRequest(bool IsActive);
 }

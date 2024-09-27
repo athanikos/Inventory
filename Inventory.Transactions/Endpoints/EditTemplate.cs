@@ -1,4 +1,6 @@
 ﻿
+using Inventory.Transactions.Services;
+
 namespace Inventory.Transactions.Endpoints
 {
     using FastEndpoints;
@@ -6,19 +8,11 @@ namespace Inventory.Transactions.Endpoints
     using Microsoft.AspNetCore.Http.HttpResults;
     using System.Threading;
     using System.Threading.Tasks;
-    using Inventory.Transactions.Repositories;
-    using Inventory.Transactions.Dto;
+    using Dto;
 
-    public class EditTemplate :
+    public class EditTemplate(ITransactionService service) :
         Endpoint<EditTemplateRequest>
     {
-        private readonly ITransactionRepository _repo;
-
-        public EditTemplate(ITransactionRepository repo)
-        {
-            _repo = repo;
-        }
-
         public override void Configure()
         {
             Put("/template");
@@ -31,7 +25,7 @@ namespace Inventory.Transactions.Endpoints
                         CancellationToken ct)
         {
             return TypedResults.Ok(
-                   await _repo.EditTemplateAsync(new TemplateDto(req.Id, req.Name,req.Type,DateTime.UtcNow,req.Sections)));
+                   await service.EditTemplateAsync(new TemplateDto(req.Id, req.Name,req.Type,DateTime.UtcNow,req.Sections)));
             
         }
     }

@@ -1,24 +1,13 @@
-﻿
-namespace Transaction.Transactions.Endpoints
-{
-    using FastEndpoints;
-    using Microsoft.AspNetCore.Http.HttpResults;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using Inventory.Transactions.Dto;
-    using Inventory.Transactions.Repositories;
-    using Microsoft.AspNetCore.Http;
+﻿using FastEndpoints;
+using Inventory.Transactions.Services;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 
-    public class TemplatesDataPrepare :
+namespace Inventory.Transactions.Endpoints
+{
+    public class TemplatesDataPrepare(ITransactionService service) :
         Endpoint<DataPrepareRequest>
     {
-        private readonly ITransactionRepository _repo;
-
-        public TemplatesDataPrepare(ITransactionRepository repo)
-        {
-            _repo = repo;
-        }
-
         public override void Configure()
         {
             Post("/TemplatesDataPrepare");
@@ -31,7 +20,7 @@ namespace Transaction.Transactions.Endpoints
             HandleAsync(DataPrepareRequest edbr, CancellationToken ct)
         {
 
-             await _repo.RoomsPrepareAsync();
+             await service.RoomsPrepareAsync();
              return TypedResults.Ok();
         }
     }

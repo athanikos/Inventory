@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using MediatR;
 using Expressions;
 using Inventory.Expressions.Repositories;
+using Inventory.Expressions.Services;
 
 namespace Inventory.Expressions
 {
@@ -28,10 +29,10 @@ namespace Inventory.Expressions
             services.AddScoped<IExpressionRepository, PostgresExpressionRepository>();
 
 
-            services.AddScoped<IEvaluator, Evaluator>(
+            services.AddScoped<IEvaluatorService, EvaluatorService>(
             sp =>
             {
-                return new Evaluator(sp.GetRequiredService<IMediator>(), sp.GetRequiredService<IExpressionRepository>());
+                return new EvaluatorService(sp.GetRequiredService<IMediator>(), sp.GetRequiredService<IExpressionRepository>());
             }
             );
                                

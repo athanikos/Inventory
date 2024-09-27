@@ -20,7 +20,7 @@ namespace Tests.Inventory
     /// </summary>
     /// 
     [Collection("Our Test Collection #1")]
-    public class EvaluatorTests : TestBed<TestFixture>
+    public class EvaluatorServiceTests : TestBed<TestFixture>
     {
         private const string ADAProductCode = "ADA";
         private const string XRPProductCode = "XRP";
@@ -32,7 +32,7 @@ namespace Tests.Inventory
         private const string PriceCode = "PRICE";
 
 
-        public EvaluatorTests(ITestOutputHelper testOutputHelper, TestFixture fixture) :
+        public EvaluatorServiceTests(ITestOutputHelper testOutputHelper, TestFixture fixture) :
             base(testOutputHelper, fixture)
         {
 
@@ -58,7 +58,7 @@ namespace Tests.Inventory
 
             await output.InventoryRepo.AddQuantityMetricAsync(new QuantityMetricDto(output.ProductId, 1, DateTime.MinValue, output.TransactionId, 0, false));
 
-            Evaluator instance = new (_mediator, _expressionsRepo);
+            EvaluatorService instance = new (_mediator, _expressionsRepo);
             EvaluatorResult result = await instance.Execute(InventoryId, expression);
             Assert.Equal(1, decimal.Parse(result.Result));
         }
@@ -92,9 +92,9 @@ namespace Tests.Inventory
 
 
             await _repo.AddOrEditProductMetricAsync(ProductMetricDto.NewProductMetricDto(priceId, output.ProductId, 5, Currency, 
-                ADAProductCode, PriceCode));
+                ADAProductCode, Constants.EmptyUnityOfMeasurementId));
 
-            Evaluator instance = new (mediator, expressionsRepo);
+            EvaluatorService instance = new (mediator, expressionsRepo);
             var result = await instance.Execute(InventoryId, expression);
             Assert.Equal(25, decimal.Parse(result.Result));
         }
@@ -128,39 +128,40 @@ namespace Tests.Inventory
             
             ProductDto prodDto = ProductDto.NewProductDto(InventoryId, ADAProductCode);
             var productId = (await _repo.AddProductAsync(prodDto)).Id;
-            await _repo.AddOrEditProductMetricAsync(ProductMetricDto.NewProductMetricDto(valueId, productId, 10, Currency, ADAProductCode,ValueCode));
+            await _repo.AddOrEditProductMetricAsync(ProductMetricDto.NewProductMetricDto(valueId, productId, 10, 
+                Currency, ADAProductCode,Constants.EmptyUnityOfMeasurementId));
       
 
-            Evaluator instance = new (mediator, _expressionsRepo);
+            EvaluatorService instance = new (mediator, _expressionsRepo);
             var result = await instance.Execute(InventoryId,expression);
             Assert.Equal(10, decimal.Parse(result.Result));
         }
 
 
         [Fact]
-        public async Task TestEvaluatorComplexALLProduct()
+        public async Task TestEvaluatorComplexAllProduct()
         {
             string expression = "SUM(VALUE([ALL],LATEST))";
 
-            var _mediator = _fixture.GetService<IMediator>(_testOutputHelper)!;
-            var _repo = _fixture.GetService<IInventoryRepository>(_testOutputHelper)!;
-            var _expressionsRepo = _fixture.GetService<IExpressionRepository>(_testOutputHelper)!;
+            var mediator = _fixture.GetService<IMediator>(_testOutputHelper)!;
+            var repo = _fixture.GetService<IInventoryRepository>(_testOutputHelper)!;
+            var expressionsRepo = _fixture.GetService<IExpressionRepository>(_testOutputHelper)!;
 
-            _repo.EmptyDB();
-            var tuple = (await SetupInventoryAndSource(_repo));
+            repo.EmptyDB();
+            var tuple = (await SetupInventoryAndSource(repo));
             var inventoryId = tuple.Item1;
             var sourceId = tuple.Item2;
-            var valueId = (await _repo.AddMetricAsync(MetricDto.NewMetricDto(sourceId, ValueCode))).Id;
+            var valueId = (await repo.AddMetricAsync(MetricDto.NewMetricDto(sourceId, ValueCode))).Id;
 
             ProductDto prodDto = ProductDto.NewProductDto(inventoryId, ADAProductCode);
-            var productId = (await _repo.AddProductAsync(prodDto)).Id;
-            await _repo.AddOrEditProductMetricAsync(ProductMetricDto.NewProductMetricDto(valueId, productId, 10, Currency, ADAProductCode, ValueCode));
+            var productId = (await repo.AddProductAsync(prodDto)).Id;
+            await repo.AddOrEditProductMetricAsync(ProductMetricDto.NewProductMetricDto(valueId, productId, 10, Currency, ADAProductCode,  Constants.EmptyUnityOfMeasurementId));
 
             prodDto = ProductDto.NewProductDto(inventoryId, XRPProductCode);
-            productId = (await _repo.AddProductAsync(prodDto)).Id;
-            await _repo.AddOrEditProductMetricAsync(ProductMetricDto.NewProductMetricDto(valueId, productId, 100, Currency, XRPProductCode, ValueCode));
+            productId = (await repo.AddProductAsync(prodDto)).Id;
+            await repo.AddOrEditProductMetricAsync(ProductMetricDto.NewProductMetricDto(valueId, productId, 100, Currency, XRPProductCode,  Constants.EmptyUnityOfMeasurementId));
 
-            Evaluator instance = new Evaluator(_mediator, _expressionsRepo);
+            EvaluatorService instance = new EvaluatorService(mediator, expressionsRepo);
             var result = await instance.Execute(inventoryId,expression);
             Assert.Equal(110, decimal.Parse(result.Result));
         }
@@ -186,14 +187,14 @@ namespace Tests.Inventory
 
             ProductDto prodDto = ProductDto.NewProductDto(inventoryId,ADAProductCode);
             var productId = (await repo.AddProductAsync(prodDto)).Id;
-            await repo.AddOrEditProductMetricAsync(ProductMetricDto.NewProductMetricDto(valueId, productId, 10, Currency, ADAProductCode, ValueCode));
+            await repo.AddOrEditProductMetricAsync(ProductMetricDto.NewProductMetricDto(valueId, productId, 10, Currency, ADAProductCode,  Constants.EmptyUnityOfMeasurementId));
 
             prodDto = ProductDto.NewProductDto(inventoryId, XRPProductCode);
             productId = (await repo.AddProductAsync(prodDto)).Id;
-            await repo.AddOrEditProductMetricAsync(ProductMetricDto.NewProductMetricDto(valueId, productId, 11, Currency, XRPProductCode, ValueCode));
+            await repo.AddOrEditProductMetricAsync(ProductMetricDto.NewProductMetricDto(valueId, productId, 11, Currency, XRPProductCode,  Constants.EmptyUnityOfMeasurementId));
 
 
-            Evaluator instance = new (mediator, expressionsRepo);
+            EvaluatorService instance = new (mediator, expressionsRepo);
             var result = await instance.Execute(inventoryId, expression);
             Assert.Equal(21, decimal.Parse(result.Result));
         }
@@ -219,14 +220,16 @@ namespace Tests.Inventory
 
             ProductDto prodDto = ProductDto.NewProductDto(InventoryId, ADAProductCode);
             var productId = (await _repo.AddProductAsync(prodDto)).Id;
-            await _repo.AddOrEditProductMetricAsync(ProductMetricDto.NewProductMetricDto(valueId, productId, 10, Currency, ADAProductCode, ValueCode));
+            await _repo.AddOrEditProductMetricAsync(ProductMetricDto.NewProductMetricDto(valueId, productId, 10, Currency, ADAProductCode, 
+                Constants.EmptyUnityOfMeasurementId));
 
             prodDto = ProductDto.NewProductDto(InventoryId, XRPProductCode);
             productId = (await _repo.AddProductAsync(prodDto)).Id;
-            await _repo.AddOrEditProductMetricAsync(ProductMetricDto.NewProductMetricDto(valueId, productId, 11, Currency, XRPProductCode, ValueCode));
+            await _repo.AddOrEditProductMetricAsync(ProductMetricDto.NewProductMetricDto(valueId, productId, 11, Currency, XRPProductCode, 
+                Constants.EmptyUnityOfMeasurementId));
 
 
-            Evaluator instance = new (_mediator, _expressionsRepo);
+            EvaluatorService instance = new (_mediator, _expressionsRepo);
             var result = await instance.Execute(InventoryId, expression);
             Assert.Equal(  EvaluatorResult.EvaluatorResultType.undefined, result.Type);
             Assert.Equal(string.Empty, result.Result);
@@ -256,17 +259,18 @@ namespace Tests.Inventory
             await _repo.AddOrEditProductMetricAsync(ProductMetricDto.NewProductMetricDto(
                                                                         valueId, 
                                                                         productId, 
-                                                                        10, 
-                                                                        Currency, 
+                                                                        10,
                                                                         ADAProductCode,
-                                                                        ValueCode));
+                                                                        Constants.Quantitycode,
+                                                                        Constants.EmptyUnityOfMeasurementId
+                                                                        ));
 
             prodDto = ProductDto.NewProductDto(InventoryId, XRPProductCode);
             productId = (await _repo.AddProductAsync(prodDto)).Id;
-            await _repo.AddOrEditProductMetricAsync(ProductMetricDto.NewProductMetricDto(valueId, productId, 11, Currency, XRPProductCode, ValueCode));
+            await _repo.AddOrEditProductMetricAsync(ProductMetricDto.NewProductMetricDto(valueId, productId, 11, Currency, XRPProductCode,  Constants.EmptyUnityOfMeasurementId));
 
 
-            Evaluator instance = new (_mediator, _expressionsRepo);
+            EvaluatorService instance = new (_mediator, _expressionsRepo);
             var result = await instance.Execute(InventoryId, expression);
             Assert.Equal("False", result.Result);
         }
@@ -292,9 +296,10 @@ namespace Tests.Inventory
             ProductDto prodDto = ProductDto.NewProductDto(InventoryId, ADAProductCode);
             var productId = (await _repo.AddProductAsync(prodDto)).Id;
 
-            await _repo.AddOrEditProductMetricAsync(ProductMetricDto.NewProductMetricDto(valueId, productId, 2, Currency, ADAProductCode, PriceCode));
+            await _repo.AddOrEditProductMetricAsync(ProductMetricDto.NewProductMetricDto(valueId, productId, 2, 
+                ADAProductCode, string.Empty, Constants.EmptyUnityOfMeasurementId));
     
-            Evaluator instance = new Evaluator(_mediator, _expressionsRepo);
+            EvaluatorService instance = new EvaluatorService(_mediator, _expressionsRepo);
             var result = await instance.Execute(InventoryId, expression);
             Assert.Equal("True", result.Result);
         }
@@ -314,7 +319,7 @@ namespace Tests.Inventory
             var tuple = (await SetupInventoryAndSource(repo));
             var inventoryId = tuple.Item1;
 
-            Evaluator instance = new (mediator, expressionsRepo);
+            EvaluatorService instance = new (mediator, expressionsRepo);
             var result = await instance.Execute(inventoryId, expression);
             Assert.Equal(EvaluatorResult.EvaluatorResultType.undefined, result.Type);
         }
@@ -341,11 +346,11 @@ namespace Tests.Inventory
             var priceId = (await repo.AddMetricAsync(MetricDto.NewMetricDto(sourceId, PriceCode))).Id;
             ProductDto prodDto = ProductDto.NewProductDto(inventoryId, ADAProductCode);
             var productId = (await repo.AddProductAsync(prodDto)).Id;
-            await repo.AddOrEditProductMetricAsync(ProductMetricDto.NewProductMetricDto(priceId, productId, 1, Currency, ADAProductCode, PriceCode));
+            await repo.AddOrEditProductMetricAsync(ProductMetricDto.NewProductMetricDto(priceId, productId, 1, Currency, ADAProductCode,  Constants.EmptyUnityOfMeasurementId));
 
 
 
-            Evaluator instance = new (mediator, expressionsRepo);
+            EvaluatorService instance = new (mediator, expressionsRepo);
             var result = await instance.Execute(inventoryId, expression);
           
             Assert.Equal(EvaluatorResult.EvaluatorResultType.boolean, result.Type);
@@ -377,11 +382,11 @@ namespace Tests.Inventory
             var priceId = (await _repo.AddMetricAsync(MetricDto.NewMetricDto(sourceId, PriceCode))).Id;
             ProductDto prodDto = ProductDto.NewProductDto(InventoryId, ADAProductCode);
             var productId = (await _repo.AddProductAsync(prodDto)).Id;
-            await _repo.AddOrEditProductMetricAsync(ProductMetricDto.NewProductMetricDto(priceId, productId, 1, Currency, ADAProductCode, PriceCode));
+            await _repo.AddOrEditProductMetricAsync(ProductMetricDto.NewProductMetricDto(priceId, productId, 1, Currency, ADAProductCode,  Constants.EmptyUnityOfMeasurementId));
 
 
 
-            Evaluator instance = new Evaluator(_mediator, _expressionsRepo);
+            EvaluatorService instance = new EvaluatorService(_mediator, _expressionsRepo);
             var result = await instance.Execute(InventoryId, expression);
 
             Assert.Equal(EvaluatorResult.EvaluatorResultType.boolean, result.Type);
