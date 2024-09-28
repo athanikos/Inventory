@@ -356,6 +356,7 @@ namespace Inventory.Products.Repositories
             UnitOfMeasurement uom = new UnitOfMeasurement();
             uom.Id = dto.Id;
             uom.Text = dto.Text;
+            uom.Type = dto.Type;
             context.Add(uom);
             await context.SaveChangesAsync();
             return await  GetUnitOfMeasurementAsync(uom.Id);
@@ -367,10 +368,11 @@ namespace Inventory.Products.Repositories
             {
                 Id = dto.Id,
                 Text = dto.Text,
+                Type = dto.Type 
             };
             context.Update(e);
             await context.SaveChangesAsync();
-            return new UnitOfMeasurementDto(e.Id, e.Text);
+            return await GetUnitOfMeasurementAsync(e.Id);
         }
         
         
@@ -555,7 +557,7 @@ namespace Inventory.Products.Repositories
         {
             return  await context.UnitOfMeasurements.
                 Where(i => i.Id == id ).
-                Select(i =>new UnitOfMeasurementDto(i.Id,i.Text)).
+                Select(i =>new UnitOfMeasurementDto(i.Id,i.Text,i.Type)).
                 SingleAsync();
 
         }

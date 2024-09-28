@@ -15,11 +15,9 @@ namespace Inventory.Transactions.Services
 
          Task<TemplateDto> EditTemplateAsync(TemplateDto inboundTemplate);
 
-
          Task EmptyDb();
          
          Task<Guid> RoomsPrepareAsync();
-
 
     }
 }

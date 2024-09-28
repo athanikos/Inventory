@@ -3,6 +3,7 @@ using Inventory.Products.Contracts;
 using Inventory.Products.Contracts.Dto;
 using Inventory.Products.Dto;
 using Inventory.Products.Repositories;
+using Microsoft.EntityFrameworkCore.Migrations.Operations;
 
 namespace Inventory.Products.Services;
 
@@ -59,7 +60,7 @@ public class InventoryService(IInventoryRepository repo) : IInventoryService
     public async     Task<UnitOfMeasurementDto> AddUnitOfMeasurementAsync(UnitOfMeasurementDto dto)
     {
         return await repo.AddUnitOfMeasurementAsync(new UnitOfMeasurementDto
-            (dto.Id, dto.Text));
+            (dto.Id, dto.Text, dto.Type));
 
     }
 
@@ -67,6 +68,7 @@ public class InventoryService(IInventoryRepository repo) : IInventoryService
     {
         throw new NotImplementedException();
     }
+
 
     public async Task<QuantityMetricDto> AddQuantityMetricAsync(QuantityMetricDto dto)
     {
@@ -86,6 +88,13 @@ public class InventoryService(IInventoryRepository repo) : IInventoryService
     }
 
  
+
+    public async Task InitializeDefaults()
+    {
+        await repo.AddUnitOfMeasurementAsync(new UnitOfMeasurementDto(Guid.NewGuid(), "EURO", UnitOfMeasurementType.Currency));
+        await repo.AddUnitOfMeasurementAsync(new UnitOfMeasurementDto(Guid.NewGuid(), "EMPTY", UnitOfMeasurementType.Empty));
+        
+    }
 
 
    

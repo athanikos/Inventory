@@ -1,17 +1,11 @@
 ﻿using Inventory.Products.Entities;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Diagnostics.Metrics;
 namespace Inventory.Products;
 
-public class ProductsDbContext : DbContext
+public class ProductsDbContext(
+    DbContextOptions
+        <ProductsDbContext> options) : DbContext(options)
 {
-
-    public ProductsDbContext(DbContextOptions
-        <ProductsDbContext> options) :
-        base(options)
-    { }
-
     public DbSet<Product> Products { get; set; }
     public DbSet<Entities.Inventory> Inventories { get; set; }
     public DbSet<Entities.Category> Categories { get; set; }
