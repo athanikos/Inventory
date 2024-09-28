@@ -59,11 +59,16 @@ namespace Tests.Inventory
                 SourceName))).Id;
             var metricId = (await output.InventoryRepo.AddMetricAsync(MetricDto.NewMetricDto(sourceId, 
                 Constants.Quantitycode))).Id;
+       
+            
             ProductDto prodDto = ProductDto.NewProductDto(inventoryId, productCode);
             output.TemplateId = await output.TransactionRepo.RoomsPrepareAsync();
+        
             output.TransactionId = (await output.TransactionRepo.AddTransactionAsync(new TransactionDto(Guid.NewGuid(),
                 "", DateTime.Now, output.TemplateId, null))).Id;
+       
             output.ProductId = (await output.InventoryRepo.AddProductAsync(prodDto)).Id;
+            
             output.QuantityId = metricId;
             return output;
         }

@@ -24,6 +24,12 @@ namespace Tests.Inventory
             var transactionRepo = _fixture1.GetService<ITransactionRepository>(_testOutputHelper)!;
             inventoryRepo.EmptyDB();
             await transactionRepo.EmptyDb();
+            
+            var category = (await inventoryRepo.AddCategoryAsync(new CategoryDto(Guid.Empty, "cat",Guid.Empty)));
+            Assert.Equal("cat",category.Description);
+
+            
+            
             var id =  (await inventoryRepo.AddInventoryAsync(new InventoryDto(Guid.Empty, "TestMe"))).Id;
             var inventory = await inventoryRepo.GetInventoryAsync(id);
             Assert.Equal("TestMe",inventory.Description);
@@ -36,9 +42,17 @@ namespace Tests.Inventory
 
             var productDto = new ProductDto(Guid.Empty, "Descr", "code", 
                 inventory.Id, new List<ProductMetricDto>());
-
+            
             var prod = await inventoryService.AddProductAsync(productDto);
             Assert.Equal("Descr",productDto.Description);
+            productDto.Description = "test";
+            productDto.Id = prod.Id;
+            
+            prod = await inventoryService.EditProductAsync(productDto);
+            Assert.Equal("test",prod.Description);
+
+            await TestSetup.ClearDb(_testOutputHelper, this._fixture);
+
         }
 
         [Fact]

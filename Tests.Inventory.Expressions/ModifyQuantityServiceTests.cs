@@ -62,6 +62,8 @@ namespace Tests.Inventory
             Assert.Equal(1, qms[1].Value);
 
             Assert.Equal(2, qms.Count);
+            await TestSetup.ClearDb(_testOutputHelper, this._fixture);
+
         }
 
         [Fact]
@@ -91,6 +93,8 @@ namespace Tests.Inventory
 
             var qms = await output.InventoryRepo.GetQuantityMetricsAsync();
             Assert.Single(qms);
+            await TestSetup.ClearDb(_testOutputHelper, this._fixture);
+
         }
 
         [Fact]
@@ -121,6 +125,7 @@ namespace Tests.Inventory
                ]);
             var qms = await output.InventoryRepo.GetQuantityMetricsAsync();
             Assert.Equal(3, qms.Count);
+            await TestSetup.ClearDb(_testOutputHelper, this._fixture);
 
         }
 
@@ -164,6 +169,8 @@ namespace Tests.Inventory
   
            // Assert.Equal(2, qms[0].Value);
             Assert.Equal(3, qms.Count);
+            await TestSetup.ClearDb(_testOutputHelper, this._fixture);
+
         }
 
         [Fact]
@@ -204,6 +211,8 @@ namespace Tests.Inventory
             Assert.Equal(6, qms[1].Value);
             Assert.Equal(7, qms[0].Value);
             Assert.Equal(3, qms.Count);
+            await TestSetup.ClearDb(_testOutputHelper, this._fixture);
+
         }
 
         [Fact]
@@ -241,6 +250,7 @@ namespace Tests.Inventory
 
             var qms = await output.InventoryRepo.GetQuantityMetricsAsync();
             Assert.Single(qms);
+            await TestSetup.ClearDb(_testOutputHelper, this._fixture);
 
         }
 
@@ -285,6 +295,7 @@ namespace Tests.Inventory
 
             var qms = await output.InventoryRepo.GetQuantityMetricsAsync();
             Assert.Equal(3, qms.Count);
+            await TestSetup.ClearDb(_testOutputHelper, this._fixture);
 
         }
 
@@ -328,6 +339,7 @@ namespace Tests.Inventory
 
             var qms = await output.InventoryRepo.GetQuantityMetricsAsync();
             Assert.Equal(5, qms.Count);
+            await TestSetup.ClearDb(_testOutputHelper, this._fixture);
 
         }
 
@@ -367,6 +379,7 @@ namespace Tests.Inventory
 
             var qms = await output.InventoryRepo.GetQuantityMetricsAsync();
             Assert.Equal(5, qms.Count);
+            await TestSetup.ClearDb(_testOutputHelper, this._fixture);
 
         }
 
@@ -392,6 +405,7 @@ namespace Tests.Inventory
 
             var qms = await output.InventoryRepo.GetQuantityMetricsAsync();
             Assert.Empty(qms);
+            await TestSetup.ClearDb(_testOutputHelper, this._fixture);
 
         }
 
@@ -454,7 +468,8 @@ namespace Tests.Inventory
             Assert.Equal(2, qms.Count);
             Assert.Equal(200, qms[0].Value);
             Assert.Equal(100, qms[0].Diff);
-
+            await TestSetup.ClearDb(_testOutputHelper, this._fixture);
+          
         }
 
 

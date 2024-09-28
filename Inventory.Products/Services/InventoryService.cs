@@ -56,6 +56,17 @@ public class InventoryService(IInventoryRepository repo) : IInventoryService
             (dto.Id, dto.Description, dto.Code, dto.SourceId));
 
     }
+    public async     Task<UnitOfMeasurementDto> AddUnitOfMeasurementAsync(UnitOfMeasurementDto dto)
+    {
+        return await repo.AddUnitOfMeasurementAsync(new UnitOfMeasurementDto
+            (dto.Id, dto.Text));
+
+    }
+
+    Task<UnitOfMeasurementDto> IInventoryService.EditUnitOfMeasurementAsync(UnitOfMeasurementDto dto)
+    {
+        throw new NotImplementedException();
+    }
 
     public async Task<QuantityMetricDto> AddQuantityMetricAsync(QuantityMetricDto dto)
     {

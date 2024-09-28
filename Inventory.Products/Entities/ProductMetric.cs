@@ -19,7 +19,8 @@ public class ProductMetric
             Value = m.Value,
             //    Currency = m.Currency,
             ProductCode = m.ProductCode,
-            MetricCode = m.MetricCode
+            MetricCode = m.MetricCode,
+            UnitOfMeasurementId = m.UnitOfMeasurementId
         };
     }
     

@@ -28,8 +28,8 @@ public class ProductDto
     }
 
 
-    public Guid Id { get; private set; } 
-    public string Description { get; private set; } 
+    public Guid Id { get;  set; } 
+    public string Description { get; set; } 
     public string Code { get; private set; } 
     public Guid InventoryId { get; private set; } 
     public List<ProductMetricDto> Metrics { get; private set; } 

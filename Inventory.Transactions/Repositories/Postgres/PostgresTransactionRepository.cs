@@ -301,7 +301,7 @@ namespace Inventory.Transactions.Repositories.Postgres
 
             };
             context.Transactions.Add(t);
-            
+            if (dto.Sections!=null)
             foreach (var ts in dto.Sections)
                 AddTransactionSection(
                     t

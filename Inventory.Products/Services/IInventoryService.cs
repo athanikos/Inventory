@@ -24,4 +24,8 @@ public interface  IInventoryService
     Task< MetricDto>    EditMetricAsync(MetricDto dto);
   
     
+    Task<UnitOfMeasurementDto> AddUnitOfMeasurementAsync(UnitOfMeasurementDto dto);
+    Task<UnitOfMeasurementDto> EditUnitOfMeasurementAsync(UnitOfMeasurementDto dto);
+
+    
 }

@@ -3,6 +3,7 @@ using System;
 using Inventory.Products;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Inventory.Products.Data.Migrations
 {
     [DbContext(typeof(ProductsDbContext))]
-    partial class ProductsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240927133217_PG2000")]
+    partial class PG2000
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -238,21 +241,6 @@ namespace Inventory.Products.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Source", "Products");
-                });
-
-            modelBuilder.Entity("Inventory.Products.Entities.UnitOfMeasurement", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Text")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("UnitOfMeasurement", "Products");
                 });
 
             modelBuilder.Entity("Inventory.Products.Entities.InventoryMetric", b =>

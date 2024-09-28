@@ -52,6 +52,12 @@ namespace Inventory.Products.Repositories
 
         public  Task<List<QuantityMetricDto>> GetQuantityMetricsAsync();
 
+        public ProductsDbContext Context();
+
+        public Task<UnitOfMeasurementDto> AddUnitOfMeasurementAsync(UnitOfMeasurementDto dto);
+
+         
+        public Task<UnitOfMeasurementDto> GetUnitOfMeasurementAsync(Guid id);
 
     }
 }

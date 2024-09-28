@@ -13,7 +13,6 @@ namespace Inventory.Products.Services
     /// </summary>
     public class ModifyQuantityService(IModifyQuantityRepository repo) : IModifyQuantityService
     {
-        private readonly IModifyQuantityRepository _repo = repo;
         private readonly ModifyQuantityInterval _interval = ModifyQuantityInterval.Daily;
 
         public enum ModifyQuantityInterval
@@ -39,13 +38,13 @@ namespace Inventory.Products.Services
         {
             Validate(inboundQuantities);
 
-            await using var transaction = await _repo.Context.Database.BeginTransactionAsync();
+            await using var transaction = await repo.Context.Database.BeginTransactionAsync();
             try
             {
                 // cancell all inbound records 
                 foreach (var item  in inboundQuantities)
-                    _repo.EditQuantityMetric(item.ProductId, item.EffectiveFrom, true);
-                await _repo.SaveChangesAsync();
+                    repo.EditQuantityMetric(item.ProductId, item.EffectiveFrom, true);
+                await repo.SaveChangesAsync();
 
                 // group by productId 
                 var groupedInboundQuantities = from i in inboundQuantities
@@ -60,7 +59,7 @@ namespace Inventory.Products.Services
 
                 foreach (var item in groupedInboundQuantities)
                 {
-                    var previousItem = await _repo.GetPreviousWithLockAsync(item);
+                    var previousItem = await repo.GetPreviousWithLockAsync(item);
                     if (previousItem == null)
                         break; 
 
@@ -81,13 +80,13 @@ namespace Inventory.Products.Services
                 }
 
                  
-                await _repo.Context.SaveChangesAsync();
+                await repo.Context.SaveChangesAsync();
                 await transaction.CommitAsync();
             }
             catch (Exception )
             {
                 await transaction.RollbackAsync();
-                _repo.Context.ChangeTracker.Clear();
+                repo.Context.ChangeTracker.Clear();
             }
 
         }
@@ -105,13 +104,13 @@ namespace Inventory.Products.Services
         {
             Validate(inboundQuantities);
             inboundQuantities = [.. inboundQuantities.OrderBy(o => o.EffectiveFrom)];
-            await using var transaction = await _repo.Context.Database.BeginTransactionAsync();
+            await using var transaction = await repo.Context.Database.BeginTransactionAsync();
             try
             {
               
                 foreach (var item in inboundQuantities)
                       await AddWithUpdatedQuantityBasedOnPrevious(item);    
-                await _repo.Context.SaveChangesAsync();
+                await repo.Context.SaveChangesAsync();
 
                 var DistinctProductIdsWithMinimumEffective = (
                                                              from prod in inboundQuantities
@@ -126,14 +125,14 @@ namespace Inventory.Products.Services
                 foreach (var prod in DistinctProductIdsWithMinimumEffective)
                 {
                     refetchedEntries.AddRange(
-                               await _repo.GetQuantityMetricsPostEffectiveDate(prod.ProductId, prod.EffectiveFrom)
+                               await repo.GetQuantityMetricsPostEffectiveDate(prod.ProductId, prod.EffectiveFrom)
                         );
                 }
 
                 foreach (var prod in refetchedEntries)
                 {
                     await ModifyQuantityPostEffectiveDate(prod);
-                    await _repo.Context.SaveChangesAsync();
+                    await repo.Context.SaveChangesAsync();
                 }
 
 
@@ -143,7 +142,7 @@ namespace Inventory.Products.Services
             catch (Exception)
             {
                 await transaction.RollbackAsync();
-                _repo.Context.ChangeTracker.Clear();
+                repo.Context.ChangeTracker.Clear();
             }
         }
 
@@ -156,13 +155,13 @@ namespace Inventory.Products.Services
         /// <exception cref="ArgumentException"></exception>
         private async Task AddWithUpdatedQuantityBasedOnPrevious(ModifyQuantityDto dto)
         {
-            var previousInStore = await _repo.GetPreviousWithLockAsync(dto);
+            var previousInStore = await repo.GetPreviousWithLockAsync(dto);
 
             if (dto.ModificationType != ModificationType.Buy)
                 if (previousInStore == null)
                     throw new ArgumentException($"no previous entry found with less than {dto.EffectiveFrom} ");
 
-            var qmStart =  _repo.AddQuantityMetric(dto.ProductId,
+            var qmStart =  repo.AddQuantityMetric(dto.ProductId,
                                     CalculateQuantity(dto, 
                                     new ModifyQuantityDto() 
                                     {
@@ -206,7 +205,7 @@ namespace Inventory.Products.Services
                 ModificationType = ModificationType.EndLet
                 
             };
-            _repo.Context.QuantityMetrics.Add(qmEnd);
+            repo.Context.QuantityMetrics.Add(qmEnd);
         }
 
 
@@ -217,7 +216,7 @@ namespace Inventory.Products.Services
         /// <returns></returns>
         private async Task ModifyQuantityPostEffectiveDate(ModifyQuantityDto baseItem)
         {
-            var postEffectiveDateRows = await _repo.GetPostEffectiveDateRowsWithLockAsync(baseItem);
+            var postEffectiveDateRows = await repo.GetPostEffectiveDateRowsWithLockAsync(baseItem);
 
             foreach (var postItem in postEffectiveDateRows)
             {

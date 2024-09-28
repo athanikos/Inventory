@@ -22,6 +22,9 @@ public class ProductsDbContext : DbContext
     public DbSet<QuantityMetric> QuantityMetrics { get; set; }
     public DbSet<InventoryMetric> InventoryMetrics { get; set; }
 
+    public DbSet<UnitOfMeasurement> UnitOfMeasurements { get; set; }
+
+    
     protected override void OnModelCreating
     (ModelBuilder modelBuilder)
     {
@@ -40,6 +43,7 @@ public class ProductsDbContext : DbContext
 
         modelBuilder.Entity<QuantityMetric>().ToTable("QuantityMetric");
 
+        modelBuilder.Entity<UnitOfMeasurement>().ToTable("UnitOfMeasurement");
 
         modelBuilder.Entity<QuantityMetric>()
         .HasKey(p => new { p.ProductId, p.EffectiveDate });
@@ -62,6 +66,7 @@ public class ProductsDbContext : DbContext
           .WithMany(e => e.Products)
           .UsingEntity<ProductMetric>()
           .HasKey(p => new { p.MetricId, p.ProductId, p.EffectiveDate });
+
 
         modelBuilder.Entity<Entities.Inventory>()
             .HasMany(e => e.Metrics)

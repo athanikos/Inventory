@@ -17,22 +17,28 @@ namespace Tests.Inventory
         [Fact]
         public async Task TestUniqueConstraintOnMinutesDifferenceTwoRecordsAreInserted()
         {
-
+            await TestSetup.ClearDb(_testOutputHelper, this._fixture);
             var output = await TestSetup.Setup(_testOutputHelper, this._fixture);
 
 
-            DateTime dateWithMinutes = new(2020, 1, 1, 1, 1, 0);
+            DateTime dateWithMinutes = new(2021, 1, 1, 1, 1, 0);
             var quantityMetricDto = QuantityMetricDto.NewQuantityMetricDto(output.ProductId, 1, 
                 dateWithMinutes, output. TransactionId, 1, false, ModificationType.Buy);
+            
             _ = await output.InventoryRepo.AddQuantityMetricAsync(quantityMetricDto);
+            
             DateTime dateWithMinutes2 = new(2020, 1, 1, 1, 13, 0);
-
             var quantityMetricDto2 = QuantityMetricDto.NewQuantityMetricDto(output.ProductId, 1, 
                 dateWithMinutes2, output.TransactionId, 1, false, ModificationType.Buy);
+         
             await output.InventoryRepo.AddQuantityMetricAsync(quantityMetricDto2);
 
             var qms = await output.InventoryRepo.GetQuantityMetricsAsync();
             Assert.Equal(2, qms.Count);
+
+            // workaround fix to clear db records, records  are kept in next test and cause to fail 
+          await TestSetup.ClearDb(_testOutputHelper, this._fixture);
+
         }
 
         [Fact]
@@ -59,8 +65,6 @@ namespace Tests.Inventory
             var qms = await output.InventoryRepo.GetQuantityMetricsAsync();
             Assert.Single(qms);
 
-
-            // workaround fix to clear db records, records  are kept in next test and cause to fail 
             await TestSetup.ClearDb(_testOutputHelper, this._fixture);
 
 
@@ -75,16 +79,24 @@ namespace Tests.Inventory
             var quantityMetricDto = QuantityMetricDto.NewQuantityMetricDto(output.ProductId, 1,
                 new DateTime(1990,1,1,1,1,1), output. TransactionId, 1, false,ModificationType.Buy);
 
-            try 
+            try
             {
                 output.InventoryRepo.AddQuantityMetric(quantityMetricDto);
                 output.InventoryRepo.AddQuantityMetric(quantityMetricDto); // fails on context add not even on saves 
-                await output.InventoryRepo.SaveChangesAsync(); 
+                await output.InventoryRepo.SaveChangesAsync();
             }
-            catch (Exception) { }
+            catch (Exception)
+            {
+                output.InventoryRepo.Context().ChangeTracker.Clear();
+            }
 
             var qms = await  output.InventoryRepo.GetQuantityMetricsAsync();
             Assert.Empty(qms);
+            
+            // workaround fix to clear db records, records  are kept in next test and cause to fail 
+        //    await TestSetup.ClearDb(_testOutputHelper, this._fixture);
+           await TestSetup.ClearDb(_testOutputHelper, this._fixture);
+
         }
 
         

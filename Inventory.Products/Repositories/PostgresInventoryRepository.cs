@@ -6,17 +6,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Inventory.Products.Repositories
 {
-    public class PostgresInventoryRepository : IInventoryRepository
+    public class PostgresInventoryRepository(ProductsDbContext context) : IInventoryRepository
     {
-        private readonly ProductsDbContext _context;
-
-        public PostgresInventoryRepository(ProductsDbContext context)
-        { _context = context; }
-
-        public Task<bool> CategoryFatherIdExistsAsync(Guid FatherId)
+        public Task<bool> CategoryFatherIdExistsAsync(Guid fatherId)
         {
-            return _context.Categories
-                   .Where(p => p.FatherId == FatherId)
+            return context.Categories
+                   .Where(p => p.FatherId == fatherId)
                    .AnyAsync();
         }
         /// <summary>
@@ -24,26 +19,28 @@ namespace Inventory.Products.Repositories
         /// </summary>
         public void EmptyDB()
         {
-            _context.Sources.RemoveRange(_context.Sources);
-            _context.Inventories.RemoveRange(_context.Inventories);
-            _context.Metrics.RemoveRange(_context.Metrics);
-            _context.Categories.RemoveRange(_context.Categories);
-            _context.ProductCategories.RemoveRange(_context.ProductCategories);
-            _context.ProductMetrics.RemoveRange(_context.ProductMetrics);
-            _context.QuantityMetrics.RemoveRange(_context.QuantityMetrics);
-            _context.Products.RemoveRange(_context.Products);
-            _context.SaveChanges();
+      
+            context.Inventories.RemoveRange(context.Inventories);
+            context.Metrics.RemoveRange(context.Metrics);
+            context.Categories.RemoveRange(context.Categories);
+            context.ProductCategories.RemoveRange(context.ProductCategories);
+            context.ProductMetrics.RemoveRange(context.ProductMetrics);
+            context.QuantityMetrics.RemoveRange(context.QuantityMetrics);
+            context.Products.RemoveRange(context.Products);
+            context.Sources.RemoveRange(context.Sources);
+            context.SaveChanges();
         }
 
+        
         #region Inventory
         public bool InventoryIdExists(Guid id)
         {
-            return _context.Inventories.Any(p => p.Id == id);
+            return context.Inventories.Any(p => p.Id == id);
         }
 
         public async Task<InventoryDto> GetInventoryAsync(Guid inventoryId)
         {
-            return await _context
+            return await context
                 .Inventories.Where(o => o.Id == inventoryId)
                 .Select(i=>new InventoryDto(i.Id,i.Description))
                 .SingleAsync();
@@ -52,16 +49,16 @@ namespace Inventory.Products.Repositories
         public async Task<InventoryDto> AddInventoryAsync(InventoryDto c)
         {
             var e = new Entities.Inventory() { Id = c.Id, Description = c.Description };
-            _context.Inventories.Add(e);
-            await _context.SaveChangesAsync();
+            context.Inventories.Add(e);
+            await context.SaveChangesAsync();
             return await GetInventoryAsync(e.Id);
         }
 
         public async Task<InventoryDto> EditInventoryAsync(InventoryDto c)
         {
             Entities.Inventory e = AddInventory(c);
-            _context.Update(e);
-            await _context.SaveChangesAsync();
+            context.Update(e);
+            await context.SaveChangesAsync();
             return new InventoryDto(c.Id, c.Description);
         }
 
@@ -72,14 +69,14 @@ namespace Inventory.Products.Repositories
 
         public async Task DeleteInventoryAsync(InventoryDto c)
         {
-            List<Product> products = [.. _context.Products.Where(p=>p.InventoryId == c.Id)];
+            List<Product> products = [.. context.Products.Where(p=>p.InventoryId == c.Id)];
 
             foreach (Product pc in products)
-                _context.Remove(pc);
-            Entities.Inventory e = _context.Inventories.Where(p => p.Id == c.Id).Single();
-            _context.Remove(e);
+                context.Remove(pc);
+            Entities.Inventory e = context.Inventories.Where(p => p.Id == c.Id).Single();
+            context.Remove(e);
 
-             await _context.SaveChangesAsync();           
+             await context.SaveChangesAsync();           
         }
         #endregion
 
@@ -88,33 +85,38 @@ namespace Inventory.Products.Repositories
             var p = new Product() { Description = c.Description, 
                 Id = c.Id, Code = c.Code, InventoryId = c.InventoryId };
             
-            _context.Products.Add(p);
+            context.Products.Add(p);
 
             foreach (var m in c.Metrics)
                 DecideNewOrEdit(m);
 
 
-            await _context.SaveChangesAsync();
+            await context.SaveChangesAsync();
 
             return await GetProductAsync(p.Id);
         }
 
         public async Task<ProductDto> EditProductAsync(ProductDto c)
         {
-            Product p = new Product()
-            { Description = c.Description, Id = c.Id, Code = c.Code, InventoryId = c.InventoryId };
-            _context.Update(p);
+
+
+            Product p = await context.Products.Where(p => p.Id == c.Id).SingleAsync();
+            p.Description = c.Description;
+            p.Code = c.Code;
+            p.InventoryId = c.InventoryId; 
+            context.Update(p);
+             
 
             foreach (var m in c.Metrics)
                 DecideNewOrEdit(m);
             
-            await _context.SaveChangesAsync();
+            await context.SaveChangesAsync();
             return await GetProductAsync(p.Id);
         }
 
         private async  Task<ProductDto> GetProductAsync(Guid id)
         {
-            var entity = await  _context.Products.Where(p => p.Id == id).Select(i => i).SingleAsync();
+            var entity = await  context.Products.Where(p => p.Id == id).Select(i => i).SingleAsync();
             return new ProductDto(entity.Id,
                                    entity.Description,
                                    entity.Code,
@@ -125,10 +127,10 @@ namespace Inventory.Products.Repositories
 
         public List<string> GetDistinctProductCodes(Guid inventoryId)
         {
-            if (!_context.Products.Any())
+            if (!context.Products.Any())
                 return [];
 
-            return [.. _context.Products
+            return [.. context.Products
                     .Where(r => !String.IsNullOrEmpty(r.Code))
                     .Select(t => t.Code.ToUpper())
                     .Distinct()];
@@ -136,10 +138,10 @@ namespace Inventory.Products.Repositories
 
         public  List<string> GetDistinctMetricCodes()
         {
-            if (!_context.Metrics.Any()) 
+            if (!context.Metrics.Any()) 
                 return [];
         
-            return [.. _context.Metrics
+            return [.. context.Metrics
                          .Where(r => !String.IsNullOrEmpty(r.Code))
                          .Select(t=> t.Code.ToUpper())
                          .Distinct()];
@@ -149,7 +151,7 @@ namespace Inventory.Products.Repositories
         {
                 UpdateProductMetricCodes(m);
                 DecideNewOrEdit(m);
-                await _context.SaveChangesAsync();
+                await context.SaveChangesAsync();
         }
 
         public void AddOrEditProductMetric(ProductMetricDto m)
@@ -160,7 +162,7 @@ namespace Inventory.Products.Repositories
 
         public async Task<ProductMetricDto> GetProductMetricAsync(string productCode, string metricCode, DateTime effectivedate )
         {
-           return  await _context.ProductMetrics
+           return  await context.ProductMetrics
                .Where(p=>p.MetricCode== metricCode && p.ProductCode == productCode
                                         && p.EffectiveDate == effectivedate)
                .Select ( i=> new ProductMetricDto(i.ProductId,i.MetricId, i.Value, 
@@ -170,7 +172,7 @@ namespace Inventory.Products.Repositories
 
         public async Task<ProductMetricDto> GetProductMetricAsync(Guid productId, DateTime effectivedate)
         {
-            return await _context.ProductMetrics
+            return await context.ProductMetrics
                                   .Where(p => p.ProductId == productId
                                          && p.EffectiveDate == effectivedate)
                                   .Select(i => new ProductMetricDto(i.ProductId, i.MetricId, i.Value, i.EffectiveDate,
@@ -190,18 +192,18 @@ namespace Inventory.Products.Repositories
                 
         private void UpdateMetricCodes(Guid productId, Guid metricId, out string productCode, out string metricCode)
         {
-            productCode = _context.Products.
+            productCode = context.Products.
                                  Where(p => p.Id == productId).
                                  Select(i => i.Code).Single();
 
-            metricCode = _context.Metrics.
+            metricCode = context.Metrics.
                           Where(p => p.Id == metricId).
                           Select(i => i.Code).Single();
         }
 
         public void DecideNewOrEdit(ProductMetricDto m)
         {
-            var pm = _context.ProductMetrics.FirstOrDefault(p => p.MetricId == m.MetricId
+            var pm = context.ProductMetrics.FirstOrDefault(p => p.MetricId == m.MetricId
                                                                  && p.ProductId == m.ProductId
                                                                  && p.EffectiveDate == m.EffectiveDate); // needed tolist ? https://stackoverflow.com/questions/61052687/a-command-is-already-in-progress
 
@@ -214,15 +216,15 @@ namespace Inventory.Products.Repositories
                 pm.EffectiveDate = m.EffectiveDate;
                 pm.MetricCode = m.MetricCode;
                 pm.MetricId = m.MetricId;
-                _context.Update(pm);
+                context.Update(pm);
             }
             else
-                _context.ProductMetrics.Add(ProductMetric.CreateProductMetric(m));
+                context.ProductMetrics.Add(ProductMetric.CreateProductMetric(m));
         }
 
         public void DecideNewOrEdit(QuantityMetricDto m)
         {
-            var qm = _context.QuantityMetrics.FirstOrDefault(p => p.ProductId == m.ProductId
+            var qm = context.QuantityMetrics.FirstOrDefault(p => p.ProductId == m.ProductId
                                                                   && p.EffectiveDate == m.EffectiveDate); // needed tolist ? https://stackoverflow.com/questions/61052687/a-command-is-already-in-progress
 
             if (qm!=null) 
@@ -230,26 +232,26 @@ namespace Inventory.Products.Repositories
                 qm.ProductId = m.ProductId;
                 qm.Value = m.Value; 
                 qm.EffectiveDate = m.EffectiveDate; 
-                _context.Update(qm);
+                context.Update(qm);
             }
             else
-                _context.QuantityMetrics.Add(QuantityMetric.CreateQuantityMetric(m));
+                context.QuantityMetrics.Add(QuantityMetric.CreateQuantityMetric(m));
         }
 
         public async Task AddOrEditInventoryMetric(InventoryMetricDto m)
         {
             UpdateInventoryMetricCodes(m);
             DecideNewOrEdit(m);
-            await _context.SaveChangesAsync();
+            await context.SaveChangesAsync();
         }
 
         public void UpdateInventoryMetricCodes(InventoryMetricDto m)
         {
-            string inventoryCode = _context.Inventories.
+            string inventoryCode = context.Inventories.
                                  Where(p => p.Id == m.InventoryId).
                                  Select(i => i.Code).Single();
 
-            string metricCode = _context.Metrics.
+            string metricCode = context.Metrics.
                           Where(p => p.Id == m.MetricId).
                           Select(i => i.Code).Single();
 
@@ -260,41 +262,41 @@ namespace Inventory.Products.Repositories
 
         public void DecideNewOrEdit(InventoryMetricDto m)
         {
-            var metricExists = _context.InventoryMetrics
+            var metricExists = context.InventoryMetrics
                 .Any(p => p.MetricId == m.MetricId
                           && p.InventoryId == m.InventoryId
                           && p.EffectiveDate == m.EffectiveDate);
 
             if (metricExists)
-                _context.Update(m);
+                context.Update(m);
             else
-                _context.InventoryMetrics.Add(InventoryMetric.CreateInventoryMetric(m));
+                context.InventoryMetrics.Add(InventoryMetric.CreateInventoryMetric(m));
         }
 
         public async Task DeleteProductAsync(ProductDto c)
         {
-            List<ProductCategory> pcs = [.. _context.ProductCategories.
+            List<ProductCategory> pcs = [.. context.ProductCategories.
                                             Where(p => p.ProductId == c.Id)];
             
             foreach (ProductCategory pc in pcs)
-                _context.Remove(pc);
+                context.Remove(pc);
 
-            List<ProductMetric> pms = [.. _context.ProductMetrics.
+            List<ProductMetric> pms = [.. context.ProductMetrics.
                                            Where(p => p.ProductId == c.Id)];
            
             foreach (ProductMetric pm in pms)
-                _context.Remove(pm);
+                context.Remove(pm);
 
-            var p = _context.Products.
+            var p = context.Products.
                 Single(p => p.Id == c.Id);
-            _context.Remove(p);
+            context.Remove(p);
 
-            await _context.SaveChangesAsync();
+            await context.SaveChangesAsync();
         }
 
         public async Task<bool> ProductDescriptionOrCategoryIsUsedAsync(ProductDto c)
         {
-            return await   _context.Products
+            return await   context.Products
                            .Where(  p => (p.Code == c.Code || p.Description == c.Description)
                             && p.Id != c.Id  )
                            .AnyAsync();    
@@ -302,52 +304,76 @@ namespace Inventory.Products.Repositories
 
         public async  Task<bool> CategoryIdExistsAsync(Guid Id)
         {
-            return await _context.Categories
+            return await context.Categories
                          .Where(p => p.Id == Id).AnyAsync(); 
         }
 
         public async Task<CategoryDto> AddCategoryAsync(CategoryDto c)
         {
-            _context.Categories.Add(new Category() { FatherId = c.FatherId, Name = c.Description });
-            await _context.SaveChangesAsync();
+            context.Categories.Add(new Category() { FatherId = c.FatherId, Name = c.Description });
+            await context.SaveChangesAsync();
             return new CategoryDto(c.Id, c.Description, c.FatherId);
         }
 
         public async Task<CategoryDto> EditCategoryAsync(CategoryDto c)
         {
             Entities.Category e = new Entities.Category() { FatherId = c.FatherId, Name = c.Description, Id = c.Id };
-            _context.Update(e);
-            await _context.SaveChangesAsync();
+            context.Update(e);
+            await context.SaveChangesAsync();
             return new CategoryDto(c.Id, c.Description, c.FatherId);
         }
 
         public async Task DeleteCategoryAsync(CategoryDto c)
         {
-            List<ProductCategory> pcs = [.. _context.ProductCategories.Where(p => p.CategoryId == c.Id)];
+            List<ProductCategory> pcs = [.. context.ProductCategories.Where(p => p.CategoryId == c.Id)];
            
             foreach (ProductCategory pc in pcs)
-                _context.Remove(pc);
+                context.Remove(pc);
             
-            var e = _context.Categories
+            var e = context.Categories
                 .Single(p => p.Id == c.Id);
-            _context.Remove(e);
+            context.Remove(e);
 
-            await _context.SaveChangesAsync();
+            await context.SaveChangesAsync();
         }
 
         public async Task<MetricDto> AddMetricAsync(MetricDto c)
         {
-            _context.Metrics.Add(new Metric()
+            context.Metrics.Add(new Metric()
             {
                 Code = c.Code,
                 Id = c.Id,
                 SourceId = c.SourceId,
                 Description = c.Description,
             });
-            await _context.SaveChangesAsync();
+            await context.SaveChangesAsync();
             return new MetricDto(c.Id, c.Description, c.Code, c.SourceId);
         }
 
+        
+      public  async  Task<UnitOfMeasurementDto> AddUnitOfMeasurementAsync(UnitOfMeasurementDto dto)
+        {
+            UnitOfMeasurement uom = new UnitOfMeasurement();
+            uom.Id = dto.Id;
+            uom.Text = dto.Text;
+            context.Add(uom);
+            await context.SaveChangesAsync();
+            return await  GetUnitOfMeasurementAsync(uom.Id);
+        }
+
+       async  Task<UnitOfMeasurementDto> EditUnitOfMeasurementAsync(UnitOfMeasurementDto dto)
+        {
+            UnitOfMeasurement e = new UnitOfMeasurement()
+            {
+                Id = dto.Id,
+                Text = dto.Text,
+            };
+            context.Update(e);
+            await context.SaveChangesAsync();
+            return new UnitOfMeasurementDto(e.Id, e.Text);
+        }
+        
+        
         public async Task<MetricDto> EditMetricAsync(MetricDto c)
         {
             Metric e = new Metric()
@@ -357,28 +383,28 @@ namespace Inventory.Products.Repositories
                 SourceId = c.SourceId,
                 Description = c.Description,
             };
-            _context.Update(e);
-            await _context.SaveChangesAsync();
+            context.Update(e);
+            await context.SaveChangesAsync();
             return new MetricDto(c.Id, c.Description, c.Code, c.SourceId);
         }
 
         public async Task DeleteMetricAsync(MetricDto c)
         {
-            List<ProductMetric> pcs = [.. _context.ProductMetrics.Where(p => p.MetricId == c.Id)];
+            List<ProductMetric> pcs = [.. context.ProductMetrics.Where(p => p.MetricId == c.Id)];
             
             foreach (ProductMetric pc in pcs)
-                _context.Remove(pc);
+                context.Remove(pc);
 
-            Metric e = _context.Metrics
+            Metric e = context.Metrics
                 .Single(p => p.Id == c.Id);
             
-            _context.Remove(e);
-            await _context.SaveChangesAsync();
+            context.Remove(e);
+            await context.SaveChangesAsync();
         }
 
         public MetricDto GetMetric(Guid metricId)
         {
-            var entity = _context.Metrics
+            var entity = context.Metrics
                          .Where(p =>  p.Id == metricId)
                          .Select(i => i)
                          .Single();
@@ -390,8 +416,8 @@ namespace Inventory.Products.Repositories
         {
             Entities.Source e = new Entities.Source() 
                                 { Id = dto.Id, Description = dto.Description  };
-            _context.Sources.Add(e);
-            await _context.SaveChangesAsync();
+            context.Sources.Add(e);
+            await context.SaveChangesAsync();
             return new SourceDto(dto.Id, dto.Description);
         }
 
@@ -411,20 +437,20 @@ namespace Inventory.Products.Repositories
             {
 
                 // todo cache reuse allcodes field add to repo and do lazy loading ? or refresh evry 
-                var productInfo  =await  _context
+                var productInfo  =await  context
                        .Products
                        .Where(i => i.Code == productCode)    
                        .Select(i => new { i.Id,  i.Code })
                        .SingleAsync();
 
-                var metricInfo = await _context
+                var metricInfo = await context
                   .Metrics
                   .Where(i => i.Code == MetricCode)
                   .Select(i => new { i.Id, i.Code })
                   .SingleAsync();
 
 
-                var item =  await _context
+                var item =  await context
                 .QuantityMetrics
                 .Where(u => u.ProductId == productInfo.Id)
                 .OrderByDescending(i => i.EffectiveDate)
@@ -448,7 +474,7 @@ namespace Inventory.Products.Repositories
             else
             {
 
-                       return await _context
+                       return await context
                        .ProductMetrics
                        .Where(i => i.ProductCode == productCode && i.MetricCode == MetricCode)
                        .OrderByDescending(i => i.EffectiveDate)
@@ -478,8 +504,8 @@ namespace Inventory.Products.Repositories
             qm.Diff = dto.Diff;
             qm.IsCancelled = dto.IsCancelled;
             qm.EffectiveDate = dto.EffectiveDate;
-            _context.Add(qm);
-            await _context.SaveChangesAsync();
+            context.Add(qm);
+            await context.SaveChangesAsync();
             return await  GetQuantityMetricAsync(qm.ProductId, qm.EffectiveDate);
         }
 
@@ -497,8 +523,8 @@ namespace Inventory.Products.Repositories
             qm.Diff = dto.Diff;
             qm.IsCancelled = dto.IsCancelled;
             qm.EffectiveDate = dto.EffectiveDate;
-            _context.Update(qm);
-            await _context.SaveChangesAsync();
+            context.Update(qm);
+            await context.SaveChangesAsync();
             return await GetQuantityMetricAsync(qm.ProductId, qm.EffectiveDate);
         }
 
@@ -511,23 +537,33 @@ namespace Inventory.Products.Repositories
             qm.Diff = dto.Diff;
             qm.IsCancelled = dto.IsCancelled;   
             qm.TransactionId = dto.TransactionId;
-           
-            _context.Add(qm);
+      
+            
+            context.Add(qm);
         }
 
-        public async Task<QuantityMetricDto> GetQuantityMetricAsync(Guid id, DateTime EffectiveDate)
+        public async Task<QuantityMetricDto> GetQuantityMetricAsync(Guid id, DateTime effectiveDate)
         {
-            return  await _context.QuantityMetrics.
-                                   Where(i => i.ProductId == id && i.EffectiveDate == EffectiveDate).
+            return  await context.QuantityMetrics.
+                                   Where(i => i.ProductId == id && i.EffectiveDate == effectiveDate).
                                    Select(i =>new QuantityMetricDto(i.ProductId,i.Value,i.EffectiveDate,i.TransactionId, i.Diff,i.IsCancelled)).
                                    SingleAsync();
 
         }
 
-        public async Task<List<QuantityMetricDto>> GetQuantityMetricsAsync(Guid TransactionId)
+        public async Task<UnitOfMeasurementDto> GetUnitOfMeasurementAsync(Guid id)
         {
-            return await _context.QuantityMetrics.
-                                   Where(i => i.TransactionId == TransactionId).
+            return  await context.UnitOfMeasurements.
+                Where(i => i.Id == id ).
+                Select(i =>new UnitOfMeasurementDto(i.Id,i.Text)).
+                SingleAsync();
+
+        }
+        
+        public async Task<List<QuantityMetricDto>> GetQuantityMetricsAsync(Guid transactionId)
+        {
+            return await context.QuantityMetrics.
+                                   Where(i => i.TransactionId == transactionId).
                                    Select(i => new QuantityMetricDto(i.ProductId, i.Value, i.EffectiveDate, i.TransactionId, i.Diff, i.IsCancelled)).
                                    ToListAsync();
 
@@ -537,12 +573,16 @@ namespace Inventory.Products.Repositories
 
         public async Task<List<QuantityMetricDto>> GetQuantityMetricsAsync()
         {
-            return await _context.QuantityMetrics.
+            return await context.QuantityMetrics.
                                     Select(i => new QuantityMetricDto(i.ProductId, i.Value, i.EffectiveDate, i.TransactionId, i.Diff, i.IsCancelled)).
                                    ToListAsync();
 
         }
 
+        public ProductsDbContext Context()
+        {
+            return context;
+        }
 
 
         public async Task<List<QuantityMetricDto>>
@@ -552,14 +592,15 @@ namespace Inventory.Products.Repositories
             foreach (var item in qms)
                 item.IsCancelled = true;
 
-            await _context.SaveChangesAsync();
+            await context.SaveChangesAsync();
 
             return await GetQuantityMetricsAsync(transactionId);
         }
 
+       
         public async Task<int> SaveChangesAsync()
         {
-            return await _context.SaveChangesAsync();
+            return await context.SaveChangesAsync();
         }
     }
 }
