@@ -10,7 +10,6 @@ public class Default
     public Guid? EntityId { get; set; } // the id of the row in the corresponding entity table, for example for Euro it will hold  the UnitOfMeasurement Guid for euro 
 
     public string? EntityName { get; set; } // UnitOfMeasurement ...  needs to be resolved with reflection 
-
     
 }
 

@@ -58,7 +58,7 @@ namespace Inventory.WebApi
            Expressions.ConfigureServices.AddServices(builder.Services, builder.Configuration, mediatRAssemblies);
            Notifications.ConfigureServices.AddServices(builder.Services, builder.Configuration, mediatRAssemblies);
            Transactions.ConfigureServices.AddServices(builder.Services, builder.Configuration, mediatRAssemblies);
-
+           Defaults.ConfigureServices.AddServices(builder.Services, builder.Configuration, mediatRAssemblies);
            builder.Services.AddMediatR(cfg =>
            cfg.RegisterServicesFromAssemblies(mediatRAssemblies.ToArray()));
 
