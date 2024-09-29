@@ -25,6 +25,11 @@ Boolean Formulas
 TBD 
 
 
+### Configuration
+Holds the default values for entities. 
+Configures the initial state. 
+
+
 #### LivePricesService
 
 TBD 

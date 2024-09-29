@@ -116,7 +116,7 @@ namespace Tests.Inventory
 
 
             var _expressionDbContext = _fixture.GetService<ExpressionsDbContext>(_testOutputHelper)!;
-            _repo.EmptyDB();
+            _repo.EmptyDb();
 
             Guid InventoryId, sourceId;
             var tuple = (await SetupInventoryAndSource(_repo));
@@ -147,7 +147,7 @@ namespace Tests.Inventory
             var repo = _fixture.GetService<IInventoryRepository>(_testOutputHelper)!;
             var expressionsRepo = _fixture.GetService<IExpressionRepository>(_testOutputHelper)!;
 
-            repo.EmptyDB();
+            repo.EmptyDb();
             var tuple = (await SetupInventoryAndSource(repo));
             var inventoryId = tuple.Item1;
             var sourceId = tuple.Item2;
@@ -177,7 +177,7 @@ namespace Tests.Inventory
 
 
             _ = _fixture.GetService<ExpressionsDbContext>(_testOutputHelper)!;
-            repo.EmptyDB();
+            repo.EmptyDb();
             var tuple = (await SetupInventoryAndSource(repo));
             var inventoryId = tuple.Item1;
             var sourceId = tuple.Item2;
@@ -209,7 +209,7 @@ namespace Tests.Inventory
             var _mediator = _fixture.GetService<IMediator>(_testOutputHelper)!;
             var _repo = _fixture.GetService<IInventoryRepository>(_testOutputHelper)!;
             var _expressionsRepo = _fixture.GetService<IExpressionRepository>(_testOutputHelper)!;
-            _repo.EmptyDB();
+            _repo.EmptyDb();
             Guid InventoryId, sourceId;
             var tuple = (await SetupInventoryAndSource(_repo));
             InventoryId = tuple.Item1;
@@ -245,7 +245,7 @@ namespace Tests.Inventory
             var _mediator = _fixture.GetService<IMediator>(_testOutputHelper)!;
             var _repo = _fixture.GetService<IInventoryRepository>(_testOutputHelper)!;
             var _expressionsRepo = _fixture.GetService<IExpressionRepository>(_testOutputHelper)!;
-            _repo.EmptyDB();
+            _repo.EmptyDb();
             Guid InventoryId, sourceId;
             var tuple = (await SetupInventoryAndSource(_repo));
             InventoryId = tuple.Item1;
@@ -284,7 +284,7 @@ namespace Tests.Inventory
             var _mediator = _fixture.GetService<IMediator>(_testOutputHelper)!;
             var _repo = _fixture.GetService<IInventoryRepository>(_testOutputHelper)!;
             var _expressionsRepo = _fixture.GetService<IExpressionRepository>(_testOutputHelper)!;
-            _repo.EmptyDB();
+            _repo.EmptyDb();
             Guid InventoryId, sourceId;
             var tuple = (await SetupInventoryAndSource(_repo));
             InventoryId = tuple.Item1;
@@ -315,7 +315,7 @@ namespace Tests.Inventory
             IInventoryRepository repo = _fixture.GetService<IInventoryRepository>(_testOutputHelper)!;
             var expressionsRepo = _fixture.GetService<IExpressionRepository>(_testOutputHelper)!;
 
-            repo.EmptyDB();
+            repo.EmptyDb();
             var tuple = (await SetupInventoryAndSource(repo));
             var inventoryId = tuple.Item1;
 
@@ -338,7 +338,7 @@ namespace Tests.Inventory
             //  todo extract string to const
             // todo extract preparation steps , services and empty db 
 
-            repo.EmptyDB();
+            repo.EmptyDb();
             var tuple = (await SetupInventoryAndSource(repo));
             var inventoryId = tuple.Item1;
             var sourceId = tuple.Item2;
@@ -373,7 +373,7 @@ namespace Tests.Inventory
             //  todo extract string to const
             // todo extract preparation steps , services and empty db 
 
-            _repo.EmptyDB();
+            _repo.EmptyDb();
             Guid InventoryId, sourceId;
             var tuple = (await SetupInventoryAndSource(_repo));
             InventoryId = tuple.Item1;

@@ -19,36 +19,36 @@ namespace Inventory.Products.Repositories
         Task DeleteProductAsync(ProductDto c);
         Task<bool> ProductDescriptionOrCategoryIsUsedAsync(ProductDto c);
 
-        List<string> GetDistinctProductCodes(Guid InventoryId);
+        List<string> GetDistinctProductCodes(Guid inventoryId);
         List<string> GetDistinctMetricCodes();
         Task AddOrEditProductMetricAsync(ProductMetricDto m);
-        Task<ProductMetricDto> GetProductMetricAsync(Guid ProductId, DateTime effectivedate    );
+        Task<ProductMetricDto> GetProductMetricAsync(Guid productId, DateTime effectivedate    );
 
         Task<MetricDto> AddMetricAsync(MetricDto dto);
         Task<MetricDto> EditMetricAsync(MetricDto c);
         Task DeleteMetricAsync(MetricDto c);
 
         Task AddOrEditInventoryMetric(InventoryMetricDto m);
-        Task<bool> CategoryFatherIdExistsAsync(Guid FatherId);
+        Task<bool> CategoryFatherIdExistsAsync(Guid fatherId);
 
         Task<CategoryDto> AddCategoryAsync(CategoryDto dto);
-        Task<bool> CategoryIdExistsAsync(Guid Id);
+        Task<bool> CategoryIdExistsAsync(Guid id);
         Task<CategoryDto> EditCategoryAsync(CategoryDto c);
         Task DeleteCategoryAsync(CategoryDto c);
         Task<SourceDto> AddSourceAsync(SourceDto sourceDto);
 
-        Task<ProductMetricDto> GetProductMetricAsync(string ProductCode, string MetricCode);
+        Task<ProductMetricDto> GetProductMetricAsync(string productCode, string metricCode);
         Task<QuantityMetricDto> AddQuantityMetricAsync(QuantityMetricDto dto);
         Task<QuantityMetricDto> EditQuantityMetricAsync(QuantityMetricDto dto);
-        Task<QuantityMetricDto> GetQuantityMetricAsync(Guid ProductId, DateTime EffectiveDate);
+        Task<QuantityMetricDto> GetQuantityMetricAsync(Guid productId, DateTime effectiveDate);
         void  AddQuantityMetric(QuantityMetricDto dto);
         
         Task<int> SaveChangesAsync();
-        void EmptyDB();
+        void EmptyDb();
 
-        public  Task<List<QuantityMetricDto>>    CancellQuantityMetricsAsync(Guid TransactionId);
+        public  Task<List<QuantityMetricDto>>    CancellQuantityMetricsAsync(Guid transactionId);
    
-        public Task<List<QuantityMetricDto>>     GetQuantityMetricsAsync(Guid TransactionId);
+        public Task<List<QuantityMetricDto>>     GetQuantityMetricsAsync(Guid transactionId);
 
         public  Task<List<QuantityMetricDto>> GetQuantityMetricsAsync();
 

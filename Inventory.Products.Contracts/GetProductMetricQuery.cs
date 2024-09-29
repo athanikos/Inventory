@@ -3,7 +3,7 @@ using MediatR;
 
 namespace Inventory.Products.Contracts
 {
-        public  record GetProductMetricQuery(
-            string   ProductCode,
-                       string   MetricCode)   :  IRequest<ProductMetricDto>;
+        public  record GetProductMetricQuery(string   ProductCode, 
+                string   MetricCode)   :  IRequest<ProductMetricDto>;
 }
+

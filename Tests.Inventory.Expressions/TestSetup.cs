@@ -36,7 +36,7 @@ namespace Tests.Inventory
                 TransactionRepo = fixture.GetService<ITransactionRepository>(testOutputHelper)!,
                 ModifyQuantityService = fixture.GetService<IModifyQuantityService>(testOutputHelper)!
             };
-            output.InventoryRepo.EmptyDB();
+            output.InventoryRepo.EmptyDb();
             await output.TransactionRepo.EmptyDb();
             return output;
         }
@@ -50,7 +50,7 @@ namespace Tests.Inventory
                 TransactionRepo = fixture.GetService<ITransactionRepository>(testOutputHelper)!,
                 ModifyQuantityService = fixture.GetService<IModifyQuantityService>(testOutputHelper)!
             };
-            output.InventoryRepo.EmptyDB();
+            output.InventoryRepo.EmptyDb();
             await output.TransactionRepo.EmptyDb();
           
             var inventoryId = (await output.InventoryRepo.AddInventoryAsync(new InventoryDto(Guid.NewGuid(), 

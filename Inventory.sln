@@ -55,11 +55,25 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SQL", "SQL", "{0844F098-CD3
 		LetScript.text = LetScript.text
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Defaults", "Defaults", "{AC7A4717-12B8-4C28-B6E1-937110C9CA79}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Configuration", "Configuration", "{AC7A4717-12B8-4C28-B6E1-937110C9CA79}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inventory.Defaults", "Inventory.Defaults\Inventory.Defaults.csproj", "{CA9E65A7-3B03-43D7-8BD1-75F8BBA543EF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inventory.Configuration", "Inventory.Configuration\Inventory.Configuration.csproj", "{CA9E65A7-3B03-43D7-8BD1-75F8BBA543EF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inventory.Defaults.Contracts", "Inventory.Defaults.Contracts\Inventory.Defaults.Contracts.csproj", "{2B15E688-57F5-4599-9F22-EE53E0C80155}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inventory.Configuration.Contracts", "Inventory.Configuration.Contracts\Inventory.Configuration.Contracts.csproj", "{2B15E688-57F5-4599-9F22-EE53E0C80155}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sample requests", "Sample requests", "{991B6BAB-6EDC-4EB2-9AA3-244C925A2ED7}"
+	ProjectSection(SolutionItems) = preProject
+		addNotificaion.json = addNotificaion.json
+		AddPricesExpression.json = AddPricesExpression.json
+		AddPricesExpression.Designer.json = AddPricesExpression.Designer.json
+		addProductExpression.json = addProductExpression.json
+		editproduct.json = editproduct.json
+		insertInventory.json = insertInventory.json
+		InsertLegoProduct.json = InsertLegoProduct.json
+		insertproduct.json = insertproduct.json
+		InsertQuantityMetric.json = InsertQuantityMetric.json
+		login.json = login.json
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -151,6 +165,7 @@ Global
 		{AC7A4717-12B8-4C28-B6E1-937110C9CA79} = {A448CE67-00F2-4249-9DE5-040476B1CB95}
 		{CA9E65A7-3B03-43D7-8BD1-75F8BBA543EF} = {AC7A4717-12B8-4C28-B6E1-937110C9CA79}
 		{2B15E688-57F5-4599-9F22-EE53E0C80155} = {AC7A4717-12B8-4C28-B6E1-937110C9CA79}
+		{991B6BAB-6EDC-4EB2-9AA3-244C925A2ED7} = {73974222-20FE-4DD3-B1B4-B4A1867377EB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {582FC159-BB6D-4F86-A864-9DCDBC25735B}

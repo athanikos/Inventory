@@ -17,7 +17,7 @@ namespace Inventory.Products.Repositories
         /// <summary>
         /// for testing 
         /// </summary>
-        public void EmptyDB()
+        public void EmptyDb()
         {
       
             context.Inventories.RemoveRange(context.Inventories);

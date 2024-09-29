@@ -27,6 +27,6 @@ public interface  IInventoryService
     Task<UnitOfMeasurementDto> AddUnitOfMeasurementAsync(UnitOfMeasurementDto dto);
     Task<UnitOfMeasurementDto> EditUnitOfMeasurementAsync(UnitOfMeasurementDto dto);
 
-    Task InitializeDefaults();
+    Task<List<InitializeConfigurationResponse>> InitialConfigureAsync();
 
 }

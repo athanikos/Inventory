@@ -3,19 +3,19 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Inventory.Defaults;
 
-public class DefaultsDbContext(
+public class ConfigurationDbContext(
     DbContextOptions
-        <DefaultsDbContext> options) : DbContext(options)
+        <ConfigurationDbContext> options) : DbContext(options)
 {
-    public DbSet<Default> Defaults { get; set; }
+    public DbSet<Configuration> Configurations { get; set; }
  
     
     protected override void OnModelCreating
         (ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        modelBuilder.HasDefaultSchema("Defaults");
-        modelBuilder.Entity<Default>().ToTable("Default");
+        modelBuilder.HasDefaultSchema("Configurations");
+        modelBuilder.Entity<Configuration>().ToTable("Configuration");
 
     }
 

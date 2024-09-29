@@ -16,11 +16,11 @@ namespace Inventory.Defaults
             )
         {
             AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
-            services.AddDbContext<DefaultsDbContext>(options =>  
+            services.AddDbContext<ConfigurationDbContext>(options =>  
                                                      options.UseNpgsql(configuration
-                                                     .GetValue<string>("Products")));
+                                                     .GetValue<string>("Configuration")));
 
-            services.AddScoped<IDefaultsService, DefaultsService>();
+            services.AddScoped<IConfigurationService, ConfigurationService>();
      
             mediatRAssemblies.Add(typeof(ConfigureServices).Assembly);
             return services;

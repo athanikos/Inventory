@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Inventory.Defaults.Contracts;
 using Inventory.Products.Contracts;
 using Inventory.Products.Contracts.Dto;
 using Inventory.Products.Dto;
@@ -64,7 +65,7 @@ public class InventoryService(IInventoryRepository repo) : IInventoryService
 
     }
 
-    Task<UnitOfMeasurementDto> IInventoryService.EditUnitOfMeasurementAsync(UnitOfMeasurementDto dto)
+    public Task<UnitOfMeasurementDto> EditUnitOfMeasurementAsync(UnitOfMeasurementDto dto)
     {
         throw new NotImplementedException();
     }
@@ -86,14 +87,18 @@ public class InventoryService(IInventoryRepository repo) : IInventoryService
     {
         return await repo.AddCategoryAsync(new CategoryDto(dto.Id,dto.Description,dto.FatherId));
     }
-
- 
-
-    public async Task InitializeDefaults()
+    
+    public async Task<List<InitializeConfigurationResponse>> InitialConfigureAsync()
     {
-        await repo.AddUnitOfMeasurementAsync(new UnitOfMeasurementDto(Guid.NewGuid(), "EURO", UnitOfMeasurementType.Currency));
-        await repo.AddUnitOfMeasurementAsync(new UnitOfMeasurementDto(Guid.NewGuid(), "EMPTY", UnitOfMeasurementType.Empty));
+        List<InitializeConfigurationResponse> config = [];
+        var uom =  await repo.AddUnitOfMeasurementAsync(new UnitOfMeasurementDto(Guid.NewGuid(), "EURO", UnitOfMeasurementType.Currency));
+        config.Add(new InitializeConfigurationResponse() { Id = uom.Id, TypeName = ConfigurationType.DefaultCurrency}); 
+        uom =  await repo.AddUnitOfMeasurementAsync(new UnitOfMeasurementDto(Guid.NewGuid(), "EMPTY", UnitOfMeasurementType.Empty));
+        config.Add(new InitializeConfigurationResponse() { Id = uom.Id, TypeName = ConfigurationType.EmptyUnitOfMeasurement}); 
+        var source = await repo.AddSourceAsync(new SourceDto(Guid.NewGuid(), "SELF"));
+        config.Add(new InitializeConfigurationResponse() { Id = source.Id, TypeName =ConfigurationType.DefaultSource } );
         
+        return config;
     }
 
 

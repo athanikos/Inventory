@@ -22,7 +22,7 @@ namespace Tests.Inventory
         {
             var inventoryRepo = _fixture1.GetService<IInventoryRepository>(_testOutputHelper)!;
             var transactionRepo = _fixture1.GetService<ITransactionRepository>(_testOutputHelper)!;
-            inventoryRepo.EmptyDB();
+            inventoryRepo.EmptyDb();
             await transactionRepo.EmptyDb();
             
             var category = (await inventoryRepo.AddCategoryAsync(new CategoryDto(Guid.Empty, "cat",Guid.Empty)));
@@ -35,7 +35,7 @@ namespace Tests.Inventory
             Assert.Equal("TestMe",inventory.Description);
             
             var inventoryService  = _fixture1.GetService<IInventoryService>(_testOutputHelper)!;
-            inventoryRepo.EmptyDB();
+            inventoryRepo.EmptyDb();
             await transactionRepo.EmptyDb();
             inventory = await inventoryService.AddInventoryAsync(inventory);
             Assert.Equal("TestMe",inventory.Description);
