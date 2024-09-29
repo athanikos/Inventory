@@ -2,6 +2,6 @@
 {
     public  interface IFetcherRepository
     {
-        public List<Entities.PricesParameter> GetParameters(string _parameterType = "COINGECKO");
+        public List<Entities.PricesParameter> GetParameters(string parameterType = "COINGECKO");
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace Expressions.Entities
+﻿namespace Inventory.Expressions.Entities
 {
     /// <summary>
     /// QUANTITY(ADA,LATEST)

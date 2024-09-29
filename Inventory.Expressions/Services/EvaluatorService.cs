@@ -1,14 +1,12 @@
 ﻿using System.Globalization;
-using MediatR;
-using Inventory.Products.Contracts;
 using Hangfire;
-using Microsoft.EntityFrameworkCore;
-using Serilog;
-using Inventory.Notifications.Contracts;
 using Inventory.Expressions.Repositories;
-using Inventory.Expressions.Services;
+using Inventory.Notifications.Contracts;
+using Inventory.Products.Contracts;
+using MediatR;
+using Serilog;
 
-namespace Expressions
+namespace Inventory.Expressions.Services
 {
     public class EvaluatorService(IMediator mediator, IExpressionRepository repo) : IEvaluatorService
     {
@@ -320,7 +318,7 @@ namespace Expressions
                     () => DoScheduledWork(i), Cron.Minutely);
         }
 
-        public  void  DoScheduledWork(Entities.InventoryExpression ie)
+        public  void  DoScheduledWork(global::Inventory.Expressions.Entities.InventoryExpression ie)
         {
             try
             {
@@ -332,7 +330,7 @@ namespace Expressions
             }
         }
 
-        public  void DoScheduledWork(Entities.ProductExpression pe)
+        public  void DoScheduledWork(global::Inventory.Expressions.Entities.ProductExpression pe)
         {
             try
             {
@@ -345,7 +343,7 @@ namespace Expressions
 
         }
 
-        public void DoScheduledWork(Entities.BooleanExpression be)
+        public void DoScheduledWork(global::Inventory.Expressions.Entities.BooleanExpression be)
         {
             try
             {
@@ -358,7 +356,7 @@ namespace Expressions
 
         }
 
-        public async Task DoScheduledWorkAsync(Entities.InventoryExpression p)
+        public async Task DoScheduledWorkAsync(global::Inventory.Expressions.Entities.InventoryExpression p)
         {
 
 
@@ -386,7 +384,7 @@ namespace Expressions
 
         }
 
-        public async Task DoScheduledWorkAsync(Entities.ProductExpression p)
+        public async Task DoScheduledWorkAsync(global::Inventory.Expressions.Entities.ProductExpression p)
         {
             var result = await Execute(p.InventoryId, p.Expression);
 
@@ -409,7 +407,7 @@ namespace Expressions
             }
         }
 
-        public async Task DoScheduledWorkAsync(Entities.BooleanExpression p)
+        public async Task DoScheduledWorkAsync(global::Inventory.Expressions.Entities.BooleanExpression p)
         {
 
             // Log.Information("DoScheduledWorkAsync with BooleanExpression");

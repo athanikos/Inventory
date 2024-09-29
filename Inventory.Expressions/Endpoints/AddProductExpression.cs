@@ -1,17 +1,12 @@
-﻿
+﻿using FastEndpoints;
+using Inventory.Expressions.Dto;
+using Inventory.Expressions.Entities;
+using MediatR;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 
-namespace Expressions.Endpoints
+namespace Inventory.Expressions.Endpoints
 {
-    using FastEndpoints;
-    using MediatR;
-    using Microsoft.AspNetCore.Http.HttpResults;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using System;
-    using Inventory.Expressions;
-    using Inventory.Expressions.Dto;
-    using Microsoft.AspNetCore.Http;
-
     public class AddProductExpression :
         Endpoint<AddProductExpressionRequest>
     {
@@ -36,7 +31,7 @@ namespace Expressions.Endpoints
                         CancellationToken ct)
         {
             var entity =
-                 new Entities.ProductExpression()
+                 new ProductExpression()
                  {
                      Expression = req.Expression,
                      Id = req.Id,

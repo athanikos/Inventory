@@ -55,7 +55,7 @@ namespace Inventory.WebApi
            builder.Configuration, mediatRAssemblies);
             
            Prices.ConfigureServices.AddServices(builder.Services, builder.Configuration, mediatRAssemblies);
-           Expressions.ConfigureServices.AddServices(builder.Services, builder.Configuration, mediatRAssemblies);
+           Inventory.Expressions.ConfigureServices.AddServices(builder.Services, builder.Configuration, mediatRAssemblies);
            Notifications.ConfigureServices.AddServices(builder.Services, builder.Configuration, mediatRAssemblies);
            Transactions.ConfigureServices.AddServices(builder.Services, builder.Configuration, mediatRAssemblies);
            Defaults.ConfigureServices.AddServices(builder.Services, builder.Configuration, mediatRAssemblies);

@@ -29,8 +29,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Expressions\Inventory.Expressions.csproj" />
     <ProjectReference Include="..\Inventory.Configuration\Inventory.Configuration.csproj" />
+    <ProjectReference Include="..\Inventory.Expressions\Inventory.Expressions.csproj" />
     <ProjectReference Include="..\Inventory.Products\Inventory.Products.csproj" />
     <ProjectReference Include="..\Inventory.Transactions\Inventory.Transactions.csproj" />
     <ProjectReference Include="..\Prices\Inventory.Prices.csproj" />

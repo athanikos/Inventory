@@ -1,4 +1,4 @@
-﻿namespace Expressions
+﻿namespace Inventory.Expressions
 {
     public class  EvaluatorResult
     {

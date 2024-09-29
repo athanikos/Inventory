@@ -1,4 +1,11 @@
-﻿using Inventory.Products.Contracts;
+﻿
+
+
+
+using Inventory.Expressions;
+using Inventory.Expressions.Repositories;
+using Inventory.Expressions.Services;
+using Inventory.Products.Contracts;
 using Inventory.Products.Contracts.Dto;
 using Inventory.Products.Dto;
 using Inventory.Products.Repositories;

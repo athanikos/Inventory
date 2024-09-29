@@ -1,15 +1,10 @@
-﻿
+﻿using FastEndpoints;
 using Inventory.Expressions.Services;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 
-namespace Inventory.Products.Endpoints
+namespace Inventory.Expressions.Endpoints
 {
-    using FastEndpoints;
-    using global::Expressions;
-    using Microsoft.AspNetCore.Http;
-    using Microsoft.AspNetCore.Http.HttpResults;
-    using System.Threading;
-    using System.Threading.Tasks;
-
     public  class RunEvaluator
         : Endpoint <RunEvaluatorRequest>
     {

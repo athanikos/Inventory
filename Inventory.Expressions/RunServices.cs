@@ -1,6 +1,4 @@
-﻿
-using Expressions;
-using Inventory.Expressions.Services;
+﻿using Inventory.Expressions.Services;
 using Microsoft.Extensions.DependencyInjection;
 
 

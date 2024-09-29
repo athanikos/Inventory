@@ -1,6 +1,6 @@
-﻿using Expressions.Entities;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using System.Reflection;
+using Inventory.Expressions.Entities;
 
 namespace Inventory.Expressions;
 

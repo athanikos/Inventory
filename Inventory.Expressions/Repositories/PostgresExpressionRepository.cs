@@ -1,5 +1,4 @@
-﻿using Expressions.Entities;
-using Inventory.Products;
+﻿using Inventory.Expressions.Entities;
 
 namespace Inventory.Expressions.Repositories
 {

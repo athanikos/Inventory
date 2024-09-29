@@ -1,20 +1,13 @@
 ﻿namespace Inventory.Prices.Repositories
 {
-    public  class PostgresFetcherRepository: IFetcherRepository
+    public class PostgresFetcherRepository(PricesDbContext context) : IFetcherRepository
     {
-        private readonly PricesDbContext _context;
-
-        public PostgresFetcherRepository(PricesDbContext context) 
-        {
-            _context = context;
-        }  
-
-        public   List<Entities.PricesParameter> GetParameters(  string _parameterType = "COINGECKO"
+        public   List<Entities.PricesParameter> GetParameters(  string parameterType = "COINGECKO"
           )
         {
-            if (string.IsNullOrEmpty(_parameterType))
-                throw new ArgumentNullException(nameof(_parameterType));
-            return [.. _context.Parameters.Where(p => p.ParameterType == _parameterType).ToList()];
+            if (string.IsNullOrEmpty(parameterType))
+                throw new ArgumentNullException(nameof(parameterType));
+            return [.. context.Parameters.Where(p => p.ParameterType == parameterType).ToList()];
         }
 
     }

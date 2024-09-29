@@ -1,5 +1,5 @@
 ﻿
-using Expressions.Entities;
+using Inventory.Expressions.Entities;
 
 namespace Inventory.Expressions.Services
 {

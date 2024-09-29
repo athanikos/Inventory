@@ -45,10 +45,13 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Expressions\Inventory.Expressions.csproj" />
+    <ProjectReference Include="..\Inventory.Configuration\Inventory.Configuration.csproj" />
+    <ProjectReference Include="..\Inventory.Expressions\Inventory.Expressions.csproj" />
     <ProjectReference Include="..\Inventory.Notifier\Inventory.Notifications.csproj" />
     <ProjectReference Include="..\Inventory.Products.Contracts\Inventory.Products.Contracts.csproj" />
     <ProjectReference Include="..\Inventory.Products\Inventory.Products.csproj" />
     <ProjectReference Include="..\Inventory.Transactions\Inventory.Transactions.csproj" />
+    <ProjectReference Include="..\Prices\Inventory.Prices.csproj" />
   </ItemGroup>
 
   <ItemGroup>
