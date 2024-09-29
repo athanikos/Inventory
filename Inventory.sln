@@ -24,7 +24,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Inventory.Notifications", "
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Prices", "Prices", "{4EDD68F9-FA56-44A8-A297-8383D03789A6}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Expressions", "Expressions", "{BF59840D-EBEE-4E3A-8DB0-ACB79CD1D488}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Inventory.Expressions", "Expressions", "{BF59840D-EBEE-4E3A-8DB0-ACB79CD1D488}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Inventory.Expressions", "Expressions\Inventory.Expressions.csproj", "{87C42F9B-2E72-425D-83E8-FC887C66175E}"
 EndProject

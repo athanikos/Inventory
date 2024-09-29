@@ -1,12 +1,7 @@
-﻿using Expressions;
-using Inventory.Expressions;
-using Inventory.Expressions.Repositories;
-using Inventory.Products.Contracts;
+﻿using Inventory.Products.Contracts;
 using Inventory.Products.Contracts.Dto;
 using Inventory.Products.Dto;
-using Inventory.Products.Entities;
 using Inventory.Products.Repositories;
-using Inventory.Transactions.Repositories;
 using MediatR;
 using Xunit.Abstractions;
 using Xunit.Microsoft.DependencyInjection.Abstracts;
