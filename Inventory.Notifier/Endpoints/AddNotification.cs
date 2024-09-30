@@ -8,20 +8,13 @@ namespace Inventory.Notifications.Endpoints
     using System.Threading;
     using System.Threading.Tasks;
     using System;
-    using Inventory.Notifications.Contracts;
+    using Contracts;
     using Microsoft.AspNetCore.Http;
 
-    public class AddNotification :
+    public class AddNotification(IMediator mediator, NotifierDbContext context) :
         Endpoint<AddNotificationRequest>
     {
-        private readonly IMediator _mediator;
-        private readonly NotifierDbContext _context;
-
-        public AddNotification(IMediator mediator, NotifierDbContext context )
-        {
-            _mediator = mediator;
-            _context = context;
-        }
+        private readonly IMediator _mediator = mediator;
 
         public override void Configure()
         {
@@ -46,8 +39,8 @@ namespace Inventory.Notifications.Endpoints
               NotifyTimes = req.NotifyTimes 
             };
 
-            _context.Notifications.Add(entity);
-            await _context.SaveChangesAsync();
+            context.Notifications.Add(entity);
+            await context.SaveChangesAsync(ct);
 
             return TypedResults.Ok(new NotificationDto( )
             {

@@ -29,7 +29,7 @@ namespace Inventory.Notifications.Endpoints
                 mediator.Send(new GetBooleanExpressionsQuery());
 
             var notifications = await context.Notifications.
-                                      ToListAsync();
+                                      ToListAsync(cancellationToken: ct);
 
             await SendAsync(notifications.Join(
                 booleanExpressions,
@@ -46,7 +46,7 @@ namespace Inventory.Notifications.Endpoints
                     Expression = be.Expression
                 }
                 ).ToList()
-                );
+, cancellation: ct);
 
 
           

@@ -10,7 +10,8 @@ namespace Inventory.Products.Endpoints
 {
     [RequiredScope("products.read")]
 
-    public class AddCategory(IMediator mediator, IInventoryService service) :
+    public class AddCategory(IMediator mediator, 
+        IInventoryService service) :
         Endpoint<AddCategoryRequest>
     {
         private readonly IMediator _mediator = mediator;
@@ -22,7 +23,8 @@ namespace Inventory.Products.Endpoints
             //  something like Admin_<CategoryId>
         }
 
-        public override async Task<Results<Ok<CategoryDto>, NotFound, ProblemDetails>>
+        public override async Task<Results<Ok<CategoryDto>, 
+                NotFound, ProblemDetails>>
             HandleAsync(AddCategoryRequest req,
                         CancellationToken ct)
         {
@@ -36,7 +38,7 @@ namespace Inventory.Products.Endpoints
             {
                 AddError(ex.Message);
                 ThrowIfAnyErrors(); // If there are errors, execution shouldn't go beyond this point
-                return new FastEndpoints.ProblemDetails(ValidationFailures);
+                return new ProblemDetails(ValidationFailures);
 
             }
 

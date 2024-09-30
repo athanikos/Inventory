@@ -2,7 +2,6 @@
 using Inventory.Products.Contracts.Dto;
 using Inventory.Products.Entities;
 using Inventory.Products.Repositories;
-using Microsoft.Extensions.Logging;
 
 namespace Inventory.Products.Services
 {
@@ -41,7 +40,7 @@ namespace Inventory.Products.Services
             await using var transaction = await repo.Context.Database.BeginTransactionAsync();
             try
             {
-                // cancell all inbound records 
+                // cancel all inbound records 
                 foreach (var item  in inboundQuantities)
                     repo.EditQuantityMetric(item.ProductId, item.EffectiveFrom, true);
                 await repo.SaveChangesAsync();

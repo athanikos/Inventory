@@ -6,11 +6,4 @@ namespace Inventory.Expressions.Contracts
 {
     public record GetBooleanExpressionsQuery
          : IRequest<List<BooleanExpressionDto>>;
-
-
-
- 
-
-
-
 }

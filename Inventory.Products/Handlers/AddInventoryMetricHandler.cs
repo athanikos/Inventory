@@ -11,7 +11,6 @@ namespace Inventory.Products.Handlers
         {
             var dto = new InventoryMetricDto( request.InventoryId,
                                               request.MetricId,
-                                           
                                               request.Value,
                                               request.EffectiveDate,
                                               string.Empty,

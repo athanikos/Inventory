@@ -5,6 +5,4 @@
           string Expression,
           int RunEveryMinutes,
           Guid InventoryId);
-
-
 }
