@@ -4,6 +4,7 @@ using MediatR;
 
 namespace Inventory.Products.Handlers;
 
+
 public class GetAvailabilityPerInventoryHandler(IInventoryRepository repository) :
     IRequestHandler<GetAvailabilityPerInventoryCommand,
         List<ModifyQuantityDto>>

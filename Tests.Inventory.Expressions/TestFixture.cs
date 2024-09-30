@@ -4,6 +4,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
+using Inventory.Defaults;
+using Inventory.Defaults.Repositories;
+using Inventory.Defaults.Services;
 using Xunit.Microsoft.DependencyInjection;
 using Products = Inventory.Products;
 using Inventory.Expressions;
@@ -28,7 +31,8 @@ namespace Tests.Inventory
 
             services.AddDbContext<ExpressionsDbContext>(options =>
             {
-                if (configuration != null) options.UseNpgsql(configuration.GetConnectionString("Expressions"));
+                if (configuration != null) 
+                    options.UseNpgsql(configuration.GetConnectionString("Expressions"));
             });
             services.AddDbContext<TransactionsDbContext>(options =>
             {
@@ -38,16 +42,27 @@ namespace Tests.Inventory
             });
             services.AddDbContext<ProductsDbContext>(options =>
             {
-                if (configuration != null) options.UseNpgsql(configuration.GetConnectionString("Products"));
+                if (configuration != null) 
+                    options.UseNpgsql(configuration.GetConnectionString("Products"));
             });
 
-
+            services.AddDbContext<ConfigurationDbContext>(options =>
+            {
+                if (configuration != null) 
+                    options.UseNpgsql(configuration.GetConnectionString("Configuration"));
+            });
+            
+            
             AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
             services.AddScoped<ITransactionRepository, PostgresTransactionRepository>();
             services.AddScoped<IInventoryRepository, PostgresInventoryRepository>();
+            services.AddScoped<IConfigurationRepository, ConfigurationRepository>();
+            
             services.AddScoped<IModifyQuantityRepository, PostgresModifyQuantityRepository>();
             services.AddScoped<IModifyQuantityService, ModifyQuantityService>();
             services.AddScoped<IInventoryService, InventoryService>();
+            services.AddScoped<IConfigurationService, ConfigurationService>();
+            
 
         }
 

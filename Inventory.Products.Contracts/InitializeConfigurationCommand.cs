@@ -15,6 +15,8 @@ namespace Inventory.Products.Contracts
 
             public required  Guid Id  { get; set; }
 
+            public required  string Value  { get; set; }
+            
         }
 }
 

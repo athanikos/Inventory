@@ -1,4 +1,5 @@
-﻿using Inventory.Defaults.Services;
+﻿using Inventory.Defaults.Repositories;
+using Inventory.Defaults.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
@@ -19,9 +20,11 @@ namespace Inventory.Defaults
             services.AddDbContext<ConfigurationDbContext>(options =>  
                                                      options.UseNpgsql(configuration
                                                      .GetValue<string>("Configuration")));
-
+            
+            
+            services.AddScoped<IConfigurationRepository, ConfigurationRepository>();
             services.AddScoped<IConfigurationService, ConfigurationService>();
-     
+            
             mediatRAssemblies.Add(typeof(ConfigureServices).Assembly);
             return services;
         }

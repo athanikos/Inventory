@@ -1,4 +1,5 @@
-﻿using Inventory.Products.Contracts;
+﻿using Inventory.Defaults.Services;
+using Inventory.Products.Contracts;
 using Inventory.Products.Contracts.Dto;
 using Inventory.Products.Dto;
 using Inventory.Products.Repositories;
@@ -20,6 +21,11 @@ namespace Tests.Inventory
         public required IInventoryRepository InventoryRepo { get; init; }
         public required IModifyQuantityService ModifyQuantityService { get; init; }
 
+        public required IInventoryService InventoryService { get; init; }
+
+        
+        public required IConfigurationService ConfigurationService { get; set; }
+        
         private const string RoomProductCode = "Room1";
         private const string Inventory = "ROOMS";
         private const string Currency = "EUR";
@@ -34,7 +40,9 @@ namespace Tests.Inventory
             {
                 InventoryRepo = fixture.GetService<IInventoryRepository>(testOutputHelper)!,
                 TransactionRepo = fixture.GetService<ITransactionRepository>(testOutputHelper)!,
-                ModifyQuantityService = fixture.GetService<IModifyQuantityService>(testOutputHelper)!
+                ModifyQuantityService = fixture.GetService<IModifyQuantityService>(testOutputHelper)!,
+                ConfigurationService = fixture.GetService<IConfigurationService>(testOutputHelper)!,
+                InventoryService = fixture.GetService<IInventoryService>(testOutputHelper)!, 
             };
             output.InventoryRepo.EmptyDb();
             await output.TransactionRepo.EmptyDb();
@@ -48,10 +56,14 @@ namespace Tests.Inventory
             {
                 InventoryRepo = fixture.GetService<IInventoryRepository>(testOutputHelper)!,
                 TransactionRepo = fixture.GetService<ITransactionRepository>(testOutputHelper)!,
-                ModifyQuantityService = fixture.GetService<IModifyQuantityService>(testOutputHelper)!
+                ModifyQuantityService = fixture.GetService<IModifyQuantityService>(testOutputHelper)!,
+                ConfigurationService = fixture.GetService<IConfigurationService>(testOutputHelper)!,
+                InventoryService = fixture.GetService<IInventoryService>(testOutputHelper)!
+
             };
             output.InventoryRepo.EmptyDb();
             await output.TransactionRepo.EmptyDb();
+            output.ConfigurationService.EmptyDb();
           
             var inventoryId = (await output.InventoryRepo.AddInventoryAsync(new InventoryDto(Guid.NewGuid(), 
                 Inventory))).Id;
@@ -72,5 +84,7 @@ namespace Tests.Inventory
             output.QuantityId = metricId;
             return output;
         }
+
+
     }
 }

@@ -23,6 +23,8 @@ namespace Inventory.Products
             services.AddScoped<IInventoryRepository, PostgresInventoryRepository>();
             services.AddScoped<IModifyQuantityRepository, PostgresModifyQuantityRepository>();
             services.AddScoped<IModifyQuantityService, ModifyQuantityService>();
+            services.AddScoped<IInventoryService, InventoryService>();
+
             mediatRAssemblies.Add(typeof(ConfigureServices).Assembly);
             return services;
         }

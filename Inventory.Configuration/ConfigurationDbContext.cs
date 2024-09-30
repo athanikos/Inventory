@@ -17,6 +17,9 @@ public class ConfigurationDbContext(
         modelBuilder.HasDefaultSchema("Configurations");
         modelBuilder.Entity<Configuration>().ToTable("Configuration");
 
+        modelBuilder.Entity<Configuration>().ToTable("Configuration").HasKey(o => o.Type);
+
+
     }
 
     protected override void ConfigureConventions(

@@ -7,6 +7,8 @@ using Inventory.Products.Contracts.Dto;
 namespace Inventory.Products.Handlers
 {
 
+    //todo pass service 
+
     public class AddQuantityMetricHandler(
         IInventoryRepository
             repository) :

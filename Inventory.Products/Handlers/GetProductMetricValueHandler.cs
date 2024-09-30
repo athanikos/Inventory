@@ -5,6 +5,8 @@ using MediatR;
 
 namespace Inventory.Products.Handlers
 {
+    //todo pass service
+    
     public class GetProductMetricValueHandler(IInventoryRepository repo) :
         IRequestHandler<GetProductMetricQuery, ProductMetricDto>
     {

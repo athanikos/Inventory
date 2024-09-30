@@ -4,10 +4,8 @@ using Inventory.Products.Contracts.Dto;
 namespace Inventory.Products.Contracts;
 
 public class ProductDto
-   
-{
-
-   public  ProductDto(Guid id,
+{ 
+    public  ProductDto(Guid id,
     string description,
     string code, 
     Guid inventoryId,
@@ -19,15 +17,10 @@ public class ProductDto
         InventoryId = inventoryId;
         Metrics = metrics;
     }
-
     public  ProductDto(Guid id)
     {
         Id = id;
-   
-
     }
-
-
     public Guid Id { get;  set; } 
     public string Description { get; set; } 
     public string Code { get; private set; } 

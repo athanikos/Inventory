@@ -3,7 +3,7 @@ using Inventory.Products.Repositories;
 using MediatR;
 
 namespace Inventory.Products.Handlers;
-
+//todo pass service
 public class GetAvailabilityPerProductHandler(IInventoryRepository repository) :
     IRequestHandler<GetAvailabilityPerProductCommand,
         List<ModifyQuantityDto>>

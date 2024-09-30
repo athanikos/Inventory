@@ -91,13 +91,18 @@ public class InventoryService(IInventoryRepository repo) : IInventoryService
     public async Task<List<InitializeConfigurationResponse>> InitialConfigureAsync()
     {
         List<InitializeConfigurationResponse> config = [];
-        var uom =  await repo.AddUnitOfMeasurementAsync(new UnitOfMeasurementDto(Guid.NewGuid(), "EURO", UnitOfMeasurementType.Currency));
-        config.Add(new InitializeConfigurationResponse() { Id = uom.Id, TypeName = ConfigurationType.DefaultCurrency}); 
-        uom =  await repo.AddUnitOfMeasurementAsync(new UnitOfMeasurementDto(Guid.NewGuid(), "EMPTY", UnitOfMeasurementType.Empty));
-        config.Add(new InitializeConfigurationResponse() { Id = uom.Id, TypeName = ConfigurationType.EmptyUnitOfMeasurement}); 
-        var source = await repo.AddSourceAsync(new SourceDto(Guid.NewGuid(), "SELF"));
-        config.Add(new InitializeConfigurationResponse() { Id = source.Id, TypeName =ConfigurationType.DefaultSource } );
-        
+        var uom =  await repo.AddUnitOfMeasurementAsync(new UnitOfMeasurementDto(Guid.NewGuid(), 
+            "EURO", UnitOfMeasurementType.Currency));
+        config.Add(new InitializeConfigurationResponse() { Id = uom.Id, 
+            TypeName = ConfigurationType.DefaultCurrency, Value = "EURO"}); 
+        uom =  await repo.AddUnitOfMeasurementAsync(new UnitOfMeasurementDto(Guid.NewGuid(), 
+            "EMPTY", UnitOfMeasurementType.Empty));
+        config.Add(new InitializeConfigurationResponse() { Id = uom.Id, 
+            TypeName = ConfigurationType.EmptyUnitOfMeasurement, Value = "EMPTY"}); 
+        var source = await repo.AddSourceAsync(new SourceDto(Guid.NewGuid(),
+            "SELF"));
+        config.Add(new InitializeConfigurationResponse() { Id = source.Id, 
+            TypeName =ConfigurationType.DefaultSource, Value = "SELF"} );
         return config;
     }
 

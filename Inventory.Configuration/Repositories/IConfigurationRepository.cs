@@ -7,4 +7,8 @@ public interface IConfigurationRepository
 {
          Task<Configuration> GetValue(ConfigurationType type);
 
+           Task SaveAsync(List<Configuration> items);
+
+           void  EmptyDb();
+
 }
