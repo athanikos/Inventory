@@ -23,7 +23,7 @@ namespace Inventory.Products.Endpoints
                         CancellationToken ct)
         {
 
-            await repo.DeleteInventoryAsync(new Dto.InventoryDto(req.Id, string.Empty));
+            await repo.DeleteInventoryAsync(new Dto.InventoryDto(req.Id, string.Empty, string.Empty));
             return TypedResults.Ok(); //todo fix 
         }
     }

@@ -29,13 +29,13 @@ namespace Inventory.Products.Endpoints
             HandleAsync(AddInventoryRequest req,
                         CancellationToken ct)
         {
-          var dto = await _service.AddInventoryAsync(new InventoryDto(req.InventoryId, req.Description));
+          var dto = await _service.AddInventoryAsync(new InventoryDto(req.InventoryId, req.Description, req.Code));
           return TypedResults.Ok( dto    );
         }
     }
 
 
-    public record AddInventoryRequest(Guid InventoryId, string Description);
+    public record AddInventoryRequest(Guid InventoryId, string Description,string Code );
 
  
   

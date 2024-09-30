@@ -7,16 +7,15 @@
         public RecordSource Source { get; set; }
         public bool IsNew { get; set; }
 
-        public InBoundQuantityMetric(Guid ProductId, decimal Value,DateTime EffectiveDate, bool IsNew, RecordSource Source           )
+        public InBoundQuantityMetric(Guid productId, decimal value,
+            DateTime effectiveDate, bool isNew, RecordSource source )
         {
-            this.ProductId = ProductId; 
-            this.Value = Value;
-            this.EffectiveDate = EffectiveDate; 
-            this.IsNew = IsNew; 
-            this.Source = Source;   
+            ProductId = productId; 
+            Value = value;
+            EffectiveDate = effectiveDate; 
+            IsNew = isNew; 
+            Source = source;   
         }
-      
-
     }
 
     public enum RecordSource

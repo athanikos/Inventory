@@ -41,13 +41,13 @@ namespace Inventory.Products.Repositories
         {
             return await context
                 .Inventories.Where(o => o.Id == inventoryId)
-                .Select(i=>new InventoryDto(i.Id,i.Description))
+                .Select(i=>new InventoryDto(i.Id,i.Description, i.Code))
                 .SingleAsync();
         }
         
         public async Task<InventoryDto> AddInventoryAsync(InventoryDto c)
         {
-            var e = new Entities.Inventory() { Id = c.Id, Description = c.Description };
+            var e = new Entities.Inventory() { Id = c.Id, Description = c.Description, Code = c.Description};
             context.Inventories.Add(e);
             await context.SaveChangesAsync();
             return await GetInventoryAsync(e.Id);
@@ -58,7 +58,7 @@ namespace Inventory.Products.Repositories
             Entities.Inventory e = AddInventory(c);
             context.Update(e);
             await context.SaveChangesAsync();
-            return new InventoryDto(c.Id, c.Description);
+            return new InventoryDto(c.Id, c.Description,c.Code);
         }
 
         private static Entities.Inventory AddInventory(InventoryDto c)
@@ -169,11 +169,11 @@ namespace Inventory.Products.Repositories
                .SingleAsync();
         }
 
-        public async Task<ProductMetricDto> GetProductMetricAsync(Guid productId, DateTime effectivedate)
+        public async Task<ProductMetricDto> GetProductMetricAsync(Guid productId, DateTime effectiveDate)
         {
             return await context.ProductMetrics
                                   .Where(p => p.ProductId == productId
-                                         && p.EffectiveDate == effectivedate)
+                                         && p.EffectiveDate == effectiveDate)
                                   .Select(i => new ProductMetricDto(i.ProductId, i.MetricId, i.Value, i.EffectiveDate,
                                                                 i.ProductCode, i.MetricCode, i.UnitOfMeasurementId))
                                   .SingleAsync();

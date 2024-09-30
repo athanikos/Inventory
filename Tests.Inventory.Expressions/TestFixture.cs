@@ -14,6 +14,7 @@ using Inventory.Products.Services;
 using Inventory.Transactions.Repositories;
 using Inventory.Transactions.Repositories.Postgres;
 using Inventory.Transactions;
+using Inventory.Transactions.Services;
 
 namespace Tests.Inventory
 {
@@ -54,6 +55,7 @@ namespace Tests.Inventory
             
             
             AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+           
             services.AddScoped<ITransactionRepository, PostgresTransactionRepository>();
             services.AddScoped<IInventoryRepository, PostgresInventoryRepository>();
             services.AddScoped<IConfigurationRepository, ConfigurationRepository>();
@@ -62,6 +64,9 @@ namespace Tests.Inventory
             services.AddScoped<IModifyQuantityService, ModifyQuantityService>();
             services.AddScoped<IInventoryService, InventoryService>();
             services.AddScoped<IConfigurationService, ConfigurationService>();
+            
+            services.AddScoped<ITransactionService, TransactionsService>();
+
             
 
         }

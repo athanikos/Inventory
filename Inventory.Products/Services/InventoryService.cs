@@ -22,7 +22,7 @@ public class InventoryService(IInventoryRepository repo) : IInventoryService
 
     public async Task< InventoryDto> AddInventoryAsync(InventoryDto dto)
     {
-        return await repo.AddInventoryAsync(new InventoryDto(Guid.NewGuid(), dto.Description));
+        return await repo.AddInventoryAsync(new InventoryDto(Guid.NewGuid(), dto.Description, dto.Code));
     }
 
     public async Task<ProductDto> AddProductAsync(ProductDto dto)
@@ -40,7 +40,7 @@ public class InventoryService(IInventoryRepository repo) : IInventoryService
 
     public async Task<InventoryDto> EditInventoryAsync(InventoryDto dto)
     {
-        return await repo.EditInventoryAsync(new InventoryDto(dto.Id, dto.Description));
+        return await repo.EditInventoryAsync(new InventoryDto(dto.Id, dto.Description, dto.Code));
     }
     
     

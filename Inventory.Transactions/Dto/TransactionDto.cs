@@ -8,7 +8,7 @@ public class TransactionDto
        Guid Id)
     {
         this.Id = Id;
-        this.Sections = null;
+        this.Sections = [];
     }
 
     public TransactionDto(

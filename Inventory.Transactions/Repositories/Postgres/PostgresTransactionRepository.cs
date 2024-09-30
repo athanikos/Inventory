@@ -28,12 +28,74 @@ namespace Inventory.Transactions.Repositories.Postgres
         {
             var sections = await GetSectionsAsync(id);
 
-            return await context.Templates.Where(o => o.Id == id)
-                                           .Select(i => new TemplateDto(i.Id, i.Name, i.Type, i.Created, sections))
-                                           .SingleAsync();
+            return await context.Templates
+                .Include(t => t.Sections)
+                .ThenInclude(s => s.Fields)
+                .Where(o => o.Id == id)
+                .Select
+                (
+                    i => new TemplateDto(i.Id,
+                        i.Name,
+                        i.Type,
+                        i.Created,
+                        i.Sections.Select
+                        (
+                            s=>new SectionDto()
+                            {
+                                Fields = s.Fields.Select(
+                                    f=> new FieldDto()
+                                    {
+                                        Id  =f.Id,
+                                        SectionId = f.SectionId,
+                                        Name = f.Name,
+                                        Expression =f.Expression,
+                                        Type =f.Type
+                                    }).ToList(),
+                                Id = s.Id,
+                                Name = s.Name,
+                                SectionType = s.SectionType,
+                                TemplateId = s.TemplateId
+                            }
+                        ).ToList()
+                    ))
+                .SingleAsync();
 
         }
 
+        public async Task<List<TemplateDto>> GetTemplatesAsync()
+        {
+            return await context.Templates
+                .Include(t => t.Sections)
+                .ThenInclude(s => s.Fields)
+                .Select
+                (
+                    i => new TemplateDto(i.Id,
+                    i.Name,
+                    i.Type,
+                    i.Created,
+                    i.Sections.Select
+                    (
+                        s=>new SectionDto()
+                        {
+                                Fields = s.Fields.Select(
+                                        f=> new FieldDto()
+                                        {
+                                              Id  =f.Id,
+                                              SectionId = f.SectionId,
+                                              Name = f.Name,
+                                              Expression =f.Expression,
+                                              Type =f.Type
+                                        }).ToList(),
+                                Id = s.Id,
+                                Name = s.Name,
+                                SectionType = s.SectionType,
+                                TemplateId = s.TemplateId
+                        }
+                    ).ToList()
+                )).ToListAsync();
+
+        }
+        
         public async Task<TemplateDto> AddTemplateAsync(TemplateDto dto)
         {
             var t = new Template() {
@@ -155,7 +217,9 @@ namespace Inventory.Transactions.Repositories.Postgres
 
         public void DeleteSection(SectionDto dto)
         {
-            Section s = context.Sections.Include(section => section.Fields).Single(p => p.Id == dto.Id);
+            Section s = context.Sections.
+                Include(section => section.Fields).
+                Single(p => p.Id == dto.Id);
             context.Remove(s);
 
             foreach (Field f in s.Fields)
@@ -247,18 +311,16 @@ namespace Inventory.Transactions.Repositories.Postgres
 
         private void AddValue(ValueDto dto, TransactionSectionGroup tsg)
         { //todo use mapper
-            tsg.Values.Add(
-
-                new Value()
-                {
-                    FieldId = dto.FieldId,
-                    Text = dto.Text,
-                    TransactionId = dto.TransactionId,
-                    TransactionSectionGroupId = dto.TransactionSectionGroupId,
-                }
-
-
-                );
+            tsg.Values.Add
+            (
+                            new Value()
+                            {
+                                FieldId = dto.FieldId,
+                                Text = dto.Text,
+                                TransactionId = dto.TransactionId,
+                                TransactionSectionGroupId = dto.TransactionSectionGroupId,
+                            }
+            );
 
         }
 
@@ -301,6 +363,7 @@ namespace Inventory.Transactions.Repositories.Postgres
 
             };
             context.Transactions.Add(t);
+            
             if (dto.Sections!=null)
             foreach (var ts in dto.Sections)
                 AddTransactionSection(
@@ -318,12 +381,14 @@ namespace Inventory.Transactions.Repositories.Postgres
             return await GetTransactionAsync(t.Id);
         }
 
-        public async Task<TransactionDto> GetTransactionAsync(Guid Id)
+        public async Task<TransactionDto> GetTransactionAsync(Guid id)
         {
-            var transactionSections = await GetTransactionSectionsAsync(Id);
+            var transactionSections = await GetTransactionSectionsAsync(id);
 
-            return await context.Transactions.Where(o => o.Id == Id)
-                                           .Select(i =>
+            return await context.Transactions.
+                Where(o => o.Id == id).
+                //todo include 
+                Select(i =>
                                                         new TransactionDto(
                                                         i.Id,
                                                         i.Description,
@@ -346,7 +411,6 @@ namespace Inventory.Transactions.Repositories.Postgres
                     AddTransactionSection(inStoreTransaction, sec);
                 else
                     EditTransactionSection(sec, inStoreTransaction);
-
             }
 
             foreach (var storedSection in inStoreTransaction.TransactionSections)
@@ -399,11 +463,11 @@ namespace Inventory.Transactions.Repositories.Postgres
                 var tsg = new TransactionSectionGroupDto()
                 {
                     GroupValue = sg.GroupValue,
-                    Id = sg.Id,
+                    Id = Guid.Empty,
                     Values = sg.Values,
                     TransactionSectionId = sg.TransactionSectionId
                 };
-                if (sg.Id == Guid.Empty)
+                if (tsg.Id == Guid.Empty)
                     AddTransactionSectionGroup(tsg, ts);
                 else
                     EditTransactionSectionGroup(tsg, ts);
@@ -412,12 +476,12 @@ namespace Inventory.Transactions.Repositories.Postgres
         }
 
         private void EditTransactionSection(TransactionSectionDto dto, 
-                                           Transactions.Entities.Transaction t )
+                                            Transaction t )
         {
             TransactionSection ts = new TransactionSection()
             {
                 Id = dto.Id,
-                TransactionId = dto.TransactionId,
+                TransactionId = t.Id,
                 TransactionSectionType = dto.TransactionSectionType,
             };
 
@@ -481,6 +545,7 @@ namespace Inventory.Transactions.Repositories.Postgres
                         
             foreach (var v in dto.Values)
             {
+                v.Id = Guid.Empty;
                 v.TransactionSectionGroupId = tsg.Id;
                 if (v.Id == Guid.Empty)
                     AddValue(v,tsg);
@@ -519,8 +584,13 @@ namespace Inventory.Transactions.Repositories.Postgres
         {
             return await AddRoomsLetTemplate();
         }
-
-
+        
+        /// <summary>
+        /// Template creation for Let Room app
+        /// with one template
+        /// having two sections individual entity and rooms let 
+        /// </summary>
+        /// <returns></returns>
         private async Task<Guid> AddRoomsLetTemplate()
         {
             var t = new Template()
@@ -531,7 +601,6 @@ namespace Inventory.Transactions.Repositories.Postgres
                     {
                         AddRoomsLetSection(),
                         AddRoomsLetIndividualEntitySection()
-
                      }
 
             };

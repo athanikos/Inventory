@@ -30,7 +30,7 @@ namespace Tests.Inventory
 
             
             
-            var id =  (await inventoryRepo.AddInventoryAsync(new InventoryDto(Guid.Empty, "TestMe"))).Id;
+            var id =  (await inventoryRepo.AddInventoryAsync(new InventoryDto(Guid.Empty, "TestMe", "test"))).Id;
             var inventory = await inventoryRepo.GetInventoryAsync(id);
             Assert.Equal("TestMe",inventory.Description);
             

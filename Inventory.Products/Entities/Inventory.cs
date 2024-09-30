@@ -6,16 +6,10 @@ namespace Inventory.Products.Entities
     {
         public Guid Id { get; set; }
          = Guid.NewGuid();
-
-        public string Description { get; set; } = string.Empty;
-
-        public string Code { get; set; } = string.Empty;
-
-        public ICollection<Product> Products
-        { get; set; } = new List<Product>();
-
-
-        public ICollection<Metric> Metrics { get; set; } = new List<Metric>();
+        public string Description { get; set; } 
+        public string Code { get; set; }
+        public ICollection<Product> Products { get; set; } = [];
+        public ICollection<Metric> Metrics { get; set; } = [];
 
     }
 

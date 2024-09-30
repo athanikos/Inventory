@@ -6,6 +6,7 @@ using Inventory.Products.Repositories;
 using Inventory.Products.Services;
 using Inventory.Transactions.Dto;
 using Inventory.Transactions.Repositories;
+using Inventory.Transactions.Services;
 using Xunit.Abstractions;
 
 namespace Tests.Inventory
@@ -23,7 +24,8 @@ namespace Tests.Inventory
 
         public required IInventoryService InventoryService { get; init; }
 
-        
+        public required ITransactionService TransactionService { get; init; }
+
         public required IConfigurationService ConfigurationService { get; set; }
         
         private const string RoomProductCode = "Room1";
@@ -42,7 +44,8 @@ namespace Tests.Inventory
                 TransactionRepo = fixture.GetService<ITransactionRepository>(testOutputHelper)!,
                 ModifyQuantityService = fixture.GetService<IModifyQuantityService>(testOutputHelper)!,
                 ConfigurationService = fixture.GetService<IConfigurationService>(testOutputHelper)!,
-                InventoryService = fixture.GetService<IInventoryService>(testOutputHelper)!, 
+                InventoryService = fixture.GetService<IInventoryService>(testOutputHelper)!,
+                TransactionService =fixture.GetService<ITransactionService>(testOutputHelper)!, 
             };
             output.InventoryRepo.EmptyDb();
             await output.TransactionRepo.EmptyDb();
@@ -58,20 +61,19 @@ namespace Tests.Inventory
                 TransactionRepo = fixture.GetService<ITransactionRepository>(testOutputHelper)!,
                 ModifyQuantityService = fixture.GetService<IModifyQuantityService>(testOutputHelper)!,
                 ConfigurationService = fixture.GetService<IConfigurationService>(testOutputHelper)!,
-                InventoryService = fixture.GetService<IInventoryService>(testOutputHelper)!
-
+                InventoryService = fixture.GetService<IInventoryService>(testOutputHelper)!,
+                TransactionService= fixture.GetService<ITransactionService>(testOutputHelper)!
             };
             output.InventoryRepo.EmptyDb();
             await output.TransactionRepo.EmptyDb();
             output.ConfigurationService.EmptyDb();
           
             var inventoryId = (await output.InventoryRepo.AddInventoryAsync(new InventoryDto(Guid.NewGuid(), 
-                Inventory))).Id;
+                Inventory, string.Empty))).Id;
             var sourceId = (await output.InventoryRepo.AddSourceAsync(new SourceDto(Guid.NewGuid(), 
                 SourceName))).Id;
             var metricId = (await output.InventoryRepo.AddMetricAsync(MetricDto.NewMetricDto(sourceId, 
                 Constants.Quantitycode))).Id;
-       
             
             ProductDto prodDto = ProductDto.NewProductDto(inventoryId, productCode);
             output.TemplateId = await output.TransactionRepo.RoomsPrepareAsync();

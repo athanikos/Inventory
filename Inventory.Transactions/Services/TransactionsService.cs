@@ -30,7 +30,10 @@
             return await  repository. RoomsPrepareAsync();
         }
 
-        
+        public async Task<TransactionDto> GetTransactionAsync(Guid id)
+        {
+            return await repository.GetTransactionAsync(id);
+        }
         
         public async Task<TransactionDto> GetValuesForNewTransaction(Guid templateId)
         {
@@ -39,7 +42,8 @@
 
             var transactionSections = template.
                         Sections.
-                        Select(
+                        Select
+                        (
                                  s => new TransactionSectionDto()
                                  {
                                      Id = Guid.NewGuid(),
@@ -59,10 +63,10 @@
                                                                         u=> new ValueDto()
                                                                         {
                                                                             Id = u.Id,
+                                                                            FieldId = u.Id,
                                                                             Text = string.Empty,
                                                                             TransactionId = trans.Id,
-                                                                            TransactionSectionGroupId =
-                                                                            Guid.NewGuid()
+                                                                            TransactionSectionGroupId = Guid.NewGuid()
                                                                         }
                                                                     ),
                                                          ]
@@ -71,6 +75,9 @@
                                  }
                         ).ToList();
 
+            trans.TemplateId = templateId;
+            trans.Id = Guid.Empty;
+            
             foreach (var item in transactionSections)
                 trans.Sections.Add(item);
 
@@ -92,7 +99,6 @@
             var command = new CancelQuantityMetricCommand(transaction.Id);
             await mediator.Send(command);
             return await repository.GetTransactionAsync(t.Id);
-
         }
 
         public async  Task<TemplateDto> AddTemplateAsync(TemplateDto templateDto)

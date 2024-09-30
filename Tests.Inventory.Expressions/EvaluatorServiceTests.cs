@@ -103,7 +103,7 @@ namespace Tests.Inventory
 
         private static async Task<Tuple<Guid,Guid>> SetupInventoryAndSource(IInventoryRepository _repo)
         {
-            var inventoryId = (await _repo.AddInventoryAsync(new InventoryDto(Guid.NewGuid(), Crypto))).Id;
+            var inventoryId = (await _repo.AddInventoryAsync(new InventoryDto(Guid.NewGuid(), Crypto,Crypto))).Id;
             var sourceId = (await _repo.AddSourceAsync(new SourceDto(Guid.NewGuid(),SourceName))).Id;
             return new Tuple<Guid, Guid>(inventoryId, sourceId);    
         }

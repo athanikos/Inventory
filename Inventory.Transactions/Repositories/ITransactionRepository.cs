@@ -17,5 +17,7 @@ namespace Inventory.Transactions.Repositories
 
         Task<Guid> RoomsPrepareAsync();
 
+        public Task<List<TemplateDto>> GetTemplatesAsync();
+
     }
 }

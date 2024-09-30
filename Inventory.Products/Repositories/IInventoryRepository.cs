@@ -22,7 +22,7 @@ namespace Inventory.Products.Repositories
         List<string> GetDistinctProductCodes(Guid inventoryId);
         List<string> GetDistinctMetricCodes();
         Task AddOrEditProductMetricAsync(ProductMetricDto m);
-        Task<ProductMetricDto> GetProductMetricAsync(Guid productId, DateTime effectivedate    );
+        Task<ProductMetricDto> GetProductMetricAsync(Guid productId, DateTime effectiveDate    );
 
         Task<MetricDto> AddMetricAsync(MetricDto dto);
         Task<MetricDto> EditMetricAsync(MetricDto c);
