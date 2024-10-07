@@ -21,11 +21,8 @@ namespace Tests.Inventory
         public required ITransactionRepository TransactionRepo { get; init; }
         public required IInventoryRepository InventoryRepo { get; init; }
         public required IModifyQuantityService ModifyQuantityService { get; init; }
-
         public required IInventoryService InventoryService { get; init; }
-
         public required ITransactionService TransactionService { get; init; }
-
         public required IConfigurationService ConfigurationService { get; set; }
         
         private const string RoomProductCode = "Room1";

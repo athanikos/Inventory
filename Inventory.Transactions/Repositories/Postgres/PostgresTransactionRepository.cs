@@ -24,6 +24,11 @@ namespace Inventory.Transactions.Repositories.Postgres
             await context.SaveChangesAsync();
         }
 
+        public TransactionsDbContext Context()
+        {
+            return context;
+        }
+        
         #region Templates
         public async Task<TemplateDto> GetTemplateAsync(Guid id)
         {
