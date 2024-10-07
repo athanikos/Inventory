@@ -61,6 +61,7 @@ namespace Tests.Inventory
             var template = (await output.TransactionRepo.GetTemplatesAsync())[0];
             TransactionDto dto =       await   output.TransactionService.GetValuesForNewTransaction(template.Id); 
             dto.Id = ( await   output.TransactionService.UpdateOrInsertTransaction(dto)).Id;
+       
             var transaction = await  output.TransactionService.GetTransactionAsync(dto.Id);
             Assert.Equal(dto.Id, transaction.Id);
 
@@ -70,6 +71,12 @@ namespace Tests.Inventory
                 v.Text = "aaaa";
             
             dto.Id = ( await   output.TransactionService.UpdateOrInsertTransaction(dto)).Id;
+            dto.Id = ( await   output.TransactionService.UpdateOrInsertTransaction(dto)).Id;
+            dto.Id = ( await   output.TransactionService.UpdateOrInsertTransaction(dto)).Id;
+            dto.Id = ( await   output.TransactionService.UpdateOrInsertTransaction(dto)).Id;
+            var items = await  output.TransactionRepo.GetTransactionsAsync();
+            Assert.Single(items);
+
         }
 
         [Fact]

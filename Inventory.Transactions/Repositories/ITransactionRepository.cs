@@ -15,6 +15,9 @@ namespace Inventory.Transactions.Repositories
         Task DeleteTransactionAsync(TransactionDto dto);
         Task<TransactionDto> GetTransactionAsync(Guid id);
 
+        Task<List<TransactionDto>> GetTransactionsAsync();
+
+        
         Task<Guid> RoomsPrepareAsync();
 
         public Task<List<TemplateDto>> GetTemplatesAsync();

@@ -3,6 +3,7 @@ using Inventory.Transactions.Dto;
 using Inventory.Transactions.Entities;
 using Inventory.Transactions.Entities.Generic;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 
 namespace Inventory.Transactions.Repositories.Postgres
 {
@@ -400,6 +401,24 @@ namespace Inventory.Transactions.Repositories.Postgres
 
         }
 
+        public async Task<List<TransactionDto>> GetTransactionsAsync()
+        {
+       
+            return await context.Transactions.
+                Include(o=>o.TransactionSections).
+             
+             
+                Select(i =>
+                    new TransactionDto(
+                        i.Id,
+                        i.Description,
+                        i.Created,
+                        i.TemplateId, null)//i.TransactionSections.Select() )
+                )
+                .ToListAsync();
+
+        }
+        
         public async Task<TransactionDto> EditTransactionAsync(TransactionDto inboundTransaction)
         {
             var inStoreTransaction = await context.Transactions
