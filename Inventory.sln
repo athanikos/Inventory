@@ -75,6 +75,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sample requests", "Sample r
 		login.json = login.json
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inventory.WebApp", "Inventory.WebApp\Inventory.WebApp.csproj", "{9B344453-34D9-48E4-A31A-18C47866F20A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -137,6 +139,10 @@ Global
 		{2B15E688-57F5-4599-9F22-EE53E0C80155}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2B15E688-57F5-4599-9F22-EE53E0C80155}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2B15E688-57F5-4599-9F22-EE53E0C80155}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9B344453-34D9-48E4-A31A-18C47866F20A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B344453-34D9-48E4-A31A-18C47866F20A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B344453-34D9-48E4-A31A-18C47866F20A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B344453-34D9-48E4-A31A-18C47866F20A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -166,6 +172,7 @@ Global
 		{CA9E65A7-3B03-43D7-8BD1-75F8BBA543EF} = {AC7A4717-12B8-4C28-B6E1-937110C9CA79}
 		{2B15E688-57F5-4599-9F22-EE53E0C80155} = {AC7A4717-12B8-4C28-B6E1-937110C9CA79}
 		{991B6BAB-6EDC-4EB2-9AA3-244C925A2ED7} = {73974222-20FE-4DD3-B1B4-B4A1867377EB}
+		{9B344453-34D9-48E4-A31A-18C47866F20A} = {A448CE67-00F2-4249-9DE5-040476B1CB95}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {582FC159-BB6D-4F86-A864-9DCDBC25735B}
