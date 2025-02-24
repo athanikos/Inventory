@@ -142,7 +142,10 @@ ClaimType = CLIENTINVENTORY claimValue = <InventoryId>
 
     dotnet ef migrations add PG7  -c TransactionsDbContext -p C:\projects\Inventory\Inventory\Inventory.Transactions\Inventory.Transactions.csproj  -s  C:\projects\Inventory\Inventory\Inventory.WebApi\Inventory.WebApi.csproj -o Data/Migrations
     dotnet ef database update   PG7 -c TransactionsDbContext
-        
+
+    dotnet ef migrations add PG7  -c ConfigurationDbContext -p C:\projects\Inventory\Inventory\Inventory.Configuration\Inventory.Configuration.csproj  -s  C:\projects\Inventory\Inventory\Inventory.WebApi\Inventory.WebApi.csproj -o Data/Migrations
+    dotnet ef database update   PG7 -c ConfigurationDbContext
+
 ### Metrics 
 
    One Metric has a source for the value. Source is a source system.
