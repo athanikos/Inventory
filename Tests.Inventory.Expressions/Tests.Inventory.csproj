@@ -44,7 +44,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Expressions\Inventory.Expressions.csproj" />
+
     <ProjectReference Include="..\Inventory.Configuration\Inventory.Configuration.csproj" />
     <ProjectReference Include="..\Inventory.Expressions\Inventory.Expressions.csproj" />
     <ProjectReference Include="..\Inventory.Notifier\Inventory.Notifications.csproj" />
