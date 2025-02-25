@@ -426,8 +426,10 @@ namespace Inventory.Transactions.Repositories.Postgres
         
         public async Task<TransactionDto> EditTransactionAsync(TransactionDto inboundTransaction)
         {
-            var inStoreTransaction = await context.Transactions
-                .Where(p => p.Id == inboundTransaction.Id).Include(transaction => transaction.TransactionSections).SingleAsync();
+            var inStoreTransaction = await context.Transactions.
+                                           Where(p => p.Id == inboundTransaction.Id).
+                                           Include(transaction => transaction.TransactionSections).
+                                           SingleAsync();
 
             foreach (var sec in inboundTransaction.Sections)
             {
@@ -459,15 +461,34 @@ namespace Inventory.Transactions.Repositories.Postgres
         #region TransactionSection 
         public async Task<ICollection<TransactionSectionDto>> GetTransactionSectionsAsync(Guid TransactionId)
         {
-            var query = from ts in context.TransactionSections
-                        where ts.TransactionId == TransactionId
-                        select new TransactionSectionDto()
+            var query = context.TransactionSections.
+                        Where(o=>o.TransactionId == TransactionId).
+                        Include(tsg=> tsg.SectionGroups).
+                        ThenInclude (v=> v.Values).
+                        Select(ts=>  new TransactionSectionDto()
                         {
                             Id = ts.Id,
                             TransactionId = TransactionId,
                             TransactionSectionType = ts.TransactionSectionType,
+                            SectionGroups = ts.SectionGroups.
+                                            Select(sg=> new TransactionSectionGroupDto()
+                                                {
+                                                    GroupValue = sg.GroupValue,
+                                                    Id = sg.Id,
+                                                    TransactionSectionId = sg.TransactionSectionId,
+                                                    Values = sg.Values.Select
+                                                    (
+                                                             v => new ValueDto()
+                                                             {
+                                                                 FieldId = v.FieldId,
+                                                                 Id = v.Id
+
+                                                             }
+                                                    ).ToList()
+                                                }).ToList()
                             //Transaction = null
-                        };
+                        });
+
            return await query.ToListAsync();
 
         }
@@ -508,6 +529,14 @@ namespace Inventory.Transactions.Repositories.Postgres
                 TransactionId = t.Id,
                 TransactionSectionType = dto.TransactionSectionType,
             };
+
+            var local = context.Set<TransactionSection>().Local.FirstOrDefault(x => x.Id == dto.Id);
+
+            if (local != null)
+            {
+                context.Entry(local).State = EntityState.Detached;
+            }
+
 
             context.Attach(ts); //test 
      

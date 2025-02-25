@@ -14,6 +14,13 @@ namespace Inventory.Products.Repositories
                    .Where(p => p.FatherId == fatherId)
                    .AnyAsync();
         }
+
+
+        public ProductsDbContext Context()
+        {
+            return context;
+        }
+
         /// <summary>
         /// for testing 
         /// </summary>
@@ -580,10 +587,6 @@ namespace Inventory.Products.Repositories
 
         }
 
-        public ProductsDbContext Context()
-        {
-            return context;
-        }
 
 
         public async Task<List<QuantityMetricDto>>

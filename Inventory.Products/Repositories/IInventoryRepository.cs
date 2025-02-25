@@ -6,6 +6,8 @@ namespace Inventory.Products.Repositories
 {
     public interface IInventoryRepository
     {
+      
+
         Task<InventoryDto> AddInventoryAsync(InventoryDto dto);
 
         Task<InventoryDto> GetInventoryAsync(Guid inventoryId);

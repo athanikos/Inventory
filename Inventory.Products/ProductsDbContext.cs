@@ -8,7 +8,7 @@ public class ProductsDbContext(
 {
     public DbSet<Product> Products { get; set; }
     public DbSet<Entities.Inventory> Inventories { get; set; }
-    public DbSet<Entities.Category> Categories { get; set; }
+    public DbSet<Category> Categories { get; set; }
     public DbSet<Metric> Metrics { get; set; }
     public DbSet<Entities.Source> Sources { get; set; }
     public DbSet<ProductCategory> ProductCategories { get; set; }

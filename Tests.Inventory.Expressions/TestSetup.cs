@@ -61,14 +61,20 @@ namespace Tests.Inventory
                 InventoryService = fixture.GetService<IInventoryService>(testOutputHelper)!,
                 TransactionService= fixture.GetService<ITransactionService>(testOutputHelper)!
             };
+
+            output.TransactionRepo.Context().ChangeTracker.Clear();
+            output.InventoryRepo.Context().ChangeTracker.Clear();
+
             output.InventoryRepo.EmptyDb();
             await output.TransactionRepo.EmptyDb();
             output.ConfigurationService.EmptyDb();
           
             var inventoryId = (await output.InventoryRepo.AddInventoryAsync(new InventoryDto(Guid.NewGuid(), 
                 Inventory, string.Empty))).Id;
+            
             var sourceId = (await output.InventoryRepo.AddSourceAsync(new SourceDto(Guid.NewGuid(), 
                 SourceName))).Id;
+
             var metricId = (await output.InventoryRepo.AddMetricAsync(MetricDto.NewMetricDto(sourceId, 
                 Constants.Quantitycode))).Id;
             

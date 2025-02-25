@@ -4,6 +4,8 @@ namespace Inventory.Transactions.Repositories
 {
     public interface ITransactionRepository
     {
+        TransactionsDbContext Context();
+
         Task EmptyDb();
         Task<TemplateDto> AddTemplateAsync(TemplateDto dto);
         Task<TemplateDto> EditTemplateAsync(TemplateDto dto);

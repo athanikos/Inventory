@@ -1,10 +1,6 @@
-﻿using Inventory.Products.Contracts;
-using Inventory.Products.Contracts.Dto;
-using Inventory.Transactions.Dto;
-using Microsoft.Extensions.Azure;
+﻿using Inventory.Transactions.Dto;
 using Xunit.Abstractions;
 using Xunit.Microsoft.DependencyInjection.Abstracts;
-using Xunit.Sdk;
 
 
 namespace Tests.Inventory
@@ -17,10 +13,12 @@ namespace Tests.Inventory
         [Fact]
         public async Task TestOnCancellationAllRecordsAreCancelledAndTransactionStatusBecomesCanceled()
         {
+        
+
             var output = await TestSetup.Setup(_testOutputHelper, 
                 _fixture);
 
-            await   output.TransactionService.RoomsPrepareAsync();
+            await output.TransactionService.RoomsPrepareAsync();
             var template = (await output.TransactionRepo.GetTemplatesAsync())[0];
       
             TransactionDto dto =       await   output.TransactionService.GetValuesForNewTransaction(template.Id);
@@ -53,15 +51,16 @@ namespace Tests.Inventory
         [Fact]
         public  async Task  TestOnSaveTransaction()
         {
-           
            var output = await TestSetup.Setup(_testOutputHelper, 
                 _fixture);
 
             await   output.TransactionService.RoomsPrepareAsync();
             var template = (await output.TransactionRepo.GetTemplatesAsync())[0];
             TransactionDto dto =       await   output.TransactionService.GetValuesForNewTransaction(template.Id); 
+          
             dto.Id = ( await   output.TransactionService.UpdateOrInsertTransaction(dto)).Id;
-       
+
+           
             var transaction = await  output.TransactionService.GetTransactionAsync(dto.Id);
             Assert.Equal(dto.Id, transaction.Id);
 
@@ -69,14 +68,15 @@ namespace Tests.Inventory
 
             foreach (var v in values)
                 v.Text = "aaaa";
+           
             
-            dto.Id = ( await   output.TransactionService.UpdateOrInsertTransaction(dto)).Id;
-            dto.Id = ( await   output.TransactionService.UpdateOrInsertTransaction(dto)).Id;
-            dto.Id = ( await   output.TransactionService.UpdateOrInsertTransaction(dto)).Id;
-            dto.Id = ( await   output.TransactionService.UpdateOrInsertTransaction(dto)).Id;
-            var items = await  output.TransactionRepo.GetTransactionsAsync();
-            Assert.Single(items);
+         
+            dto.Id = ( await   output.TransactionService.UpdateOrInsertTransaction(transaction)).Id;
+            dto.Id = ( await   output.TransactionService.UpdateOrInsertTransaction(transaction)).Id;
+         
 
+            var items = await  output.TransactionRepo.GetTransactionsAsync();
+            Assert.Equal(2, items.Count);
         }
 
         [Fact]
