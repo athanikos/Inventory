@@ -1,6 +1,5 @@
 # Inventory
 A generic Inventory Implementation that allows:
-
 - Buy/ Sell / Let or EndLet properties, Those add or subtract from Quantity Metric table.
 - Template Creation for any type of entity. Currently supported for transactions. 
 - Dynamic metrics creation via ProductMetric table. Create formulas for any type of metric. 
