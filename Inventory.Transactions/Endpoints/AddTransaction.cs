@@ -1,6 +1,5 @@
 ﻿using FastEndpoints;
 using Inventory.Transactions.Dto;
-using Inventory.Transactions.Repositories;
 using Inventory.Transactions.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -29,7 +28,7 @@ namespace Inventory.Transactions.Endpoints
                                    req.TemplateId,
                                    req.Sections));
 
-            return TypedResults.Ok<TransactionDto>(dto);
+            return TypedResults.Ok(dto);
         }
     }
     public record AddTransactionRequest(Guid TransactionId, 

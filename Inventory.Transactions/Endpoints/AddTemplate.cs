@@ -23,9 +23,14 @@ namespace Inventory.Transactions.Endpoints
             HandleAsync(AddTemplateRequest req,
                         CancellationToken ct)
         {
-            var dto = await service.AddTemplateAsync(
-                new TemplateDto(Guid.Empty, req.Name, req.Type, DateTime.UtcNow, req.Sections));
-                
+            var dto = await service.AddTemplateAsync
+                (
+                new TemplateDto(Guid.Empty,
+                req.Name, req.Type,
+                DateTime.UtcNow,
+                req.Sections)
+                );
+
             return TypedResults.Ok(dto);
         }
     }

@@ -20,14 +20,12 @@ public class ConfigurationService(IConfigurationRepository repo) : IConfiguratio
         public async Task SaveAsync(List<InitializeConfigurationResponse> items)
         {
                 var configs =
-                        items.Select(o =>
-                                new Configuration()
+                items.Select(o => new Configuration()
                                 {
                                         Type = o.TypeName,
                                         Value = o.Value,
                                         EntityId = o.Id
                                 }).ToList();
-
                 await repo.SaveAsync(configs);
         }
         

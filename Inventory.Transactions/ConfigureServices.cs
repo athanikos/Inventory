@@ -1,8 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Configuration;
-using Inventory.Transactions.Repositories;
+﻿using Inventory.Transactions.Repositories;
 using Inventory.Transactions.Repositories.Postgres;
+using Inventory.Transactions.Services;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Inventory.Transactions
 {
@@ -23,6 +25,9 @@ namespace Inventory.Transactions
             .GetValue<string>("Transactions")));
 
             services.AddScoped<ITransactionRepository, PostgresTransactionRepository>();
+
+            services.AddScoped<ITransactionService, TransactionsService>();
+               
             mediatRAssemblies.Add(typeof(ConfigureServices).Assembly);
             return services;
         }
