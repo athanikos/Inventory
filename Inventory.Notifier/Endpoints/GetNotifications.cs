@@ -1,10 +1,8 @@
 ﻿using FastEndpoints;
 using MediatR;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Inventory.Notifications.Contracts;
 using Microsoft.EntityFrameworkCore;
 using Inventory.Expressions.Contracts;
-using Microsoft.AspNetCore.Http;
 
 namespace Inventory.Notifications.Endpoints
 {

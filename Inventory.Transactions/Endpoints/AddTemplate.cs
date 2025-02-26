@@ -13,7 +13,7 @@ namespace Inventory.Transactions.Endpoints
     {
         public override void Configure()
         {
-            Post("/template");
+            Post("/templates");
             AllowAnonymous();
             // to do claims this is per TransactionId claim
             //  something like Admin_<TransactionId>

@@ -2,7 +2,6 @@
 namespace Source.Products.Endpoints
 {
     using FastEndpoints;
-    using MediatR;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Http.HttpResults;
     using System.Threading;
@@ -16,7 +15,7 @@ namespace Source.Products.Endpoints
     {
         public override void Configure()
         {
-            Post("/Source");
+            Post("/sources");
             AllowAnonymous();
             // to do claims this is per SourceId claim
             //  something like Admin_<SourceId>

@@ -7,18 +7,22 @@ A generic Inventory Implementation that allows:
 
 ### Transactions Service 
 
-Inserts, Updates Transactions. Gets Default new Transaction from template.
+- Inserts, Updates Transactions. 
+- Gets Default new Transaction from template.
+
+
+
 
 ### QuantityModifyService
-Supports Add/Subtract through buy/sell and let through quantity metric table. 
-Supports cancelling entries.
-Chain updates quantity post effective date. 
+- Supports Add/Subtract through buy/sell and let through quantity metric table. 
+- Supports cancelling entries.
+- Chain updates quantity post effective date. 
 
 
 ### Expressions Service
-Product Based Formula
-Inventory Based Formula 
-Boolean Formulas 
+- Product Based Formula
+- Inventory Based Formula 
+- Boolean Formulas 
 
 ### Notifications Service 
 
@@ -26,18 +30,13 @@ TBD
 
 
 ### Configuration
-Holds the default values for entities. 
-Configures the initial state. 
+- Holds the default values for entities. 
+- Configures the initial state. 
 
 
 #### LivePricesService
 
 TBD 
-
-
-
-
-
 
 ### Availability Service 
 
@@ -96,9 +95,9 @@ A hangfire job that retrieves prices from an external endpoint and updates price
 Uses Ncalc for evaluation. 
 
 Evaluates three types of expressions:
-    Boolean Expressions ie RPICE([ADA]) > 1. Saves the result of the expression to Notification table in notifications table. 
-    Product Expressions ie these are expressions that compute some attribute for a product . example PRICE([ADA]) * VALUE([ADA]) 
-    Inventory Expressions. computes some attribute per inventory . Example SUM(VALUE([ALL])) 
+    -Boolean Expressions ie RPICE([ADA]) > 1. Saves the result of the expression to Notification table in notifications table. 
+    -Product Expressions ie these are expressions that compute some attribute for a product . example PRICE([ADA]) * VALUE([ADA]) 
+    -Inventory Expressions. computes some attribute per inventory . Example SUM(VALUE([ALL])) 
 
 
 ### Authorization rules 
@@ -112,6 +111,45 @@ Client can order from inventory. For an inventory to be able to order
 ClaimType = CLIENTINVENTORY claimValue = <InventoryId>
    
 
+### Metrics 
+One Metric has a source for the value. Source is a source system.
+An example of metric is quantity which has source = SELF where self is the system it self. 
+Transactions affect quantity. 
+A metric for a product is stored in Product Metric table. so the actual values are stored in this table. 
+
+
+
+### Use cases
+
+#### Read Invoices module (extract text and insert) 
+
+#### Notify on threshold 
+
+Set a threshold and notify
+        
+#### Compute total portofolio value & display   
+Sum all balances 
+
+#### any product pricing through ebay ?
+
+#### Betting portofolio support 
+
+#### invoice items 
+
+dynamic fields 
+for rooms it has line items :
+
+quantity - entered and validated (days)
+price per day - computed by product metrics 
+discount value - entered 
+datefrom inclusive 
+dateto inclusive 
+
+
+
+
+    
+    
 ## migrations (postgres sql )
     
     cd C:\projects\Inventory\Inventory\Inventory.WebApi
@@ -145,64 +183,3 @@ ClaimType = CLIENTINVENTORY claimValue = <InventoryId>
 
     dotnet ef migrations add PG7  -c ConfigurationDbContext -p C:\projects\Inventory\Inventory\Inventory.Configuration\Inventory.Configuration.csproj  -s  C:\projects\Inventory\Inventory\Inventory.WebApi\Inventory.WebApi.csproj -o Data/Migrations
     dotnet ef database update   PG7 -c ConfigurationDbContext
-
-### Metrics 
-
-   One Metric has a source for the value. Source is a source system.
-   An example of metric is quantity which has source = SELF where self is the system it self. 
-   Transactions affect quantity. 
-   A metric for a product is stored in Product Metric table. so the actual values are stored in this table. 
-
-
-
-### Use cases
-
-#### Read Invoices module (extract text and insert) 
-
-#### Notify on threshold 
-
-Set a threshold and notify
-        
-#### Compute total portofolio value & display   
-Sum all balances 
-
-#### any product pricing through ebay ?
-
-#### Betting portofolio support 
-
-### Rooms to let 
-
-Stores Room as product.
-Update Rooms quantity via Transaction. 
-Allows Let via Transaction.
-
-
-
-Room management 
-
-Each room is a product. Rooms are added via product management.
-All rooms are created under an inventoryId.
-To add quantity an init transaction that buys a room should be created.
-
-
-Rates 
-
-A let price per day is added via Product Metric table.
-A let action can happen via transactions service. 
-
-
-#### invoice items 
-
-dynamic fields 
-for rooms it has line items :
-
-quantity - entered and validated (days)
-price per day - computed by product metrics 
-discount value - enterwd 
-datefrom inclusive 
-dateto inclusive 
-
-
-
-
-    

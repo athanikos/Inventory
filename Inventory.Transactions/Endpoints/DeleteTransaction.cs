@@ -11,7 +11,7 @@ namespace Inventory.Transactions.Endpoints
     {
         public override void Configure()
         {
-            Delete("/transaction");
+            Delete("/transactions");
             // to do claims this is per TransactionId claim
             //  something like Admin_<TransactionId>
         }

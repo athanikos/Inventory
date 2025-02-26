@@ -5,7 +5,6 @@ namespace Inventory.Products.Endpoints
 {
     using FastEndpoints;
     using Inventory.Products.Contracts.Dto;
-    using Inventory.Products.Dto;
     using Inventory.Products.Repositories;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Http.HttpResults;
@@ -16,7 +15,7 @@ namespace Inventory.Products.Endpoints
     {
         public override void Configure()
         {
-            Post("/product");
+            Post("/products");
             AllowAnonymous(); //todo remove 
             // to do claims this is per InventoryId claim
             //  something like Admin_<inventoryId>
@@ -47,7 +46,7 @@ namespace Inventory.Products.Endpoints
             return TypedResults.Ok(dto);
         }
     }
-    public abstract record AddProductRequest
+    public record AddProductRequest
     (Guid ProductId, string Description,string Code, Guid InventoryId, List<ProductMetricDto> Metrics);
 
     

@@ -17,7 +17,7 @@ namespace Inventory.Products.Endpoints
     {
         public override void Configure()
         {
-            Put("/product");
+            Put("/products");
             AllowAnonymous();
             // to do claims this is per ProductId claim
             //  something like Admin_<ProductId>

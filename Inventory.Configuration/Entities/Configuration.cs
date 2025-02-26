@@ -8,7 +8,7 @@ public class Configuration
     
     public Guid? EntityId { get; set; }
 
-    public string Value { get; set; }
+    public required string Value { get; set; }
 }
 
 

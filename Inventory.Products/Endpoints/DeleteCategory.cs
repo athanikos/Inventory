@@ -11,7 +11,7 @@ namespace Inventory.Products.Endpoints
     {
         public override void Configure()
         {
-            Delete("/category");
+            Delete("/categories");
             // to do claims this is per CategoryId claim
             //  something like Admin_<CategoryId>
         }

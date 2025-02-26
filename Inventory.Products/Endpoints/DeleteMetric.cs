@@ -3,7 +3,6 @@ namespace Inventory.Metrics.Endpoints
 {
     using FastEndpoints;
     using Inventory.Products.Contracts.Dto;
-    using Inventory.Products.Dto;
     using Inventory.Products.Repositories;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Http.HttpResults;
@@ -14,7 +13,7 @@ namespace Inventory.Metrics.Endpoints
     {
         public override void Configure()
         {
-            Delete("/metric");
+            Delete("/metrics");
             // to do claims this is per InventoryId claim
             //  something like Admin_<inventoryId>
         }

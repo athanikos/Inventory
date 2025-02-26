@@ -8,7 +8,6 @@ using Microsoft.Identity.Web.Resource;
 
 namespace Inventory.Products.Endpoints
 {
-    [RequiredScope("products.read")]
 
     public class AddCategory(IMediator mediator, IInventoryService service) :
         Endpoint<AddCategoryRequest>
@@ -17,7 +16,7 @@ namespace Inventory.Products.Endpoints
 
         public override void Configure()
         {
-            Post("/Category");
+            Post("/categories");
             // to do claims this is per CategoryId claim
             //  something like Admin_<CategoryId>
         }

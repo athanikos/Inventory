@@ -21,7 +21,7 @@ namespace Inventory.Metrics.Endpoints
 
         public override void Configure()
         {
-            Post("/Metric");
+            Post("/metrics");
             AllowAnonymous(); //todo remove 
 
             // to do claims this is per InventoryId claim

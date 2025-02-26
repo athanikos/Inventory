@@ -70,7 +70,7 @@ namespace Inventory.Products.Repositories
 
         private static Entities.Inventory AddInventory(InventoryDto c)
         {
-            return new Entities.Inventory() { Id = c.Id, Description = c.Description };
+            return new Entities.Inventory() { Id = c.Id, Description = c.Description, Code = c.Code };
         }
 
         public async Task DeleteInventoryAsync(InventoryDto c)
@@ -88,17 +88,21 @@ namespace Inventory.Products.Repositories
 
         public async Task<ProductDto> AddProductAsync(ProductDto c)
         {
-            var p = new Product() { Description = c.Description, 
-                Id = c.Id, Code = c.Code, InventoryId = c.InventoryId };
-            
+            var p = new Product() 
+            {
+                Description = c.Description, 
+                Id = c.Id, 
+                Code = c.Code,
+                InventoryId = c.InventoryId
+            };
+
             context.Products.Add(p);
 
+            if (c.Metrics!= null)   
             foreach (var m in c.Metrics)
                 DecideNewOrEdit(m);
 
-
             await context.SaveChangesAsync();
-
             return await GetProductAsync(p.Id);
         }
 
@@ -517,11 +521,6 @@ namespace Inventory.Products.Repositories
             return await  GetQuantityMetricAsync(qm.ProductId, qm.EffectiveDate);
         }
 
-
-      
-
-
-
         public async Task<QuantityMetricDto> EditQuantityMetricAsync(QuantityMetricDto dto)
         {
 
@@ -577,8 +576,6 @@ namespace Inventory.Products.Repositories
 
         }
 
-
-
         public async Task<List<QuantityMetricDto>> GetQuantityMetricsAsync()
         {
             return await context.QuantityMetrics.
@@ -586,8 +583,6 @@ namespace Inventory.Products.Repositories
                                    ToListAsync();
 
         }
-
-
 
         public async Task<List<QuantityMetricDto>>
           CancellQuantityMetricsAsync(Guid transactionId)
@@ -600,7 +595,6 @@ namespace Inventory.Products.Repositories
 
             return await GetQuantityMetricsAsync(transactionId);
         }
-
        
         public async Task<int> SaveChangesAsync()
         {

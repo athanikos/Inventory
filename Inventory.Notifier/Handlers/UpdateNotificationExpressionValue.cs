@@ -11,10 +11,7 @@ namespace Inventory.Notifications.Handlers
         async   Task<NotificationDto> IRequestHandler<UpdateNotificationExpressionValueCommand, 
           NotificationDto>.Handle(UpdateNotificationExpressionValueCommand request, CancellationToken cancellationToken)
         {
-            // Log.Information("UpdateNotificationExpressionValue BooleanExpressionId " + request.BooleanExpressionId);
-            // Log.Information("UpdateNotificationExpressionValue ExpressionValue " + request.ExpressionValue);
-
-
+         
            List<Notification> entities = context.Notifications.Where(p=>p.BooleanExpressionId == request.BooleanExpressionId).ToList();
 
             if (entities.Any())
@@ -24,8 +21,7 @@ namespace Inventory.Notifications.Handlers
                     item.ExpressionValue = request.ExpressionValue;
                     item.SystemDate = DateTime.Now;
                 }
-                // Log.Information("UpdateNotificationExpressionValue  _context.SaveChangesAsync");
-
+       
                 try
                 {
                     await context.SaveChangesAsync();

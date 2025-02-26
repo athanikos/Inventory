@@ -5,19 +5,15 @@ namespace Inventory.Products.Contracts.Dto
 
     public class ProductMetricDto
     {
-        public ProductMetricDto(Guid productId)
-        {
-            ProductId = productId;
-        }
-
-
+        public ProductMetricDto() {  }
+       
+        public ProductMetricDto(Guid productId) { ProductId = productId; }
 
         public ProductMetricDto(
             Guid productId, 
             Guid metricId,
             decimal value, 
             DateTime effectiveDate, 
-        
             string productCode,
             string metricCode,
             Guid     unitOfMeasurementId

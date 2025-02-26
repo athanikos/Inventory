@@ -14,7 +14,7 @@ namespace Inventory.Products.Endpoints
     {
         public override void Configure()
         {
-            Put("/inventory");
+            Put("/inventories");
             // to do claims this is per InventoryId claim
             //  something like Admin_<inventoryId>
         }
