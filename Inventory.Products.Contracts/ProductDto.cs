@@ -17,16 +17,17 @@ public class ProductDto
         InventoryId = inventoryId;
         Metrics = metrics;
     }
+
     public ProductDto(Guid id)
     {
         Id = id;
     }
 
     public Guid Id { get;  set; } 
-    public string Description { get; set; } 
-    public string Code { get; private set; } 
-    public Guid InventoryId { get; private set; } 
-    public List<ProductMetricDto> Metrics { get; private set; } 
+    public string Description { get; set; } = string.Empty;
+    public string Code { get; private set; } = string.Empty;
+    public Guid InventoryId { get; private set; } = Guid.Empty;
+    public List<ProductMetricDto> Metrics { get; private set; } = [];
 
     public  static ProductDto NewProductDto(Guid inventoryId, string productCode)
     {

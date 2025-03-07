@@ -22,17 +22,27 @@ namespace Inventory.Transactions.Endpoints
                         CancellationToken ct)
         {
             var dto = await service.UpdateOrInsertTransaction(
-                new TransactionDto(req.TransactionId,
-                                   req.Description,
-                                   DateTime.Now,
-                                   req.TemplateId,
-                                   req.Sections));
+                             AddTransactionRequestExtensions.ToDto(req));
 
             return TypedResults.Ok(dto);
         }
-    }
-    public record AddTransactionRequest(Guid TransactionId, 
-        string Description,Guid TemplateId, ICollection<TransactionSectionDto> Sections );
 
-  
+      
+    }
+
+    public record AddTransactionRequest(Guid TransactionId,
+        string Description, Guid TemplateId, ICollection<TransactionSectionDto> Sections);
+
+
+    public static class AddTransactionRequestExtensions
+    {
+        public static TransactionDto ToDto(this AddTransactionRequest req)
+        {
+            return new TransactionDto(req.TransactionId,
+                                               req.Description,
+                                               DateTime.Now,
+                                               req.TemplateId,
+                                               req.Sections);
+        }
+    }
 }

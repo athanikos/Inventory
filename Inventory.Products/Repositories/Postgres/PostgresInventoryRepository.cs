@@ -108,15 +108,12 @@ namespace Inventory.Products.Repositories
 
         public async Task<ProductDto> EditProductAsync(ProductDto c)
         {
-
-
             Product p = await context.Products.Where(p => p.Id == c.Id).SingleAsync();
             p.Description = c.Description;
             p.Code = c.Code;
             p.InventoryId = c.InventoryId; 
             context.Update(p);
-             
-
+         
             foreach (var m in c.Metrics)
                 DecideNewOrEdit(m);
             
@@ -134,6 +131,17 @@ namespace Inventory.Products.Repositories
                                    [] // todo populate 
                                    );
         }
+
+        public  async Task<List<ProductDto>> GetProductsAsync()
+        {
+            return await context.Products.Select(i => new ProductDto(i.Id,
+                                   i.Description,
+                                   i.Code,
+                                   i.InventoryId, new List<ProductMetricDto>()
+
+                                   )).ToListAsync();    
+        }
+
 
         public List<string> GetDistinctProductCodes(Guid inventoryId)
         {

@@ -25,6 +25,5 @@ namespace Inventory.Transactions.Endpoints
         }
     }
   
-    public record DataPrepareRequest(string Name)
-    { }
+    public record DataPrepareRequest(string Name) { }
 }

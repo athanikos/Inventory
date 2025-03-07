@@ -21,12 +21,10 @@ namespace Inventory.Transactions.Endpoints
         }
 
         public override async Task<Results<Ok<TemplateDto>, NotFound, ProblemDetails>>
-            HandleAsync(EditTemplateRequest req,
-                        CancellationToken ct)
+            HandleAsync(EditTemplateRequest req, CancellationToken ct)
         {
             return TypedResults.Ok(
-                   await service.EditTemplateAsync(new TemplateDto(req.Id, req.Name,req.Type,DateTime.UtcNow,req.Sections)));
-            
+                   await service.EditTemplateAsync(EditTemplateRequestExtensions.ToDto(req)));
         }
     }
 
@@ -34,4 +32,11 @@ namespace Inventory.Transactions.Endpoints
                              ICollection<SectionDto> Sections);
 
   
+    public static class EditTemplateRequestExtensions
+    {
+        public static TemplateDto ToDto(this EditTemplateRequest req)
+        {
+            return new TemplateDto(req.Id, req.Name, req.Type, DateTime.UtcNow, req.Sections);
+        }
+    }   
 }

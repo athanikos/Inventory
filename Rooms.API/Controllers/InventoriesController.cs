@@ -20,25 +20,55 @@ namespace Rooms.API.Controllers
         [HttpPost(ApiEndpoints.Inventories.Create)]
         public async Task<IActionResult> Create([FromBody] Inventory inventory)
         {
-          
-            using (var httpClient = new HttpClient())
+            try
             {
-                var json = JsonConvert.SerializeObject(inventory);
-                var stringContent = new StringContent(json, UnicodeEncoding.UTF8, "application/json"); // use MediaTypeNames.Application.Json in Core 3.0+ and Standard 2.1+
-
-                using (var response = await httpClient.PostAsync
-                    (_url + "inventories", stringContent))
+                using (var httpClient = new HttpClient())
                 {
-                    string apiResponse = await response.Content.ReadAsStringAsync();
-                    inventory = JsonConvert.DeserializeObject<Inventory>(apiResponse);
+                    var json = JsonConvert.SerializeObject(inventory);
+                    var stringContent = new StringContent(json, UnicodeEncoding.UTF8, "application/json"); // use MediaTypeNames.Application.Json in Core 3.0+ and Standard 2.1+
+                    await httpClient.PostAsync(_url + "inventories", stringContent);
                 }
             }
-
-            return CreatedAtAction("get", new { id = inventory.Id }, inventory);
+            catch (Exception ex)
+            {
+                return Problem(detail: ex.StackTrace, title: ex.Message);
+            }
+            return Ok();
 
         }
 
+        [HttpGet(ApiEndpoints.Inventories.Get)]
+        public async Task<IActionResult> Get([FromBody] Guid Id)
+        {
+            try
+            {
+                using (var httpClient = new HttpClient())
+                {
+                    var jsonResponse = string.Empty;
+                    try
+                    {
+                        using HttpResponseMessage response = await 
+                            httpClient.GetAsync(_url + "inventories/" + Id.ToString());
+                        if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                        {
+                            jsonResponse = await response.Content.ReadAsStringAsync();
+                        }
 
-      
+                    }
+                    catch (Exception ex)
+                    {
+                        return Problem(detail: ex.StackTrace, title: ex.Message);
+                    }
+                    return Ok(jsonResponse);
+                }
+            }
+            catch (Exception ex)
+            {
+                return Problem(detail: ex.StackTrace, title: ex.Message);
+            }
+            
+        }
+
+
     }
 }

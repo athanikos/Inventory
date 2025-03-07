@@ -6,12 +6,8 @@ namespace Inventory.Products.Repositories
 {
     public interface IInventoryRepository
     {
-      
-
         Task<InventoryDto> AddInventoryAsync(InventoryDto dto);
-
         Task<InventoryDto> GetInventoryAsync(Guid inventoryId);
-        
         bool InventoryIdExists(Guid id);
         Task<InventoryDto> EditInventoryAsync(InventoryDto c);
         Task DeleteInventoryAsync(InventoryDto c);
@@ -20,16 +16,16 @@ namespace Inventory.Products.Repositories
         Task<ProductDto> EditProductAsync(ProductDto c);
         Task DeleteProductAsync(ProductDto c);
         Task<bool> ProductDescriptionOrCategoryIsUsedAsync(ProductDto c);
-
+        Task<List<ProductDto>> GetProductsAsync();
         List<string> GetDistinctProductCodes(Guid inventoryId);
         List<string> GetDistinctMetricCodes();
         Task AddOrEditProductMetricAsync(ProductMetricDto m);
         Task<ProductMetricDto> GetProductMetricAsync(Guid productId, DateTime effectiveDate    );
+     
 
         Task<MetricDto> AddMetricAsync(MetricDto dto);
         Task<MetricDto> EditMetricAsync(MetricDto c);
         Task DeleteMetricAsync(MetricDto c);
-
         Task AddOrEditInventoryMetric(InventoryMetricDto m);
         Task<bool> CategoryFatherIdExistsAsync(Guid fatherId);
 

@@ -23,16 +23,11 @@ namespace Inventory.Transactions.Endpoints
             HandleAsync(AddTemplateRequest req,
                         CancellationToken ct)
         {
-            var dto = await service.AddTemplateAsync
-                (
-                new TemplateDto(Guid.Empty,
-                req.Name, req.Type,
-                DateTime.UtcNow,
-                req.Sections)
-                );
-
+            var dto = await service.AddTemplateAsync(AddTemplateRequestExtensions.ToDto(req));
             return TypedResults.Ok(dto);
         }
+
+      
     }
 
     public class AddTemplateRequest(
@@ -50,5 +45,18 @@ namespace Inventory.Transactions.Endpoints
 
         public DateTime Created { get; set; } = created;
         public ICollection<SectionDto> Sections { get; set; } = sections;
+
+       
     }
+
+    public static class AddTemplateRequestExtensions
+    {
+        public static TemplateDto ToDto(this AddTemplateRequest req)
+        {
+            return new TemplateDto(Guid.Empty,
+                            req.Name, req.Type,
+                            DateTime.UtcNow,
+                            req.Sections);
+        }
+    }   
 }

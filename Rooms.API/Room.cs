@@ -6,7 +6,9 @@ namespace Rooms.API
     {
         public Guid Id { get; set; }
 
-        public required string Name { get; set; }
+        public required string Description { get; set; }
+
+        public required string Code  { get; set; }
 
         public Guid InventoryId { get; set; }
     }
