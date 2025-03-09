@@ -20,7 +20,6 @@ namespace Inventory.Transactions.Endpoints
             HandleAsync(DeleteTransactionRequest req,
                         CancellationToken ct)
         {
-            //todo fix optional parameters , just id contructor?
             await service.DeleteTransactionAsync(new TransactionDto(req.Id));
             return TypedResults.Ok();
         }

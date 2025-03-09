@@ -23,6 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj" />
     <ProjectReference Include="..\Inventory.Expressions.Contracts\Inventory.Expressions.Contracts.csproj" />
     <ProjectReference Include="..\Inventory.Notifications.Contracts\Inventory.Notifications.Contracts.csproj" />
     <ProjectReference Include="..\Inventory.Notifier\Inventory.Notifications.csproj" />

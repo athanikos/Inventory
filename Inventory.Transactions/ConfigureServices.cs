@@ -1,7 +1,6 @@
 ﻿using Inventory.Transactions.Repositories;
 using Inventory.Transactions.Repositories.Postgres;
 using Inventory.Transactions.Services;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

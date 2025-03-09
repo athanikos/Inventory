@@ -1,5 +1,4 @@
-﻿
-namespace Inventory.Metrics.Endpoints
+﻿namespace Inventory.Metrics.Endpoints
 {
     using FastEndpoints;
     using Inventory.Products.Contracts.Dto;
@@ -9,12 +8,11 @@ namespace Inventory.Metrics.Endpoints
     using System.Threading;
     using System.Threading.Tasks;
 
-    public  class AddMetric 
-        : Endpoint<AddMetricRequest>
+    public class AddMetric : Endpoint<AddMetricRequest>
     {
         private readonly IInventoryRepository _repo;
 
-        public  AddMetric(IInventoryRepository repo)
+        public AddMetric(IInventoryRepository repo)
         {
             _repo = repo;
         }
@@ -28,25 +26,21 @@ namespace Inventory.Metrics.Endpoints
             //  something like Admin_<inventoryId>
         }
 
-
-        public override async Task<Results<Ok<MetricDto>, NotFound, ProblemDetails>>
-            HandleAsync(AddMetricRequest req,
-                        CancellationToken ct)
+        public override async Task<Results<Ok<MetricDto>, NotFound, ProblemDetails>> HandleAsync(AddMetricRequest req, CancellationToken ct)
         {
-            
-            
-            var dto =   await _repo.AddMetricAsync(new MetricDto(req.Id,
-                                                                 req.Description,  
-                                                                 req.Code, 
-                                                                 req.SourceId));
-
+            var dto = await _repo.AddMetricAsync(new MetricDto(req.Id, req.Description, req.Code, req.SourceId));
 
             return TypedResults.Ok<MetricDto>(dto);
         }
     }
 
-    public record AddMetricRequest (Guid Id, string Description,string Code,  Guid SourceId);
+    public record AddMetricRequest(Guid Id, string Description, string Code, Guid SourceId);
 
-  
-  
+    public static class MetricDtoExtensions
+    {
+        public static MetricDto ToMetricDto(this AddMetricRequest request)
+        {
+            return new MetricDto(request.Id, request.Description, request.Code, request.SourceId);
+        }
+    }
 }

@@ -4,13 +4,11 @@ using Inventory.Products.Services;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.Identity.Web.Resource;
 
 namespace Inventory.Products.Endpoints
 {
 
-    public class AddCategory(IMediator mediator, IInventoryService service) :
-        Endpoint<AddCategoryRequest>
+    public class AddCategory(IMediator mediator, IInventoryService service) : Endpoint<AddCategoryRequest>
     {
         private readonly IMediator _mediator = mediator;
 
@@ -21,30 +19,32 @@ namespace Inventory.Products.Endpoints
             //  something like Admin_<CategoryId>
         }
 
-        public override async Task<Results<Ok<CategoryDto>, NotFound, ProblemDetails>>
-            HandleAsync(AddCategoryRequest req,
-                        CancellationToken ct)
+        public override async Task<Results<Ok<CategoryDto>, NotFound, ProblemDetails>> HandleAsync(AddCategoryRequest req, CancellationToken ct)
         {
-
             try
             {
-                  var categoryDto =  await service.AddCategoryAsync(new CategoryDto(Guid.NewGuid(), req.Description, req.FatherId));
-                  return TypedResults.Ok(categoryDto);
+                return TypedResults.Ok(await service.AddCategoryAsync(AddCategoryRequestExtensions.ToDto(req)));
             }
             catch (Exception ex)
             {
                 AddError(ex.Message);
                 ThrowIfAnyErrors(); // If there are errors, execution shouldn't go beyond this point
-                return new FastEndpoints.ProblemDetails(ValidationFailures);
-
+                return new ProblemDetails(ValidationFailures);
             }
-
         }
     }
 
 
     public abstract record AddCategoryRequest(Guid FatherId, string Description);
 
- 
-  
+    public static class AddCategoryRequestExtensions
+    {
+        public static CategoryDto ToDto(this AddCategoryRequest req)
+        {
+            return new CategoryDto(Guid.NewGuid(), req.Description, req.FatherId);
+        }
+    }   
+
+
+
 }

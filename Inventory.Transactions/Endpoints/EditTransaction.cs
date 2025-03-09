@@ -25,9 +25,8 @@ namespace Inventory.Transactions.Endpoints
             HandleAsync(EditTransactionRequest req,
                         CancellationToken ct)
         {
-
-            var dto = await service.UpdateOrInsertTransaction(EditTransactionRequestExtensions.ToDto(req));
-            return TypedResults.Ok(dto);
+            return TypedResults.Ok(await service.UpdateOrInsertTransaction
+                (EditTransactionRequestExtensions.ToDto(req)));
         }
     }
 

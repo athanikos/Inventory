@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 namespace Inventory.Transactions.Endpoints
 {
     public class AddTemplate(ITransactionService service) :
-        Endpoint<AddTemplateRequest>
+            Endpoint<AddTemplateRequest>
     {
         public override void Configure()
         {
@@ -26,16 +26,14 @@ namespace Inventory.Transactions.Endpoints
             var dto = await service.AddTemplateAsync(AddTemplateRequestExtensions.ToDto(req));
             return TypedResults.Ok(dto);
         }
-
-      
     }
 
     public class AddTemplateRequest(
-        Guid id,
-        string name,
-        TemplateType type,
-        DateTime created,
-        ICollection<SectionDto> sections)
+            Guid id,
+            string name,
+            TemplateType type,
+            DateTime created,
+            ICollection<SectionDto> sections)
     {
         public Guid Id { get; set; } = id;
         public string Name { get; set; } = name;
@@ -45,8 +43,6 @@ namespace Inventory.Transactions.Endpoints
 
         public DateTime Created { get; set; } = created;
         public ICollection<SectionDto> Sections { get; set; } = sections;
-
-       
     }
 
     public static class AddTemplateRequestExtensions

@@ -32,27 +32,17 @@ namespace Inventory.Prices.Services
             {
                 try
                 {
-                    // Log.Information("DoScheduledWork " + p.Id.ToString());
-
                     var options = new RestClientOptions(p.TargetURL + p.TargetProductCode);
                     var client = new RestClient(options);
                     var request = new RestRequest("");
                     request.AddHeader("accept", "application/json");
                     request.AddHeader("x-cg-demo-api-key", p.TargetKey);
-                    // Log.Information(" client.Get(request) ");
-
                     var response = client.Get(request);
                     JObject o = JObject.Parse(response.Content);
                     var value = decimal.Parse(o.SelectToken(p.TargetPathForProductCode).ToString());
                     var command = new AddProductMetricCommand(p.ProductId, p.MetricId,
                         value, DateTime.Now, Constants.CurrencyUnityOfMeasurementId);
-
-                    // Log.Information("AddProductMetricCommand  _mediator.Send " + p.ProductId + " " + p.MetricId);
-
-                   await  mediator.Send(command);
-                    
-                    // Log.Information("After mediator.send ");
-
+                    await  mediator.Send(command);
                 }
                 catch (Exception ex)
                 {

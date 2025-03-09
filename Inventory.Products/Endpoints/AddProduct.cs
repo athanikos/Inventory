@@ -16,17 +16,16 @@ namespace Inventory.Products.Endpoints
         public override void Configure()
         {
             Post("/products");
-            AllowAnonymous(); //todo remove 
-            // to do claims this is per InventoryId claim
-            //  something like Admin_<inventoryId>
+            AllowAnonymous(); // todo remove
+                              // to do claims this is per InventoryId claim
+                              //  something like Admin_<inventoryId>
         }
-
 
         public override async Task<Results<Ok<ProductDto>, NotFound, ProblemDetails>>
             HandleAsync(AddProductRequest req,
                         CancellationToken ct)
         {
-            var dto = new ProductDto(req.ProductId, req.Description,req.Code, req.InventoryId,req.Metrics);
+            var dto = new ProductDto(req.ProductId, req.Description, req.Code, req.InventoryId, req.Metrics);
 
             if (!repo.InventoryIdExists(req.InventoryId))
             {
@@ -46,8 +45,7 @@ namespace Inventory.Products.Endpoints
             return TypedResults.Ok(dto);
         }
     }
-    public record AddProductRequest
-    (Guid ProductId, string Description,string Code, Guid InventoryId, List<ProductMetricDto> Metrics);
+    public record AddProductRequest(Guid ProductId, string Description, string Code, Guid InventoryId, List<ProductMetricDto> Metrics);
 
     
 }

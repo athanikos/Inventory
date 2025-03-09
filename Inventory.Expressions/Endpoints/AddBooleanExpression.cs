@@ -1,9 +1,11 @@
-﻿using FastEndpoints;
+﻿using Common;
+using FastEndpoints;
 using Inventory.Expressions.Dto;
 using Inventory.Expressions.Entities;
 using MediatR;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Inventory.Expressions.Endpoints
 {
@@ -18,7 +20,6 @@ namespace Inventory.Expressions.Endpoints
         {
             _mediator = mediator;
             _context = context;
-            _context = context;
         }
 
         public override void Configure()
@@ -32,37 +33,48 @@ namespace Inventory.Expressions.Endpoints
             HandleAsync(AddBooleanExpressionRequest req,
                         CancellationToken ct)
         {
-            var entity =
-                 new BooleanExpression()
-                 {
-                     Expression = req.Expression,
-                     Id = req.Id,
-                     InventoryId = req.InventoryId,
-                     RunEveryMinutes = req.RunEveryMinutes,
+            return await new EndPointHandleWrapper<BooleanExpressionDto,
+                            AddBooleanExpressionRequest,
+                            CancellationToken>(Handle, req, ct).
+                            Execute();
+        }
 
-                 };
-
+        private async Task<BooleanExpressionDto>
+            Handle(AddBooleanExpressionRequest req, CancellationToken ct)
+        {
+            var entity = AddBooleanExpressionRequestExtensions.ToEntity(req);
             _context.BooleanExpressions.Add(entity);
             await _context.SaveChangesAsync();
-
-            return TypedResults.Ok(new BooleanExpressionDto(
-                entity.Id, entity.Expression, entity.RunEveryMinutes, entity.InventoryId
-                ));
-
-
+            return BoooleanExpressionExtensions.ToDto(entity);
         }
     }
-
 
     public record AddBooleanExpressionRequest(Guid Id,
           string Expression,
           int RunEveryMinutes,
           Guid InventoryId);
 
+    public static class BoooleanExpressionExtensions
+    {
+        public static BooleanExpressionDto ToDto(this BooleanExpression entity)
+        {
+            return new BooleanExpressionDto(
+                            entity.Id, entity.Expression, entity.RunEveryMinutes, entity.InventoryId
+                            );
+        }
+    }
 
-
-
-
-
-
+    public static class AddBooleanExpressionRequestExtensions
+    {
+        public static BooleanExpression ToEntity(this AddBooleanExpressionRequest req)
+        {
+            return new BooleanExpression()
+            {
+                Expression = req.Expression,
+                Id = req.Id,
+                InventoryId = req.InventoryId,
+                RunEveryMinutes = req.RunEveryMinutes,
+            };
+        }
+    }
 }

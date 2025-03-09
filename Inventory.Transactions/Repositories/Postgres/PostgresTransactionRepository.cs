@@ -8,14 +8,14 @@ using Microsoft.EntityFrameworkCore.Query;
 namespace Inventory.Transactions.Repositories.Postgres
 {
     public class PostgresTransactionRepository(TransactionsDbContext context) :
-        ITransactionRepository
+            ITransactionRepository
     {
         public async Task EmptyDb()
         {
             context.Values.RemoveRange(context.Values);
             context.Fields.RemoveRange(context.Fields);
             context.Sections.RemoveRange(context.Sections);
-       
+
             context.TransactionSectionGroups.RemoveRange(context.TransactionSectionGroups);
             context.TransactionSections.RemoveRange(context.TransactionSections);
             context.Transactions.RemoveRange(context.Transactions);
@@ -28,7 +28,7 @@ namespace Inventory.Transactions.Repositories.Postgres
         {
             return context;
         }
-        
+
         #region Templates
         public async Task<TemplateDto> GetTemplateAsync(Guid id)
         {
@@ -46,16 +46,16 @@ namespace Inventory.Transactions.Repositories.Postgres
                         i.Created,
                         i.Sections.Select
                         (
-                            s=>new SectionDto()
+                            s => new SectionDto()
                             {
                                 Fields = s.Fields.Select(
-                                    f=> new FieldDto()
+                                    f => new FieldDto()
                                     {
-                                        Id  =f.Id,
+                                        Id = f.Id,
                                         SectionId = f.SectionId,
                                         Name = f.Name,
-                                        Expression =f.Expression,
-                                        Type =f.Type
+                                        Expression = f.Expression,
+                                        Type = f.Type
                                     }).ToList(),
                                 Id = s.Id,
                                 Name = s.Name,
@@ -65,7 +65,6 @@ namespace Inventory.Transactions.Repositories.Postgres
                         ).ToList()
                     ))
                 .SingleAsync();
-
         }
 
         public async Task<List<TemplateDto>> GetTemplatesAsync()
@@ -81,35 +80,35 @@ namespace Inventory.Transactions.Repositories.Postgres
                     i.Created,
                     i.Sections.Select
                     (
-                        s=>new SectionDto()
+                        s => new SectionDto()
                         {
-                                Fields = s.Fields.Select(
-                                        f=> new FieldDto()
-                                        {
-                                              Id  =f.Id,
-                                              SectionId = f.SectionId,
-                                              Name = f.Name,
-                                              Expression =f.Expression,
-                                              Type =f.Type
-                                        }).ToList(),
-                                Id = s.Id,
-                                Name = s.Name,
-                                SectionType = s.SectionType,
-                                TemplateId = s.TemplateId
+                            Fields = s.Fields.Select(
+                                f => new FieldDto()
+                                {
+                                    Id = f.Id,
+                                    SectionId = f.SectionId,
+                                    Name = f.Name,
+                                    Expression = f.Expression,
+                                    Type = f.Type
+                                }).ToList(),
+                            Id = s.Id,
+                            Name = s.Name,
+                            SectionType = s.SectionType,
+                            TemplateId = s.TemplateId
                         }
                     ).ToList()
                 )).ToListAsync();
-
         }
-        
+
         public async Task<TemplateDto> AddTemplateAsync(TemplateDto dto)
         {
-            var t = new Template() {
-                                        Id = dto.Id, 
-                                        Created = dto.Created, 
-                                        Name = dto.Name,
-                                         Type = dto.Type 
-                                    };
+            var t = new Template()
+            {
+                Id = dto.Id,
+                Created = dto.Created,
+                Name = dto.Name,
+                Type = dto.Type
+            };
             context.Templates.Add(t);
             await context.SaveChangesAsync(); //todo do work in context avoid saving per level 
 
@@ -118,7 +117,6 @@ namespace Inventory.Transactions.Repositories.Postgres
                 s.TemplateId = t.Id;
                 await AddSection(s);
             }
-
 
             return await GetTemplateAsync(t.Id);
         }
@@ -179,7 +177,6 @@ namespace Inventory.Transactions.Repositories.Postgres
                 TemplateId = c.TemplateId,
                 Fields = fields,
                 SectionType = c.SectionType
-
             };
             context.Sections.Add(s);
             await context.SaveChangesAsync();
@@ -191,28 +188,30 @@ namespace Inventory.Transactions.Repositories.Postgres
                     Expression = f.Expression,
                     Id = f.Id,
                     SectionId = s.Id,
-                     Type = f.Type,
+                    Type = f.Type,
                 });
 
             await context.SaveChangesAsync();
-
         }
 
         private void EditSection(SectionDto inboundSection)
         {
-
             var inStoreSection = context.Sections.Include(section => section.Fields).Single(i => i.Id == inboundSection.Id);
 
-            Section f = new ()
-            { Id = inboundSection.Id, Name = inboundSection.Name, TemplateId = inboundSection.TemplateId, SectionType = inboundSection.SectionType };
-
+            Section f = new()
+            {
+                Id = inboundSection.Id,
+                Name = inboundSection.Name,
+                TemplateId = inboundSection.TemplateId,
+                SectionType = inboundSection.SectionType
+            };
 
             foreach (var field in inboundSection.Fields)
                 if (field.Id == Guid.Empty)
                     AddField(field);
                 else
                     EditField(field);
-            
+
             foreach (var storedField in inStoreSection.Fields)
             {
                 if (inboundSection.Fields.Any(t => storedField.SectionId == t.SectionId) == false)
@@ -230,18 +229,15 @@ namespace Inventory.Transactions.Repositories.Postgres
 
             foreach (Field f in s.Fields)
                 context.Remove(f);
-
         }
-
-        #endregion 
+        #endregion
 
         #region Fields 
         public async Task<ICollection<FieldDto>> GetFieldsAsync(Guid templateId)
         {
             var SectionId = await context.Sections
                             .Where(o => o.TemplateId == templateId)
-                            .Select(i=>i.Id).SingleOrDefaultAsync();  
-
+                            .Select(i => i.Id).SingleOrDefaultAsync();
 
             return await context.Fields.Where(o => o.SectionId == SectionId)
                            .Select(i => new FieldDto()
@@ -263,7 +259,7 @@ namespace Inventory.Transactions.Repositories.Postgres
                 Expression = c.Expression,
                 Name = c.Name,
                 Type = c.Type,
-                SectionId = c.SectionId,    
+                SectionId = c.SectionId,
             });
         }
 
@@ -289,10 +285,8 @@ namespace Inventory.Transactions.Repositories.Postgres
 
         #region Values
 
-        public async Task<ICollection<ValueDto>>
-            GetTransactionValuesAsync(Guid transactionId)
+        public async Task<ICollection<ValueDto>> GetTransactionValuesAsync(Guid transactionId)
         {
-
             var query = from value in context.Values
                         where value.TransactionId == transactionId
                         join sectionGroup in context.TransactionSectionGroups
@@ -310,24 +304,21 @@ namespace Inventory.Transactions.Repositories.Postgres
                             TransactionSectionType = section.TransactionSectionType
                         };
 
-
             return await query.ToListAsync();
-
         }
 
         private void AddValue(ValueDto dto, TransactionSectionGroup tsg)
-        { //todo use mapper
+        {
             tsg.Values.Add
             (
-                            new Value()
-                            {
-                                FieldId = dto.FieldId,
-                                Text = dto.Text,
-                                TransactionId = dto.TransactionId,
-                                TransactionSectionGroupId = dto.TransactionSectionGroupId,
-                            }
+                new Value()
+                {
+                    FieldId = dto.FieldId,
+                    Text = dto.Text,
+                    TransactionId = dto.TransactionId,
+                    TransactionSectionGroupId = dto.TransactionSectionGroupId,
+                }
             );
-
         }
 
         private void EditValue(ValueDto dto, TransactionSectionGroup tsg)
@@ -350,38 +341,32 @@ namespace Inventory.Transactions.Repositories.Postgres
             Value f = context.Values.Single(p => p.Id == dto.Id);
             context.Remove(f);
         }
-
         #endregion Values 
 
         #region Transaction 
-
-
-
         public async Task<TransactionDto> AddTransactionAsync(TransactionDto dto)
         {
-            //todo use mapper
             var t = new Entities.Transaction()
             {
                 Id = dto.Id,
                 Created = dto.Created,
                 Description = dto.Description,
                 TemplateId = dto.TemplateId
-
             };
             context.Transactions.Add(t);
-            
-            if (dto.Sections!=null)
-            foreach (var ts in dto.Sections)
-                AddTransactionSection(
-                    t
-                    , new TransactionSectionDto()
-                    {
-                        Id = ts.Id,
-                        TransactionId = t.Id,
-                        TransactionSectionType = ts.TransactionSectionType,
-                        SectionGroups = ts.SectionGroups,
-                    }
-                );
+
+            if (dto.Sections != null)
+                foreach (var ts in dto.Sections)
+                    AddTransactionSection(
+                        t,
+                        new TransactionSectionDto()
+                        {
+                            Id = ts.Id,
+                            TransactionId = t.Id,
+                            TransactionSectionType = ts.TransactionSectionType,
+                            SectionGroups = ts.SectionGroups,
+                        }
+                    );
 
             await context.SaveChangesAsync();
             return await GetTransactionAsync(t.Id);
@@ -393,37 +378,29 @@ namespace Inventory.Transactions.Repositories.Postgres
 
             return await context.Transactions.
                 Where(o => o.Id == id).
-                //todo include 
-                Select(i =>
-                                                        new TransactionDto(
-                                                        i.Id,
-                                                        i.Description,
-                                                        i.Created,
-                                                        i.TemplateId,
-                                                        transactionSections)
-                                                 )
-                                           .SingleAsync();
-
-        }
-
-        public async Task<List<TransactionDto>> GetTransactionsAsync()
-        {
-       
-            return await context.Transactions.
-                Include(o=>o.TransactionSections).
-             
-             
                 Select(i =>
                     new TransactionDto(
                         i.Id,
                         i.Description,
                         i.Created,
-                        i.TemplateId, null)//i.TransactionSections.Select() )
-                )
-                .ToListAsync();
-
+                        i.TemplateId,
+                        transactionSections)
+                ).SingleAsync();
         }
-        
+
+        public async Task<List<TransactionDto>> GetTransactionsAsync()
+        {
+            return await context.Transactions.
+                Include(o => o.TransactionSections).
+                Select(i =>
+                    new TransactionDto(
+                        i.Id,
+                        i.Description,
+                        i.Created,
+                        i.TemplateId, null)
+                ).ToListAsync();
+        }
+
         public async Task<TransactionDto> EditTransactionAsync(TransactionDto inboundTransaction)
         {
             var inStoreTransaction = await context.Transactions.
@@ -450,50 +427,46 @@ namespace Inventory.Transactions.Repositories.Postgres
             return await GetTransactionAsync(inStoreTransaction.Id);
         }
 
-        public async Task  DeleteTransactionAsync(TransactionDto c)
+        public async Task DeleteTransactionAsync(TransactionDto c)
         {
-             throw new NotImplementedException();
-             await Task.CompletedTask;
+            throw new NotImplementedException();
+            await Task.CompletedTask;
         }
-
         #endregion Transaction 
 
         #region TransactionSection 
         public async Task<ICollection<TransactionSectionDto>> GetTransactionSectionsAsync(Guid TransactionId)
         {
             var query = context.TransactionSections.
-                        Where(o=>o.TransactionId == TransactionId).
-                        Include(tsg=> tsg.SectionGroups).
-                        ThenInclude (v=> v.Values).
-                        Select(ts=>  new TransactionSectionDto()
+                        Where(o => o.TransactionId == TransactionId).
+                        Include(tsg => tsg.SectionGroups).
+                        ThenInclude(v => v.Values).
+                        Select(ts => new TransactionSectionDto()
                         {
                             Id = ts.Id,
                             TransactionId = TransactionId,
                             TransactionSectionType = ts.TransactionSectionType,
                             SectionGroups = ts.SectionGroups.
-                                            Select(sg=> new TransactionSectionGroupDto()
-                                                {
-                                                    GroupValue = sg.GroupValue,
-                                                    Id = sg.Id,
-                                                    TransactionSectionId = sg.TransactionSectionId,
-                                                    Values = sg.Values.Select
-                                                    (
-                                                             v => new ValueDto()
-                                                             {
-                                                                 FieldId = v.FieldId,
-                                                                 Id = v.Id
-
-                                                             }
-                                                    ).ToList()
-                                                }).ToList()
-                            //Transaction = null
+                                            Select(sg => new TransactionSectionGroupDto()
+                                            {
+                                                GroupValue = sg.GroupValue,
+                                                Id = sg.Id,
+                                                TransactionSectionId = sg.TransactionSectionId,
+                                                Values = sg.Values.Select
+                                                (
+                                                    v => new ValueDto()
+                                                    {
+                                                        FieldId = v.FieldId,
+                                                        Id = v.Id
+                                                    }
+                                                ).ToList()
+                                            }).ToList()
                         });
 
-           return await query.ToListAsync();
-
+            return await query.ToListAsync();
         }
 
-        private void  AddTransactionSection(Entities.Transaction t, TransactionSectionDto tsdto)
+        private void AddTransactionSection(Entities.Transaction t, TransactionSectionDto tsdto)
         {
             var ts = new TransactionSection()
             {
@@ -520,8 +493,7 @@ namespace Inventory.Transactions.Repositories.Postgres
             t.TransactionSections.Add(ts);
         }
 
-        private void EditTransactionSection(TransactionSectionDto dto, 
-                                            Transaction t )
+        private void EditTransactionSection(TransactionSectionDto dto, Transaction t)
         {
             TransactionSection ts = new TransactionSection()
             {
@@ -537,28 +509,24 @@ namespace Inventory.Transactions.Repositories.Postgres
                 context.Entry(local).State = EntityState.Detached;
             }
 
+            context.Attach(ts);
 
-            context.Attach(ts); //test 
-     
-            
             foreach (var sg in dto.SectionGroups)
                 if (sg.Id == Guid.Empty)
-                   AddTransactionSectionGroup(sg,ts);
+                    AddTransactionSectionGroup(sg, ts);
                 else
-                   EditTransactionSectionGroup(sg,ts);
+                    EditTransactionSectionGroup(sg, ts);
         }
 
-        private void  DeleteTransactionSection(Entities.TransactionSection ts  )
+        private void DeleteTransactionSection(Entities.TransactionSection ts)
         {
             foreach (var sg in ts.SectionGroups)
-               context.Remove(sg);
+                context.Remove(sg);
             context.Remove(ts);
-         }
-
+        }
         #endregion
 
         #region TransactionSectionGroup 
-
         public async Task AddTransactionSectionGroupAsync(TransactionSectionGroupDto dto)
         {
             var tsg = new TransactionSectionGroup()
@@ -576,16 +544,15 @@ namespace Inventory.Transactions.Repositories.Postgres
             {
                 v.TransactionSectionGroupId = tsg.Id;
                 if (v.Id == Guid.Empty)
-                    AddValue(v,tsg);
+                    AddValue(v, tsg);
                 else
-                    EditValue(v,tsg);
+                    EditValue(v, tsg);
             }
 
             await context.SaveChangesAsync();
         }
 
-        private void AddTransactionSectionGroup(TransactionSectionGroupDto dto, 
-            Entities.TransactionSection ts )
+        private void AddTransactionSectionGroup(TransactionSectionGroupDto dto, Entities.TransactionSection ts)
         {
             var tsg = new TransactionSectionGroup()
             {
@@ -595,55 +562,44 @@ namespace Inventory.Transactions.Repositories.Postgres
                 TransactionSection = null
             };
             ts.SectionGroups.Add(tsg);
-                        
+
             foreach (var v in dto.Values)
             {
                 v.Id = Guid.Empty;
                 v.TransactionSectionGroupId = tsg.Id;
                 if (v.Id == Guid.Empty)
-                    AddValue(v,tsg);
+                    AddValue(v, tsg);
                 else
                     EditValue(v, tsg);
             }
         }
 
-        private void EditTransactionSectionGroup(TransactionSectionGroupDto dto, 
-            Entities.TransactionSection ts)
+        private void EditTransactionSectionGroup(TransactionSectionGroupDto dto, Entities.TransactionSection ts)
         {
             var tsg = new TransactionSectionGroup()
             {
                 GroupValue = dto.GroupValue,
                 Id = dto.Id,
                 TransactionSectionId = dto.TransactionSectionId,
-                TransactionSection  = ts 
+                TransactionSection = ts
             };
             context.Update(tsg);
             foreach (var v in dto.Values)
             {
                 v.TransactionSectionGroupId = tsg.Id;
                 if (v.Id == Guid.Empty)
-                    AddValue(v,tsg);
+                    AddValue(v, tsg);
                 else
-                    EditValue(v, tsg    );
+                    EditValue(v, tsg);
             }
         }
-
-
-
-
         #endregion
 
         public async Task<Guid> RoomsPrepareAsync()
         {
             return await AddRoomsLetTemplate();
         }
-        
-        /// <summary>
-        /// Template creation for Let Room app
-        /// with one template
-        /// having two sections individual entity and rooms let 
-        /// </summary>
-        /// <returns></returns>
+
         private async Task<Guid> AddRoomsLetTemplate()
         {
             var t = new Template()
@@ -654,13 +610,10 @@ namespace Inventory.Transactions.Repositories.Postgres
                     {
                         AddRoomsLetSection(),
                         AddRoomsLetIndividualEntitySection()
-                     }
-
+                    }
             };
 
-            context.Add(
-               t
-            );
+            context.Add(t);
 
             await context.SaveChangesAsync();
             return t.Id;
@@ -674,32 +627,31 @@ namespace Inventory.Transactions.Repositories.Postgres
                 Name = "Rooms Individual Entity Template",
                 SectionType = Contracts.SectionType.IndividualEntity,
                 Fields = [
-
-                                new()
-                                {
-                                    Expression = string.Empty,
-                                    Name="ID",
-                                    Type= FieldType.String
-                                },
-                                new()
-                                {
-                                    Expression = string.Empty,
-                                    Name="Name",
-                                    Type= FieldType.String
-                                },
-                                new()
-                                {
-                                  Expression  = string.Empty,
-                                  Name="FullName",
-                                  Type= FieldType.String
-                                },
-                                  new()
-                                {
-                                  Expression  = string.Empty,
-                                  Name="Email",
-                                  Type= FieldType.String
-                                },
-                            ]
+                    new()
+                        {
+                            Expression = string.Empty,
+                            Name = "ID",
+                            Type = FieldType.String
+                        },
+                        new()
+                        {
+                            Expression = string.Empty,
+                            Name = "Name",
+                            Type = FieldType.String
+                        },
+                        new()
+                        {
+                            Expression = string.Empty,
+                            Name = "FullName",
+                            Type = FieldType.String
+                        },
+                        new()
+                        {
+                            Expression = string.Empty,
+                            Name = "Email",
+                            Type = FieldType.String
+                        },
+                    ]
             };
         }
 
@@ -709,25 +661,25 @@ namespace Inventory.Transactions.Repositories.Postgres
             Name = "Rooms Let Section",
             SectionType = Contracts.SectionType.ProductLet,
             Fields = [
-
-                                            new()
-                                            {
-                                                Expression = string.Empty,
-                                                Name="DateFrom",
-                                                Type= FieldType.Date
-                                            },
-                                            new()
-                                            {
-                                                Expression = string.Empty,
-                                                Name="DateTo",
-                                                Type= FieldType.Date
-                                            },
-                                            new()
-                                            { Expression = "DateTo - DateFrom",
-                                              Name="Days",
-                                              Type= FieldType.Date
-                                            },
-                                        ]
+                new()
+                    {
+                        Expression = string.Empty,
+                        Name = "DateFrom",
+                        Type = FieldType.Date
+                    },
+                    new()
+                    {
+                        Expression = string.Empty,
+                        Name = "DateTo",
+                        Type = FieldType.Date
+                    },
+                    new()
+                    {
+                        Expression = "DateTo - DateFrom",
+                        Name = "Days",
+                        Type = FieldType.Date
+                    },
+                ]
         };
     }
 }
